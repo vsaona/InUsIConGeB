@@ -3,7 +3,7 @@ var router = express.Router();
 var fs = require('fs');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/prueba', function(req, res, next) {
   fs.readFile('./data/operon_bphA.gbff','utf8',function(err, contents){
     //console.log(contents)
     array = contents.split(/gene\u0020\u0020+/g);//\u0020 -> caracter espacio
