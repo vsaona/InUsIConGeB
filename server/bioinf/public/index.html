@@ -33,7 +33,7 @@
         <script>
             Array.prototype.last = function(){return this[this.length - 1];};
             Array.prototype.first = function(){return this[0];};
-            var genomaHeight = 200;
+            var genomaHeight = 1;
             var fontSize = 24;
             var activeElement = null;
             var thisIsAVariable = null;
@@ -91,7 +91,7 @@
             function draw(genoma, y, group){
                 var a = d3.select("#canvas");
                 group.selectAll("g").data(genoma.genes).enter().append("g").classed("jscolor", true).each(function(gene, index) {
-                    var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").style("fill", gene.color).classed("flecha", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
+                    var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").classed("flecha", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
                     if(!gene.complement) {
                         arrow.attr("points", gene.start+","+(y - genomaHeight/4)+" "+gene.start+","+(y + genomaHeight/4)+" "+gene.end+","+y);
                     }
@@ -121,6 +121,7 @@
             }
 
             function drawAll(genomas) {
+                console.log(genomas[0]);
                 d3.select("#drawAll").classed("invisible", true);
                 d3.select("#update").classed("invisible", false);
                 var difference = 0;
@@ -151,6 +152,8 @@
                         if(data.genes[j].end > localMaxEnd)
                             localMaxEnd = data.genes[j].end;
                     }
+                    if(genomaHeight == 1)
+                        genomaHeight = localMaxEnd/data.genes.length;
                     draw(data, index * genomaHeight, d3.select(this));
                     d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true);
                     this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", d3.selectAll(".genomaTag"), data);}, false);
