@@ -7,12 +7,14 @@ router.get('/prueba', function(req, res, next) {
   fs.readFile('./data/operon_bphA.gbff','utf8',function(err, contents){
     //console.log(contents)
     array = contents.split(/gene\u0020\u0020+/g);//\u0020 -> caracter espacio
+    array = array.slice(1);
     genomas = []
     for(var i = 0; i < array.length;i++){
       json = {};
-      fields = array[i].match(/.+\n/g);
+      fields = array[i].match(/.+/g);
+      console.log(fields);
       if (fields != null){
-        large = fields[0].match(/\d+/g);
+        large = array[i].match(/\d+/g);
         json["start"] = large[0];
         json["end"] = large[1];
         complement = fields[0].match(/complement/);
@@ -24,15 +26,15 @@ router.get('/prueba', function(req, res, next) {
         name = fields[1].match(/\/gene=.+/g);
         console.log(name);
         if(name != null) {
-          json["name"] = name[0].match(/[^(\/gene=")].+[^"]/g);
+          json["name"] = name[0].match(/[^(\/gene=")].+[^"]/g)[0];
         } else {
           json["name"] = "no";
         }
         genomas.push(json);
       }
     }
-    console.log(genomas)
-    res.json({genomas})
+    console.log(genomas);
+    res.json({genomas});
   });
 });
 

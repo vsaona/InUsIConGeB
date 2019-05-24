@@ -121,10 +121,11 @@
             }
 
             function drawAll(genomas) {
-                console.log(genomas[0]);
+                console.log("al inicio");
+                console.log(genomas);
                 d3.select("#drawAll").classed("invisible", true);
                 d3.select("#update").classed("invisible", false);
-                var difference = 0;
+                var difference = -1;
                 var minStart = 0;
                 var maxEnd = 0;
                 d3.select("#canvas").selectAll("g").data(genomas).enter().append("g").each(function(data, index) {
@@ -137,30 +138,38 @@
                                 reverseAll = true;
                         }
                     }
+                    if(difference = -1)
+                        data.genes[0].interest = true;
+                        difference = data.genes[0].start;
+                        if(data.genes[0].complement)
+                            reverseAll = true;
                     for(var j = 0; j < data.genes.length; j++) {
                         data.genes[j].start -= difference;
                         data.genes[j].end   -= difference;
                         if(reverseAll) {
-                            data.genes[j].start = -data.genes[j].start;
-                            data.genes[j].end = -data.genes[j].end;
+                            temp = -data.genes[j].start;
+                            data.genes[j].start = -data.genes[j].end;
+                            data.genes[j].end = temp;
                             data.genes[j].complement = !data.genes[j].complement;
                         }
                         if(data.genes[j].start < minStart)
                             minStart = data.genes[j].start;
-                        if(data.genes[j].end + data.name.length*fontSize/2 > maxEnd)
-                            maxEnd   = data.genes[j].end + data.name.length*fontSize/2;
+                        if(data.genes[j].end > maxEnd)
+                            maxEnd   = data.genes[j].end;
                         if(data.genes[j].end > localMaxEnd)
                             localMaxEnd = data.genes[j].end;
                     }
+                    console.log(reverseAll);
                     if(genomaHeight == 1)
-                        genomaHeight = localMaxEnd/data.genes.length;
+                        genomaHeight = (localMaxEnd- minStart)/data.genes.length;
+                    fontSize = genomaHeight/6;
                     draw(data, index * genomaHeight, d3.select(this));
                     d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true);
+                    console.log(genomaHeight);
                     this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", d3.selectAll(".genomaTag"), data);}, false);
-                    console.log(this.getElementsByTagName("text"));
                 });
                 var begin = minStart - 10;
-                var width = maxEnd + 10 - begin;
+                var width = maxEnd + 10 - begin  + 15*fontSize;
                 document.getElementById("canvas").setAttribute("viewBox", ""+begin+" "+(-(genomaHeight/2))+" "+width+" "+(genomaHeight*genomas.length));
                 return(true);
             }
