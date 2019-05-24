@@ -6,10 +6,14 @@
         <script src="jscolor.js"></script>
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-        <title>Flechas</title>
+        <title>Genomic context diagram editor</title>
         <style>
-            .flecha {
-                fill: aquamarine;
+            @keyframes appear {
+                0% {opacity: 0;}
+                100% {opacity: 100;}
+            }
+            .arrow {
+                fill: #D7D7D7;
                 stroke: black;
                 stroke-width:5;
                 border-radius: 50%;
@@ -29,6 +33,9 @@
             .invisible {
                 display: none
             }
+            .toolBar {
+                animation: appear 1s;
+            }
         </style>
         <script>
             Array.prototype.last = function(){return this[this.length - 1];};
@@ -36,7 +43,6 @@
             var genomaHeight = 1;
             var fontSize = 24;
             var activeElement = null;
-            var thisIsAVariable = null;
             
             $.get( "read/prueba", function( data ) {
                 console.log(data);
@@ -66,7 +72,6 @@
                           {start: 3550, end: 3340, name: "A3", color: "#0000FF", complement: false, interest: false}]};
         */
             function activate(type, element, data) {
-                console.log("activating!");
                 d3.select("#arrowToolBar").classed("invisible", true);
                 d3.select("#arrowTextToolBar").classed("invisible", true);
                 d3.select("#globalToolBar").classed("invisible", true);
@@ -77,29 +82,39 @@
                     d3.select(arrowColor).style("background-color", arrowColor.value);
                 } else if (type == "arrowText") {
                     d3.select("#arrowTextToolBar").classed("invisible", false);
-                    d3.select("#arrowTextToolBar").select("#geneName").text(element.value);
-                    thisIsAVariable = element;
+                    d3.select("#arrowTextToolBar").select("#geneName").attr("value", data.name);
+                    d3.select("#geneFontSize").attr("value", $(element).css("font-size").slice(0,-2));
                 } else if (type == "global") {
                     d3.select("#globalToolBar").classed("invisible", false);
+                    d3.select("#globalToolBar").select("#genomaName").attr("value", data.name);
                 } else {
                     console.log("You should implement this thing!");
                 }
-                console.log("active!");
                 activeElement = element;
             }
 
             function draw(genoma, y, group){
                 var a = d3.select("#canvas");
                 group.selectAll("g").data(genoma.genes).enter().append("g").classed("jscolor", true).each(function(gene, index) {
-                    var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").classed("flecha", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
+                    var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").classed("arrow", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
                     if(!gene.complement) {
                         arrow.attr("points", gene.start+","+(y - genomaHeight/4)+" "+gene.start+","+(y + genomaHeight/4)+" "+gene.end+","+y);
                     }
                     else {
                         arrow.attr("points", gene.end+","+(y - genomaHeight/4)+" "+gene.end+","+(y + genomaHeight/4)+" "+gene.start+","+y);
                     }
+                    if(gene.color) {
+                        arrow.style("fill", gene.color);
+                    } else {
+                        gene.color = "#D7D7D7";
+                    }
+                    if(gene.identity) {
+                        arrow.style("fill-opacity", gene.identity);
+                    } else {
+                        gene.identity = 1;
+                    }
                     this.getElementsByTagName("polygon")[0].addEventListener("click", function(){activate("arrow", this, gene);}, false);
-                    d3.select(this).append("text").attr("x", (gene.start + gene.end) / 2).attr("y", (y - genomaHeight/4)).text(gene.name).classed("geneTag", true);
+                    d3.select(this).append("text").attr("x", (gene.start + gene.end) / 2 - gene.name.length*fontSize/2).attr("y", (y - genomaHeight/4)).text(gene.name).classed("geneTag", true);
                     d3.selectAll(".geneTag").style("font-size", fontSize+"px");
                     this.getElementsByTagName("text")[0].addEventListener("click", function(){activate("arrowText", this, gene);}, false);
                 });
@@ -108,6 +123,14 @@
 
             function updateColor(input) {
                 d3.select(activeElement).style('fill', input.value);
+                d3.select(activeElement).data()[0].color = input.value;
+            }
+            function updateStrokeWidth(input) {
+                d3.selectAll(".arrow").style("stroke-width", input.value);
+            }
+            function updateIdentity(input) {
+                d3.select(activeElement).style("fill-opacity", input.value / 100);
+                d3.select(activeElement).data()[0].identity = input.value / 100;
             }
             function updateGeneFontSize(input) {
                 d3.selectAll(".geneTag").style('font-size', input.value+"px");
@@ -121,10 +144,6 @@
             }
 
             function drawAll(genomas) {
-                console.log("al inicio");
-                console.log(genomas);
-                d3.select("#drawAll").classed("invisible", true);
-                d3.select("#update").classed("invisible", false);
                 var difference = -1;
                 var minStart = 0;
                 var maxEnd = 0;
@@ -159,13 +178,11 @@
                         if(data.genes[j].end > localMaxEnd)
                             localMaxEnd = data.genes[j].end;
                     }
-                    console.log(reverseAll);
                     if(genomaHeight == 1)
                         genomaHeight = (localMaxEnd- minStart)/data.genes.length;
-                    fontSize = genomaHeight/6;
+                    fontSize = Math.round(genomaHeight/6);
                     draw(data, index * genomaHeight, d3.select(this));
                     d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true);
-                    console.log(genomaHeight);
                     this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", d3.selectAll(".genomaTag"), data);}, false);
                 });
                 var begin = minStart - 10;
@@ -176,23 +193,23 @@
         </script>
     </head>
     <body>
-        <button id = "drawAll"> Generate all genomas </button>
-        <button onClick="update()" id = "update"> Update drawing </button>
         <div class = "container">
             <svg viewbox = "0 0 3000 20" class="canvas" id="canvas">
                 Sorry, looks like your web broser doesn't support this technology. We suggest using Mozilla Firefox
             </svg>
         </div>
-        <div id = "arrowToolBar" class = "invisible">
+        <div id = "arrowToolBar" class = "invisible toolBar">
             Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">
+            Stroke width: <input value = "5" type = "number" onchange = "updateStrokeWidth(this)">
+            Identity percentage: <input value = "100" type = "number" onchange = "updateIdentity(this)">
         </div>
-        <div id = "arrowTextToolBar" class = "invisible">
-            Font size: <input value = "24" type = "number" onchange = "updateGeneFontSize(this)">
+        <div id = "arrowTextToolBar" class = "invisible toolBar">
+            Font size: <input id = "geneFontSize" value = "24" type = "number" onchange = "updateGeneFontSize(this)">
             Gene name: <input id = "geneName" value = "" onchange = "updateName(this)">
         </div>
-        <div id = "globalToolBar" class = "invisible">
+        <div id = "globalToolBar" class = "invisible toolBar">
             Font size: <input value = "24" type = "number" onchange = "updateGenomaFontSize(this)">
-            Genoma name: <input value = "" onchange = "updateName(this)">
+            Genoma name: <input id = "genomaName" value = "" onchange = "updateName(this)">
         </div>
     </body>
 </html>
