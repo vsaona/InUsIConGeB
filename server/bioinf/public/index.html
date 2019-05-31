@@ -43,6 +43,7 @@
             var genomaHeight = 1;
             var fontSize = 24;
             var activeElement = null;
+            var arrowStyle = "clearlyNotATriangle";
             
             $.get( "read/prueba", function( data ) {
                 console.log(data);
@@ -97,11 +98,18 @@
                 var a = d3.select("#canvas");
                 group.selectAll("g").data(genoma.genes).enter().append("g").classed("jscolor", true).each(function(gene, index) {
                     var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").classed("arrow", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
-                    if(!gene.complement) {
-                        arrow.attr("points", gene.start+","+(y - genomaHeight/4)+" "+gene.start+","+(y + genomaHeight/4)+" "+gene.end+","+y);
+                    if(gene.complement) {
+                        start = gene.end;
+                        end = gene.start;
+                    } else {
+                        start = gene.start;
+                        end = gene.end;
                     }
-                    else {
-                        arrow.attr("points", gene.end+","+(y - genomaHeight/4)+" "+gene.end+","+(y + genomaHeight/4)+" "+gene.start+","+y);
+                    if (arrowStyle == "triangle") {
+                        arrow.attr("points", start+","+(y - genomaHeight/4)+" "+start+","+(y + genomaHeight/4)+" "+end+","+y);
+                    } else {
+                        middle = (start + end * 3) / 4
+                        arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
                     }
                     if(gene.color) {
                         arrow.style("fill", gene.color);
@@ -183,7 +191,7 @@
                     fontSize = Math.round(genomaHeight/6);
                     draw(data, index * genomaHeight, d3.select(this));
                     d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true);
-                    this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", d3.selectAll(".genomaTag"), data);}, false);
+                    this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", this, data);}, false);
                 });
                 var begin = minStart - 10;
                 var width = maxEnd + 10 - begin  + 15*fontSize;
