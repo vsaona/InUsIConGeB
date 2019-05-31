@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no">
+        <meta charset="UTF-8">  
+        <script src="../jscolor.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <title>Genomic context diagram editor</title>
+        <style>
+            @keyframes appear {
+                0% {opacity: 0;}
+                100% {opacity: 100;}
+            }
+            .arrow {
+                fill: #D7D7D7;
+                stroke: black;
+                stroke-width:5;
+                border-radius: 50%;
+            }
+            .canvas {
+                flex: 1 1 auto;
+
+            }
+            .container {
+                display: flex;
+            }
+            #toolBar {
+                background: black;
+                color: white;
+                padding: 20px;
+            }
+            .invisible {
+                display: none
+            }
+            .toolBar {
+                animation: appear 1s;
+            }
+        </style>
+        <script>
+            Array.prototype.last = function(){return this[this.length - 1];};
+            Array.prototype.first = function(){return this[0];};
+            var genomaHeight = 1;
+            var fontSize = 24;
+            var activeElement = null;
+            var arrowStyle = "clearlyNotATriangle";
+            
+            $.get( "prueba", function( data ) {
+                console.log(data);
+                drawAll([{name: "prueba", genes: data.genomas}])
+            });
+
+            /*getJSONP('/read/prueba', function(data){
+                console.log(data);
+                drawAll([{name: "prueba", genes: data.genomas}])
+                
+            });*/ 
+
+            /*g1 = {name: "pseudococco",
+                  genes: [{start: 5790, end: 6020, name: "A1", color: "#FF0000", complement: false, interest: true},
+                          {start: 6440, end: 6650, name: "A2", color: "#00FF00", complement: false, interest: false},
+                          {start: 7230, end: 7530, name: "A3", color: "#0000FF", complement: true, interest: false}]};
+
+            g2 = {name: "pseudomonas furukawaii KF707",
+                  genes: [{start: 2790, end: 3120, name: "A1", color: "#FF0000", complement: false, interest: true},
+                          {start: 3340, end: 3550, name: "A2", color: "#00FF00", complement: false, interest: false},
+                          {start: 3930, end: 4230, name: "A3", color: "#0000FF", complement: true, interest: false},
+                          {start: 4500, end: 4600, name: "A4", color: "#FF00FF", complement: true, interest: false}]};
+            g3 = {name: "pseudomonas inverted",
+                  genes: [{start: 4900, end: 4850, name: "A4", color: "#FF00FF", complement: false, interest: false},
+                          {start: 4600, end: 4500, name: "A1", color: "#FF0000", complement: true, interest: true},
+                          {start: 4230, end: 3930, name: "A2", color: "#00FF00", complement: true, interest: false},
+                          {start: 3550, end: 3340, name: "A3", color: "#0000FF", complement: false, interest: false}]};
+        */
+            function activate(type, element, data) {
+                d3.select("#arrowToolBar").classed("invisible", true);
+                d3.select("#arrowTextToolBar").classed("invisible", true);
+                d3.select("#globalToolBar").classed("invisible", true);
+                if(type == "arrow") {
+                    d3.select("#arrowToolBar").classed("invisible", false);
+                    var arrowColor = document.getElementById("arrowColor");
+                    arrowColor.value = data.color;
+                    d3.select(arrowColor).style("background-color", arrowColor.value);
+                } else if (type == "arrowText") {
+                    d3.select("#arrowTextToolBar").classed("invisible", false);
+                    d3.select("#arrowTextToolBar").select("#geneName").attr("value", data.name);
+                    d3.select("#geneFontSize").attr("value", $(element).css("font-size").slice(0,-2));
+                } else if (type == "global") {
+                    d3.select("#globalToolBar").classed("invisible", false);
+                    d3.select("#globalToolBar").select("#genomaName").attr("value", data.name);
+                } else {
+                    console.log("You should implement this thing!");
+                }
+                activeElement = element;
+            }
+
+            function draw(genoma, y, group){
+                var a = d3.select("#canvas");
+                group.selectAll("g").data(genoma.genes).enter().append("g").classed("jscolor", true).each(function(gene, index) {
+                    var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").classed("arrow", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
+                    if(gene.complement) {
+                        start = gene.end;
+                        end = gene.start;
+                    } else {
+                        start = gene.start;
+                        end = gene.end;
+                    }
+                    if (arrowStyle == "triangle") {
+                        arrow.attr("points", start+","+(y - genomaHeight/4)+" "+start+","+(y + genomaHeight/4)+" "+end+","+y);
+                    } else {
+                        middle = (start + end * 3) / 4
+                        arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
+                    }
+                    if(gene.color) {
+                        arrow.style("fill", gene.color);
+                    } else {
+                        gene.color = "#D7D7D7";
+                    }
+                    if(gene.identity) {
+                        arrow.style("fill-opacity", gene.identity);
+                    } else {
+                        gene.identity = 1;
+                    }
+                    this.getElementsByTagName("polygon")[0].addEventListener("click", function(){activate("arrow", this, gene);}, false);
+                    d3.select(this).append("text").attr("x", (gene.start + gene.end) / 2 - gene.name.length*fontSize/2).attr("y", (y - genomaHeight/4)).text(gene.name).classed("geneTag", true);
+                    d3.selectAll(".geneTag").style("font-size", fontSize+"px");
+                    this.getElementsByTagName("text")[0].addEventListener("click", function(){activate("arrowText", this, gene);}, false);
+                });
+                return(true);
+            }
+
+            function updateColor(input) {
+                d3.select(activeElement).style('fill', input.value);
+                d3.select(activeElement).data()[0].color = input.value;
+            }
+            function updateStrokeWidth(input) {
+                d3.selectAll(".arrow").style("stroke-width", input.value);
+            }
+            function updateIdentity(input) {
+                d3.select(activeElement).style("fill-opacity", input.value / 100);
+                d3.select(activeElement).data()[0].identity = input.value / 100;
+            }
+            function updateGeneFontSize(input) {
+                d3.selectAll(".geneTag").style('font-size', input.value+"px");
+            }
+            function updateGenomaFontSize(input) {
+                d3.selectAll(".genomaTag").style('font-size', input.value+"px");
+            }
+
+            function updateName(input) {
+                d3.select(activeElement).text(input.value);
+            }
+
+            function drawAll(genomas) {
+                var difference = -1;
+                var minStart = 0;
+                var maxEnd = 0;
+                d3.select("#canvas").selectAll("g").data(genomas).enter().append("g").each(function(data, index) {
+                    var localMaxEnd = 0;
+                    var reverseAll = false;
+                    for(var j = 0; j < data.genes.length; j++) {
+                        if(data.genes[j].interest) {
+                            difference = data.genes[j].start;
+                            if(data.genes[j].complement)
+                                reverseAll = true;
+                        }
+                    }
+                    if(difference = -1)
+                        data.genes[0].interest = true;
+                        difference = data.genes[0].start;
+                        if(data.genes[0].complement)
+                            reverseAll = true;
+                    for(var j = 0; j < data.genes.length; j++) {
+                        data.genes[j].start -= difference;
+                        data.genes[j].end   -= difference;
+                        if(reverseAll) {
+                            temp = -data.genes[j].start;
+                            data.genes[j].start = -data.genes[j].end;
+                            data.genes[j].end = temp;
+                            data.genes[j].complement = !data.genes[j].complement;
+                        }
+                        if(data.genes[j].start < minStart)
+                            minStart = data.genes[j].start;
+                        if(data.genes[j].end > maxEnd)
+                            maxEnd   = data.genes[j].end;
+                        if(data.genes[j].end > localMaxEnd)
+                            localMaxEnd = data.genes[j].end;
+                    }
+                    if(genomaHeight == 1)
+                        genomaHeight = (localMaxEnd- minStart)/data.genes.length;
+                    fontSize = Math.round(genomaHeight/6);
+                    draw(data, index * genomaHeight, d3.select(this));
+                    d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true);
+                    this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", this, data);}, false);
+                });
+                var begin = minStart - 10;
+                var width = maxEnd + 10 - begin  + 15*fontSize;
+                document.getElementById("canvas").setAttribute("viewBox", ""+begin+" "+(-(genomaHeight/2))+" "+width+" "+(genomaHeight*genomas.length));
+                return(true);
+            }
+        </script>
+    </head>
+    <body>  
+        <div class = "container">
+            <svg viewbox = "0 0 3000 20" class="canvas" id="canvas">
+                Sorry, looks like your web browser doesn't support this technology. We suggest using Mozilla Firefox
+            </svg>
+        </div>
+        <div id = "arrowToolBar" class = "invisible toolBar">
+            Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">
+            Stroke width: <input value = "5" type = "number" onchange = "updateStrokeWidth(this)">
+            Identity percentage: <input value = "100" type = "number" onchange = "updateIdentity(this)">
+        </div>
+        <div id = "arrowTextToolBar" class = "invisible toolBar">
+            Font size: <input id = "geneFontSize" value = "24" type = "number" onchange = "updateGeneFontSize(this)">
+            Gene name: <input id = "geneName" value = "" onchange = "updateName(this)">
+        </div>
+        <div id = "globalToolBar" class = "invisible toolBar">
+            Font size: <input value = "24" type = "number" onchange = "updateGenomaFontSize(this)">
+            Genoma name: <input id = "genomaName" value = "" onchange = "updateName(this)">
+        </div>
+    </body>
+</html>
