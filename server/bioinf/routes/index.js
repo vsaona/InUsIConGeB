@@ -4,12 +4,21 @@ var fs = require('fs');
 var formidable = require('formidable');
 
 /* GET home page. */
-router.get('/prueba?', function(req, res, next) {
-  fileName = req.query.filePath.split("/")[req.query.filePath.split("/").length - 1]
-  fs.readFile(req.query.filePath,'utf8',function(err, contents){
+router.post('/prueba', function(req, res, next) {
+  console.log(req.body["filePath[]"]);                      // No tengo idea de por que se tiene que poner los corchetes vacios. Atte, Vicente
+  if(!(Array.isArray(req.body["filePath[]"]))) {
+    filePath = [req.body["filePath[]"]];
+  } else {
+    filePath = req.body["filePath[]"];
+  }
+  console.log(filePath);
+  genomas = [];
+  for(j = 0; j < filePath.length; j++) {
+    fileName = filePath[j].split("/")[filePath[j].split("/").length - 1]
+    contents = fs.readFileSync(filePath[j],'utf8');
     array = contents.split(/gene\u0020\u0020+/g);//\u0020 -> caracter espacio
     array = array.slice(1);
-    genomas = []
+    genes = []
     for(var i = 0; i < array.length;i++){
       json = {};
       fields = array[i].match(/.+/g);
@@ -24,19 +33,17 @@ router.get('/prueba?', function(req, res, next) {
           json["complement"] = true;
         }
         name = fields[1].match(/\/gene=.+/g);
-        console.log("NAMAE");
-        console.log(name);
         if(name != null) {
-          console.log(name[0]);
           json["name"] = name[0].match(/[^(")]\w+?(?=")/g)[0];
         } else {
           json["name"] = "no";
         }
-        genomas.push(json);
+        genes.push(json);
       }
     }
-    res.json({genomas: genomas, name: fileName});
-  });
+    genomas.push({genes:genes, name: fileName});
+  }
+  res.json({genomas: genomas});
 });
 
 router.post('/fileupload', function(req, res, next) {
@@ -45,25 +52,25 @@ router.post('/fileupload', function(req, res, next) {
   form.uploadDir = "./data"
   form.parse(req, function (err, fields, files){
     if(err) throw err;
-    var oldpath = files.filetoupload.path;
-    var newpath = './data/' + files.filetoupload.name;
-    fs.rename(oldpath, newpath, function (err) {
-      if (err) throw err;
-      res.writeHead(200,{'Content-Type':'text/html'})
-      fs.readFile('./public/render.html', null, function(error,data){
-        if(error){
-          res.writeHead(404);
-          res.write('File not found!');
-        } else {
-          res.write("<script> ");
-          res.write("var filePath = '" + newpath + "'");
-          res.write(" </script>");
-          res.write(data);
-        }
+    res.writeHead(200,{'Content-Type':'text/html'});
+    res.write("<script> ");
+    res.write("var filePath = [");
+    for(j = 0; files["file" + j]; j++) {
+      var oldpath = files["file" + j].path;
+      var newpath = './data/' + files["file" + j].name;
+      fs.renameSync(oldpath, newpath);
+      res.write((j?", '":"'")+ newpath + "'");    // Esto escribe la coma al principio si j != 0
+    }
+    fs.readFile('./public/render.html', null, function(error,data){
+      if(error){
+        res.writeHead(404);
+        res.write('File not found!');
+      } else {
+        res.write(" ]; </script>");
+        res.write(data);
         res.end();
-      });
+      }
     });
   });
 });
-
 module.exports = router;

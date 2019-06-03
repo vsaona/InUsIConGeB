@@ -45,9 +45,8 @@
             var activeElement = null;
             var arrowStyle = "clearlyNotATriangle";
             
-            $.get( "prueba", {filePath: filePath}, function( data ) {
-                console.log(data);
-                drawAll([{name: data.name?data.name:"prueba", genes: data.genomas}])
+            $.post( "prueba", {filePath: filePath}, function( data ) {
+                drawAll(data.genomas);
             });
 
             /*getJSONP('/read/prueba', function(data){
@@ -152,6 +151,7 @@
             }
 
             function drawAll(genomas) {
+                console.log(genomas);
                 var difference = -1;
                 var minStart = 0;
                 var maxEnd = 0;
