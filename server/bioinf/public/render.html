@@ -45,9 +45,9 @@
             var activeElement = null;
             var arrowStyle = "clearlyNotATriangle";
             
-            $.get( "prueba", function( data ) {
+            $.get( "prueba", {filePath: filePath}, function( data ) {
                 console.log(data);
-                drawAll([{name: "prueba", genes: data.genomas}])
+                drawAll([{name: data.name?data.name:"prueba", genes: data.genomas}])
             });
 
             /*getJSONP('/read/prueba', function(data){
