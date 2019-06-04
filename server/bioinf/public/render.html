@@ -7,6 +7,7 @@
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
         <title>Genomic context diagram editor</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
         <style>
             @keyframes appear {
                 0% {opacity: 0;}
@@ -24,6 +25,7 @@
             }
             .container {
                 display: flex;
+                max-width: none;
             }
             #toolBar {
                 background: black;
@@ -35,18 +37,33 @@
             }
             .toolBar {
                 animation: appear 1s;
+                padding: 10px;
+            }
+            text {
+                cursor: grab;
+            }
+            text:active {
+                cursor: grabbing;
             }
         </style>
         <script>
+            // I think I'm using too much global variables :(
             Array.prototype.last = function(){return this[this.length - 1];};
             Array.prototype.first = function(){return this[0];};
             var genomaHeight = 1;
             var fontSize = 24;
             var activeElement = null;
             var arrowStyle = "clearlyNotATriangle";
+            var difference = -1;
+            var minStart = 0;
+            var maxEnd = 0;
+            var genomas;
+            var viewBox = [];
+            var genomaElement = null;
             
             $.post( "prueba", {filePath: filePath}, function( data ) {
-                drawAll(data.genomas);
+                genomas = data.genomas;
+                drawAll(genomas);
             });
 
             /*getJSONP('/read/prueba', function(data){
@@ -94,12 +111,6 @@
             }
 
             function draw(genoma, y, group){
-                console.log("genoma");
-                console.log(genoma);
-                console.log("y");
-                console.log(y);
-                console.log("group");
-                console.log(group);
                 group.selectAll("g").data(genoma.genes).enter().append("g").classed("jscolor", true).each(function(gene, index) {
                     var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").classed("arrow", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
                     if(gene.complement) {
@@ -128,7 +139,20 @@
                     this.getElementsByTagName("polygon")[0].addEventListener("click", function(){activate("arrow", this, gene);}, false);
                     d3.select(this).append("text").attr("x", (gene.start + gene.end) / 2 - gene.name.length*fontSize/2).attr("y", (y - genomaHeight/4)).text(gene.name).classed("geneTag", true);
                     d3.selectAll(".geneTag").style("font-size", fontSize+"px");
-                    this.getElementsByTagName("text")[0].addEventListener("click", function(){activate("arrowText", this, gene);}, false);
+                    text = this.getElementsByTagName("text")[0];
+                    text.addEventListener("click", function(){activate("arrowText", this, gene);}, false);
+                    // Now we make the text to be draggable
+                    var dragHandler = d3.drag().on("start", function () {
+                        var current = d3.select(this);
+                        deltaX = current.attr("x") - d3.event.x;
+                        deltaY = current.attr("y") - d3.event.y;
+                    })
+                    .on("drag", function () {
+                        d3.select(this)
+                            .attr("x", d3.event.x + deltaX)
+                            .attr("y", d3.event.y + deltaY);
+                    });
+                    dragHandler(d3.select(text));
                 });
                 return(true);
             }
@@ -150,31 +174,112 @@
             function updateGenomaFontSize(input) {
                 d3.selectAll(".genomaTag").style('font-size', input.value+"px");
             }
-
             function updateName(input) {
                 d3.select(activeElement).text(input.value);
             }
+            function updateArrowStyle(input) {
+                arrowStyle = input.value;
+                d3.selectAll("#canvas > g").each(function(genoma, y) {
+                    y = y * genomaHeight;
+                    d3.select(this).selectAll("g").each(function(gene, index) {
+                        var arrow = d3.select(this).select("polygon");
+                        if(gene.complement) {
+                            start = gene.end;
+                            end = gene.start;
+                        } else {
+                            start = gene.start;
+                            end = gene.end;
+                        }
+                        if (arrowStyle == "triangle") {
+                            arrow.attr("points", start+","+(y - genomaHeight/4)+" "+start+","+(y + genomaHeight/4)+" "+end+","+y);
+                        } else {
+                            middle = (start + end * 3) / 4
+                            arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
+                        }
+                    });
+                    return(true);
+                });
+            }
+
+            function setInterestGene() {
+                interestGene = d3.select(activeElement).data()[0];
+                var genoma = null;
+                var index;
+                for(i = 0; i < genomas.length; i++) {
+                    for(j = 0; j < genomas[i].genes.length; j++) {
+                        if(genomas[i].genes[j] == interestGene){
+                            genoma = genomas[i];
+                            index = i
+                            break;
+                        }
+                    }
+                }
+                // Now we recover the actual DOM element
+                d3.select("#canvas").selectAll("g").each( function(data, index) {
+                    if(!data) return(0);
+                    if(data.start) return(0);
+                    if(data == genoma)
+                        genomaElement = this;
+                });
+                for(j = 0; j < genoma.genes.length; j++) {
+                    genoma.genes[j].interest = false;
+                }
+                d3.select(activeElement).data()[0].interest = true;
+                // redraw();
+
+                var reverseAll = d3.select(activeElement).data()[0].complement;
+                var localMaxEnd = 0;
+                var difference = d3.select(activeElement).data()[0].start;
+
+                for(var j = 0; j < genoma.genes.length; j++) {
+                    genoma.genes[j].start -= difference;
+                    genoma.genes[j].end   -= difference;
+                    if(reverseAll) {
+                        temp = -genoma.genes[j].start;
+                        genoma.genes[j].start = -genoma.genes[j].end;
+                        genoma.genes[j].end = temp;
+                        genoma.genes[j].complement = !genoma.genes[j].complement;
+                    }
+                    if(genoma.genes[j].start < minStart)
+                        minStart = genoma.genes[j].start;
+                    if(genoma.genes[j].end > maxEnd)
+                        maxEnd   = genoma.genes[j].end;
+                    if(genoma.genes[j].end > localMaxEnd)
+                        localMaxEnd = genoma.genes[j].end;
+                }
+                // Resetting viewbox
+                var begin = minStart - 10;
+                var width = maxEnd + 10 - begin  + 15*fontSize;
+                viewBox = [begin, viewBox[1], width, viewBox[3]];
+                document.getElementById("canvas").setAttribute("viewBox", ""+viewBox[0]+" "+viewBox[1]+" "+viewBox[2]+" "+viewBox[3]);
+                // We move the genoma tag
+                d3.select(genomaElement).select(".genomaTag").attr("x", localMaxEnd + 20);
+                // Now I should... em... redraw the genoma
+                redraw(genoma, genomaElement, i*genomaHeight);
+                console.log("alo?");
+            }
+
+            function redraw(genoma, el, y) {
+                return(0);
+            }
 
             function drawAll(genomas) {
-                console.log(genomas);
-                var difference = -1;
-                var minStart = 0;
-                var maxEnd = 0;
                 d3.select("#canvas").selectAll("g").data(genomas).enter().append("g").each(function(data, index) {
+                    difference = -1;
                     var localMaxEnd = 0;
                     var reverseAll = false;
                     for(var j = 0; j < data.genes.length; j++) {
                         if(data.genes[j].interest) {
                             difference = data.genes[j].start;
-                            if(data.genes[j].complement)
-                                reverseAll = true;
+                            reverseAll = data.genes[j].complement;
                         }
                     }
-                    if(difference = -1)
+                    if(difference = -1) {
                         data.genes[0].interest = true;
                         difference = data.genes[0].start;
                         if(data.genes[0].complement)
                             reverseAll = true;
+                    }
                     for(var j = 0; j < data.genes.length; j++) {
                         data.genes[j].start -= difference;
                         data.genes[j].end   -= difference;
@@ -199,13 +304,14 @@
                     this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", this, data);}, false);
                 });
                 // We build the scale indicator arrow
-                scaleGroup = d3.select("#canvas").selectAll("g").append("g");
+                scaleGroup = d3.select("#canvas").append("g");
                 scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)"}], name: " "}
                 draw(scaleData, genomas.length * genomaHeight, scaleGroup);
                 // Setting viewbox
                 var begin = minStart - 10;
                 var width = maxEnd + 10 - begin  + 15*fontSize;
-                document.getElementById("canvas").setAttribute("viewBox", ""+begin+" "+(-(genomaHeight/2))+" "+width+" "+(genomaHeight*(genomas.length + 1)));
+                viewBox = [begin, (-(genomaHeight/2)), width, (genomaHeight*(genomas.length + 1))];
+                document.getElementById("canvas").setAttribute("viewBox", ""+viewBox[0]+" "+viewBox[1]+" "+viewBox[2]+" "+viewBox[3]);
                 return(true);
             }
         </script>
@@ -216,11 +322,16 @@
                 Sorry, looks like your web browser doesn't support this technology. We suggest using Mozilla Firefox
             </svg>
         </div>
-        <a class="download" href="javascript:(function () { var e = document.createElement('script'); e.setAttribute('src', '../svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e); })();"><big>⇩</big> Download</a>
+        <a class="download btn btn-primary" href="javascript:(function () { var e = document.createElement('script'); e.setAttribute('src', '../svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e); })();"><big>⇩</big> Download</a>
         <div id = "arrowToolBar" class = "invisible toolBar">
             Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">
             Stroke width: <input value = "5" type = "number" onchange = "updateStrokeWidth(this)">
             Identity percentage: <input value = "100" type = "number" onchange = "updateIdentity(this)">
+            Arrow style: <select id = "#arrowStyleSelector" onchange = "updateArrowStyle(this)">
+                             <option value = "arrow"> Arrows </option>
+                             <option value = "triangle"> Triangles </option>
+                         </select>
+            <!-- <button onclick = "setInterestGene()"> Este es el gen de interés </button> -->
         </div>
         <div id = "arrowTextToolBar" class = "invisible toolBar">
             Font size: <input id = "geneFontSize" value = "24" type = "number" onchange = "updateGeneFontSize(this)">
