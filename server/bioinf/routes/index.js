@@ -5,9 +5,8 @@ var formidable = require('formidable');
 
 /* GET home page. */
 router.post('/prueba', function(req, res, next) {
-  console.log(req.body["filePath[]"]);                      // No tengo idea de por que se tiene que poner los corchetes vacios. Atte, Vicente
-  if(!(Array.isArray(req.body["filePath[]"]))) {
-    filePath = [req.body["filePath[]"]];
+  if(!(Array.isArray(req.body["filePath[]"]))) {  // Este if era para probar cuando aun se enviaba un string. Puedes borrarlo si lo estimas conveniente.
+    filePath = [req.body["filePath[]"]];          // No tengo idea de por que se tiene que poner los corchetes vacios. Atte, Vicente
   } else {
     filePath = req.body["filePath[]"];
   }

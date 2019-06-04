@@ -94,7 +94,12 @@
             }
 
             function draw(genoma, y, group){
-                var a = d3.select("#canvas");
+                console.log("genoma");
+                console.log(genoma);
+                console.log("y");
+                console.log(y);
+                console.log("group");
+                console.log(group);
                 group.selectAll("g").data(genoma.genes).enter().append("g").classed("jscolor", true).each(function(gene, index) {
                     var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").classed("arrow", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
                     if(gene.complement) {
@@ -193,9 +198,14 @@
                     d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true);
                     this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", this, data);}, false);
                 });
+                // We build the scale indicator arrow
+                scaleGroup = d3.select("#canvas").selectAll("g").append("g");
+                scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)"}], name: " "}
+                draw(scaleData, genomas.length * genomaHeight, scaleGroup);
+                // Setting viewbox
                 var begin = minStart - 10;
                 var width = maxEnd + 10 - begin  + 15*fontSize;
-                document.getElementById("canvas").setAttribute("viewBox", ""+begin+" "+(-(genomaHeight/2))+" "+width+" "+(genomaHeight*genomas.length));
+                document.getElementById("canvas").setAttribute("viewBox", ""+begin+" "+(-(genomaHeight/2))+" "+width+" "+(genomaHeight*(genomas.length + 1)));
                 return(true);
             }
         </script>
@@ -206,6 +216,7 @@
                 Sorry, looks like your web browser doesn't support this technology. We suggest using Mozilla Firefox
             </svg>
         </div>
+        <a class="download" href="javascript:(function () { var e = document.createElement('script'); e.setAttribute('src', '../svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e); })();"><big>⇩</big> Download</a>
         <div id = "arrowToolBar" class = "invisible toolBar">
             Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">
             Stroke width: <input value = "5" type = "number" onchange = "updateStrokeWidth(this)">
