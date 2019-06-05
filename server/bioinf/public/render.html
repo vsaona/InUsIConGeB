@@ -285,7 +285,7 @@
                         middle = (start + end * 3) / 4
                         arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
                     }
-                    d3.select(this).select("text").attr("x", (start + end) / 2 - gene.name.length*fontSize/2)
+                    d3.select(this).select("text").attr("x", (start + end) / 2 - gene.name.length*fontSize/2);
                 });
                 return(0);
             }
@@ -328,7 +328,9 @@
                     fontSize = Math.round(genomaHeight/6);
                     draw(data, index * genomaHeight, d3.select(this));
                     d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true);
-                    this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1  ].addEventListener("click", function(){activate("global", this, data);}, false);
+                    this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1].addEventListener("click", function(){activate("global", this, data);}, false);
+                    console.log()
+                    dragHandler(d3.select(this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1]));
                 });
                 // We build the scale indicator arrow
                 scaleGroup = d3.select("#canvas").append("g");
