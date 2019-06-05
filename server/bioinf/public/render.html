@@ -66,6 +66,16 @@
                 drawAll(genomas);
             });
 
+            var dragHandler = d3.drag().on("start", function () {
+                var current = d3.select(this);
+                deltaX = current.attr("x") - d3.event.x;
+                deltaY = current.attr("y") - d3.event.y;
+            }).on("drag", function () {
+                d3.select(this)
+                    .attr("x", d3.event.x + deltaX)
+                    .attr("y", d3.event.y + deltaY);
+            });            
+
             /*getJSONP('/read/prueba', function(data){
                 console.log(data);
                 drawAll([{name: "prueba", genes: data.genomas}])
@@ -142,16 +152,6 @@
                     text = this.getElementsByTagName("text")[0];
                     text.addEventListener("click", function(){activate("arrowText", this, gene);}, false);
                     // Now we make the text to be draggable
-                    var dragHandler = d3.drag().on("start", function () {
-                        var current = d3.select(this);
-                        deltaX = current.attr("x") - d3.event.x;
-                        deltaY = current.attr("y") - d3.event.y;
-                    })
-                    .on("drag", function () {
-                        d3.select(this)
-                            .attr("x", d3.event.x + deltaX)
-                            .attr("y", d3.event.y + deltaY);
-                    });
                     dragHandler(d3.select(text));
                 });
                 return(true);
@@ -181,41 +181,50 @@
                 arrowStyle = input.value;
                 d3.selectAll("#canvas > g").each(function(genoma, y) {
                     y = y * genomaHeight;
-                    d3.select(this).selectAll("g").each(function(gene, index) {
-                        var arrow = d3.select(this).select("polygon");
-                        if(gene.complement) {
-                            start = gene.end;
-                            end = gene.start;
-                        } else {
-                            start = gene.start;
-                            end = gene.end;
-                        }
-                        if (arrowStyle == "triangle") {
-                            arrow.attr("points", start+","+(y - genomaHeight/4)+" "+start+","+(y + genomaHeight/4)+" "+end+","+y);
-                        } else {
-                            middle = (start + end * 3) / 4
-                            arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
-                        }
-                    });
+                    redraw(genoma, y, this);
+                    
                     return(true);
                 });
             }
 
             function setInterestGene() {
+                /* Bugs (I should fix these):
+                 * What happens when the genoma is reversed?
+                 */
                 interestGene = d3.select(activeElement).data()[0];
                 var genoma = null;
-                var index;
+                var index = -1;
+                minStart = 0;
+                maxEnd = 0;
                 for(i = 0; i < genomas.length; i++) {
-                    for(j = 0; j < genomas[i].genes.length; j++) {
-                        if(genomas[i].genes[j] == interestGene){
-                            genoma = genomas[i];
-                            index = i
-                            break;
+                    if(genomas[i].genes.includes(interestGene)) {
+                        index = i;
+                        genoma = genomas[i];
+                    }
+                    if(index != i) {
+                        for(j = 0; j < genomas[i].genes.length; j++) {
+                            if(genomas[i].genes[j].start < minStart) {
+                                minStart = genomas[i].genes[j].start;
+                            }
+                            if(genomas[i].genes[j].end > maxEnd) {
+                                maxEnd = genomas[i].genes[j].end;
+                            }
+                        }
+                    } else {
+                        for(j = 0; j < genomas[i].genes.length; j++) {
+                            if(genomas[i].genes[j] == interestGene){
+                                if(genomas[i].genes[j].interest)
+                                    return(0);
+                            }
+                            if(genomas[i].genes[j].interest && genomas[i].genes[j].end < 0) {
+                                // Now we handle the reversed issue
+                                // I should implement this
+                            }
                         }
                     }
                 }
                 // Now we recover the actual DOM element
-                d3.select("#canvas").selectAll("g").each( function(data, index) {
+                d3.select("#canvas").selectAll("g").each( function(data, i) {
                     if(!data) return(0);
                     if(data.start) return(0);
                     if(data == genoma)
@@ -254,12 +263,30 @@
                 document.getElementById("canvas").setAttribute("viewBox", ""+viewBox[0]+" "+viewBox[1]+" "+viewBox[2]+" "+viewBox[3]);
                 // We move the genoma tag
                 d3.select(genomaElement).select(".genomaTag").attr("x", localMaxEnd + 20);
-                // Now I should... em... redraw the genoma
-                redraw(genoma, genomaElement, i*genomaHeight);
+                // We move the genoma
+                redraw(genoma, index*genomaHeight, genomaElement);
+                // And now we move the texts
                 console.log("alo?");
             }
 
-            function redraw(genoma, el, y) {
+            function redraw(genoma, y, el) {
+                d3.select(el).selectAll("g").each(function(gene, index) {
+                    var arrow = d3.select(this).select("polygon");
+                    if(gene.complement) {
+                        start = gene.end;
+                        end = gene.start;
+                    } else {
+                        start = gene.start;
+                        end = gene.end;
+                    }
+                    if (arrowStyle == "triangle") {
+                        arrow.attr("points", start+","+(y - genomaHeight/4)+" "+start+","+(y + genomaHeight/4)+" "+end+","+y);
+                    } else {
+                        middle = (start + end * 3) / 4
+                        arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
+                    }
+                    d3.select(this).select("text").attr("x", (start + end) / 2 - gene.name.length*fontSize/2)
+                });
                 return(0);
             }
 
@@ -331,7 +358,7 @@
                              <option value = "arrow"> Arrows </option>
                              <option value = "triangle"> Triangles </option>
                          </select>
-            <!-- <button onclick = "setInterestGene()"> Este es el gen de interés </button> -->
+            <button class = "btn btn-secondary" onclick = "setInterestGene()"> Align this gene </button>
         </div>
         <div id = "arrowTextToolBar" class = "invisible toolBar">
             Font size: <input id = "geneFontSize" value = "24" type = "number" onchange = "updateGeneFontSize(this)">
