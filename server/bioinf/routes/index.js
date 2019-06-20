@@ -3,14 +3,22 @@ var router = express.Router();
 var fs = require('fs');
 var formidable = require('formidable');
 
+router.all("/*", function(req, res, next){
+  console.log("pasa por el 'all'");
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, X-Requested-With");
+  next();
+});
+
 /* GET home page. */
 router.post('/prueba', function(req, res, next) {
-  if(!(Array.isArray(req.body["filePath[]"]))) {  // Este if era para probar cuando aun se enviaba un string. Puedes borrarlo si lo estimas conveniente.
-    filePath = [req.body["filePath[]"]];          // No tengo idea de por que se tiene que poner los corchetes vacios. Atte, Vicente
+  console.log(req.body);
+  if(!(Array.isArray(req.body["filePath"]))) {
+    filePath = [req.body["filePath"]];
   } else {
-    filePath = req.body["filePath[]"];
+    filePath = req.body["filePath"];
   }
-  console.log(filePath);
   genomas = [];
   for(j = 0; j < filePath.length; j++) {
     fileName = filePath[j].split("/")[filePath[j].split("/").length - 1]
@@ -45,7 +53,8 @@ router.post('/prueba', function(req, res, next) {
   res.json({genomas: genomas});
 });
 
-router.post('/fileupload', function(req, res, next) {
+// Esta es la funcion original, responde correctamente a las vistas de Node.
+router.post('/fileUploadAndRender', function(req, res, next) {
   console.log("DEBUG: POST FUNCTION /fileUpload");
   var form = new formidable.IncomingForm();
   form.uploadDir = "./data"
@@ -71,5 +80,39 @@ router.post('/fileupload', function(req, res, next) {
       }
     });
   });
+});
+
+// Esta es la funcion en construccion para ser llamada desde angular. No se si funciona como deberia (no tengo como probarla).
+router.post('/fileupload', function(req, res, next) {
+  console.log("DEBUG: POST FUNCTION /fileUpload");
+  var returnable = {fileNames: []};
+  var form = new formidable.IncomingForm();
+  form.uploadDir = "./data"
+
+  form.on('file', (field, file) => {
+    console.log("DEBUG: form.on(file)");
+    console.log(field);
+  });
+  form.on('end', () => {
+    console.log("DEBUG: form.on(end)");
+  });
+  form.parse(req, function (err, fields, files){
+    console.log("DEBUG: form.parse");
+    if(err) throw err;
+    res.header("Content-Type", "application/json");
+    //res.writeHead(200,{'Content-Type':'application/json'});
+    for(j = 0; files["file" + j]; j++) {
+      var oldpath = files["file" + j].path;
+      var newpath = './data/' + files["file" + j].name;
+      fs.renameSync(oldpath, newpath);
+      returnable.fileNames.push(newpath);
+    }
+    console.log("Viene el returnable");
+    console.log(JSON.stringify(returnable));
+    res.write(JSON.stringify(returnable));
+    res.end();
+  });
+  console.log("DEBUG: outside form.parse");
+  res.end();
 });
 module.exports = router;

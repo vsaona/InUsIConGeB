@@ -1,0 +1,33 @@
+<div class = "container">
+    <svg [attr.viewbox] = 'viewBox[0]' class="canvas" id="canvas">
+        Sorry, looks like your web browser doesn't support this technology. We suggest using Mozilla Firefox
+        <g *ngFor = "let genoma of genomas">
+            <g *ngFor = "let gene of genoma.genes">
+                <polygon class = "arrow" *ngIf = 'arrowStyle == "triangle"' (click) = "selectArrow($event.target, 'arrow')" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/4)+" "+gene.start+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y'>
+                </polygon>
+                <polygon class = "arrow" *ngIf = 'arrowStyle != "triangle"' (click) = "selectArrow($event.target, 'arrow')" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/6)+" "+gene.start+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y+" "+gene.middle+","+(genoma.y - genomaHeight/4)+" "+gene.middle+","+(genoma.y - genomaHeight/6)'>
+                </polygon>
+            </g>
+        </g>
+    </svg>
+</div>
+<a class="download btn btn-primary" href="javascript:(function () { var e = document.createElement('script'); e.setAttribute('src', '../svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e); })();">⇩ Download</a>
+<div id = "arrowToolBar" class = "invisible toolBar">
+    Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">
+    Stroke width: <input value = "5" type = "number" onchange = "updateStrokeWidth(this)">
+    Identity percentage: <input value = "100" type = "number" onchange = "updateIdentity(this)">
+    Arrow style: <select id = "#arrowStyleSelector" onchange = "updateArrowStyle(this)">
+                    <option value = "arrow"> Arrows </option>
+                    <option value = "triangle"> Triangles </option>
+                </select>
+    <button class = "btn btn-secondary" onclick = "setInterestGene()"> Align this gene </button>
+</div>
+<div id = "arrowTextToolBar" class = "invisible toolBar">
+    Font size: <input id = "geneFontSize" value = "24" type = "number" onchange = "updateGeneFontSize(this)">
+    Gene name: <input id = "geneName" value = "" onchange = "updateName(this)">
+</div>
+<div id = "globalToolBar" class = "invisible toolBar">
+    Font size: <input value = "24" type = "number" onchange = "updateGenomaFontSize(this)">
+    Genoma name: <input id = "genomaName" value = "" onchange = "updateName(this)">
+</div>
+<router-outlet></router-outlet>
