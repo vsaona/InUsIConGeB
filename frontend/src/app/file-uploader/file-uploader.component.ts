@@ -12,6 +12,7 @@ export class FileUploaderComponent implements OnInit {
   filesCount = 0;
   public files: Set<File> = new Set();
   @ViewChild('file', {static: true}) file;
+  uploadedFiles: Array<File>;
 
   // La idea de esta funcion es enviar los datos a Node, recibir la respuesta, y luego cargar la vista genomic-context-editor
   upload() {
@@ -49,5 +50,18 @@ export class FileUploaderComponent implements OnInit {
 
   ngOnInit() {
   }
+  fileChange(element) {
+    this.uploadedFiles = element.target.files;
+  }
 
+  subir() {
+    let formData = new FormData();
+    for (var i = 0; i < this.uploadedFiles.length; i++) {
+        formData.append("uploads[]", this.uploadedFiles[i], this.uploadedFiles[i].name);
+    }
+    this.http.post('/read/angularFile', formData)
+    .subscribe((response) => {
+         console.log('response received is ', response);
+    })
+  }
 }

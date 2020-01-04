@@ -2,6 +2,14 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 var formidable = require('formidable');
+var multipart  =  require('connect-multiparty');
+var multipartMiddleware  =  multipart({ uploadDir:  './data' });
+var bodyParser = require('body-parser');
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({
+    extended: true
+}));
+
 
 router.all("/*", function(req, res, next){
   console.log("pasa por el 'all'");
@@ -11,7 +19,12 @@ router.all("/*", function(req, res, next){
   next();
 });
 
-/* GET home page. */
+router.post('/angularFile', multipartMiddleware, (req, res) => {
+  res.json({
+      'message': 'File uploaded successfully'
+  });
+});
+
 router.post('/prueba', function(req, res, next) {
   console.log(req.body);
   if(!(Array.isArray(req.body["filePath"]))) {

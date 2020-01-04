@@ -1,0 +1,256 @@
+     gene            375..1082
+                     /locus_tag="ASE11_24840"
+     CDS             375..1082
+                     /locus_tag="ASE11_24840"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:SwissProt:P37335.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="transcriptional regulator"
+                     /protein_id="KRC03202.1"
+                     /translation="MRGDKSFGDASPAPGASVRSLIEATFQRLRADIVEGRLAAGSRL
+                     AIEDLKSRYEVSGGTVREALSLLVANNLVQTQAQRGFHVTPMSLDDMRDLATTRIALE
+                     CEALRQSVLNGDAEWEARVVSSYHRLSLLDERTMRDPVHLFNQWEQANRDFHEALISA
+                     CSSAWTQRFLSILYLQMERYRRLTAMHNQPARNVHEEHLALRDSVLARDVERCTQLLR
+                     AHIESSILVVRQFGLLR"
+     gene            1173..2549
+                     /locus_tag="ASE11_24845"
+     CDS             1173..2549
+                     /locus_tag="ASE11_24845"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_020206171.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="benzene 1,2-dioxygenase"
+                     /protein_id="KRC03203.1"
+                     /translation="MSSVIKEAQESPVKWTRNWTPDAIRALVDQEKGLLDPRIYADQG
+                     LYELELERVFGRSWLLLGHESHVPKTGDFLTTYMGEDPVVMVRQQDKSIKVFLNQCRH
+                     RGMRICRTDAGNAKAFTCSYHGWAYDIAGNLVNVPFEKEAFCDKKESDCGFDKADWGP
+                     LQARVAIYKGLVFANWDAEAPDLETYLGDARPYMDVMLDRTPAGTEAIGGIQKWVIPC
+                     NWKFAAEQFCSDMYHAGTMSHLSGILAGMPPEMDLSNAQVPTKGNQFRANWGGHGTGW
+                     FVDEPGMLMAVMGPKVTQYWTEGPAADLAEKRLGQTMPVRRMFGQHMNIFPTCSFLPA
+                     INTIRSWHPRGPNEIEVWAFTLVDVDAPEEIKEEYRRHNIRTFSAGGVFEQDDGENWV
+                     EIQKVLRGHKAKSQPLNAQMGLGRSKTGHPDFPGKVGYVYAEEAARGMYHHWARVMSE
+                     PNWATLKP"
+     gene            2667..3233
+                     /locus_tag="ASE11_24850"
+     CDS             2667..3233
+                     /locus_tag="ASE11_24850"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_011797817.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="benzene 1,2-dioxygenase"
+                     /protein_id="KRC03204.1"
+                     /translation="MTNPSPHSFKTFEWQSKAVGLELQNEIEQFYYREAQLLDHRAYE
+                     AWFALLEKDIRYFMPLRTNRTLRESKLEYSGDQDFAHFDETYETMYGRIRKVTSELGW
+                     AENPPSRTRHLVSNVLINEAAEPNSFEVSSAFILYRNRLERQVDIFAGERRDVLRRAD
+                     NGLGFKIAKRTILLDQSTLLSNNLSIFF"
+     gene            3272..3679
+                     /locus_tag="ASE11_24855"
+     CDS             3272..3679
+                     /locus_tag="ASE11_24855"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_014160691.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="hypothetical protein"
+                     /protein_id="KRC03205.1"
+                     /translation="MTKVRLFLIGIGLFYIINLIGTLPFSTLGLFGTMYPGVELRVGE
+                     PIFTVLQDAWAVVGLQLGAIGVVALWGALDPVRYEAVIPVVIATEVVDSLWDFYSIVW
+                     SHEALWFGLVTLAIHVMWIGWGLLAWSAVASNR"
+     gene            3791..4120
+                     /locus_tag="ASE11_24860"
+     CDS             3791..4120
+                     /locus_tag="ASE11_24860"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_014160692.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="3-phenylpropionate dioxygenase"
+                     /protein_id="KRC03206.1"
+                     /translation="MKFTRVCERSDVPEGEALKVESGDTSVAIFNVDGELFATQDRCT
+                     HGDWSLSEGGYLDGDVVECSLHMGKFCVRTGKIKSPPPCQALKVFPIRVEGNEVFVDF
+                     DAGYLAP"
+     gene            4117..5352
+                     /locus_tag="ASE11_24865"
+     CDS             4117..5352
+                     /locus_tag="ASE11_24865"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_011797814.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="pyridine nucleotide-disulfide oxidoreductase"
+                     /protein_id="KRC03207.1"
+                     /translation="MIETIETIAIIGAGLTGAMAAHALRAQGYAGRLHLIGDESRQAY
+                     DRTTLSKAVLMGEPPEPPAIMDTSWYASAHVDVQLGRRVSCLDVASRQIQFESGAPLA
+                     YDRLLLATGARARRVAISGCELEGIHTLRDRADSLALRQALQPGQSLVIVGGGLIGCE
+                     VATTARKASVNVTILEAGDELLLRVLGHQTGAWCRAELERLGVQVERNAQASCFEGEE
+                     RVRAVVCADGRKVAADLVLVSIGADPADELARAAGIACARGVLVDATGASSCPRVFAA
+                     GDVAAWPLRGGGQRSLETYLNSQAQAEAAASAMLGKPVPALQVPTSWTEIAGHRIQMI
+                     GNAEGPGEIVLRGEAQTGQPLVLFRLFDGCVEAATAINAAKEFSVATRLVGARVPVSA
+                     GQLQDAGLNLRDLLKAKPQ"
+     gene            5401..6234
+                     /locus_tag="ASE11_24870"
+     CDS             5401..6234
+                     /locus_tag="ASE11_24870"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_011797813.1"
+                     /note="Converts
+                     cis-3-(3-carboxyethyl)-3,5-cyclohexadiene-1,2-diol
+                     (PP-dihydrodiol) into 3-(2,3-dihydroxylphenyl)propionate;
+                     Derived by automated computational analysis using gene
+                     prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="cis-2,3-dihydrobiphenyl-2,3-diol dehydrogenase"
+                     /protein_id="KRC03208.1"
+                     /translation="MKLTGEVVLITGGAAGLGRALVDRFVAEGANVAVLDKSADRIKQ
+                     LESDHGDNVVGIVGDVRSLRDQKQAAERCVAKFGKIDTLIPNAGIWDYSTALIDLPED
+                     SIDAAFDEVFHINVKGYIHAVKACLPALVASRGSVIFTISNAGFYPNGGGPLYTAAKH
+                     AVVGLVRELAFELAPYVRVNGVAPGGMNTDLRGPSSLGMSGQSISTVPLADMLKSVLP
+                     IGRMPETEEYTGAYVFFATRGDVAPATGALLNYDGGMGVRGFFSAAGGADLLEKLNIS
+                     H"
+     gene            6280..7134
+                     /locus_tag="ASE11_24875"
+     CDS             6280..7134
+                     /locus_tag="ASE11_24875"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_011797812.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="2,3-dihydroxybiphenyl 1,2-dioxygenase"
+                     /protein_id="KRC03215.1"
+                     /translation="MGFAVKDVSAWRSFLTQKLGLMEAGATDDGSLFRIDSRAWRIAV
+                     QPGEVDDLAYAGYEVADAAGLAQMTEKLKQAGIAVTSGDASMARRRGVMGLISFADPF
+                     GLPLEIYYGASEVFEKPFMPAAAVSGFLTGEQGLGHFVRCVPDSDKALAFYTQVLGFQ
+                     LSDVIDMKMGPDVTVPAYFLHCNERHHTLAIAAFPLPKRIHHFMLEVSSLNDVGFAFD
+                     RVDADGLITSTLGCHTNDHMVSFYAATPSGVEVEYGWGARTVDRSWVVARHDSPSMWG
+                     HKSVRNKQ"
+     gene            7166..7777
+                     /locus_tag="ASE11_24880"
+     CDS             7166..7777
+                     /locus_tag="ASE11_24880"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_003450988.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="glutathione S-transferase"
+                     /protein_id="KRC03209.1"
+                     /translation="MKLYYSPGACSLSPHIALREAGLNFELVQVDLASKKTASGQDYL
+                     EINPFGYVPCLQLDDGRMLAEGPAILQYVADQVPGKLLAPANGSFERYHLQQWLNFIS
+                     TELHKSFSPLFNPAASEDWKNAVRQTLNARLGQVARQLERAPYLLGDRLSVADIYLLV
+                     VLGWGAYVNLDLSPWPALQAFMGRVGGREAVQAALRAEGLIKG"
+     gene            7865..8647
+                     /locus_tag="ASE11_24885"
+     CDS             7865..8647
+                     /locus_tag="ASE11_24885"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_020206177.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="2-oxopent-4-enoate hydratase"
+                     /protein_id="KRC03210.1"
+                     /translation="MTPELIETLGDELYSALCARTVVEPLTSRHPDITIEHAYHIQQR
+                     MISRRLQAGERVVGKKIGVTSAAVMNMLGVYQPDFGYMLDGMIVSDGGSIAMSSLIQP
+                     KAEGEIAFVLKKDLMGPGVTNADVLAATDFVMPCFEIVDSRIRDWKIKIQDTVADNAS
+                     CGMFVLGSTAVDPRKIDLKTCGMVLEKNGEIIATGAGAAALGSPVNAVAWLANTLGRL
+                     GIGLKAGEVILSGALAAMFPAQAGDHFRISIGGIGDCSVRFH"
+     gene            8668..9582
+                     /locus_tag="ASE11_24890"
+     CDS             8668..9582
+                     /locus_tag="ASE11_24890"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:SwissProt:A1VUV2.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="acetaldehyde dehydrogenase (acetylating)"
+                     /protein_id="KRC03211.1"
+                     /translation="MTKKIKCALIGPGNIGTDLLAKLQRSAVLEPVWMVGIDPESDGL
+                     KRAREMGIKTTADGVDGLIPHMQADGVQIVFDATSAYVHAENSRKVNAEGALMIDLTP
+                     AAIGPFCVPPVNLKEHVGKGEMNVNMVTCGGQATIPMVAAVSRVQPVAYGEIVATVSS
+                     KSAGPGTRKNIDEFTRTTAGAVEKVGGAKKGKAIIILNPAEPPLIMRDTVHCLLESEP
+                     DQPKITESIHAMIKEVQKYVPGYKLVNGPVFDGKRVSVYLEVEGLGDYLPKYAGNLDI
+                     MTAAAARTAEMFAEEIIAGRLTLKPVHA"
+     gene            9602..10642
+                     /locus_tag="ASE11_24895"
+     CDS             9602..10642
+                     /locus_tag="ASE11_24895"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:SwissProt:Q52040.1"
+                     /note="catalyzes the formation of pyruvate and
+                     acetaldehyde from 4-hydroxy-2-ketovaleric acid; involved
+                     in the degradation of phenylpropionate; Derived by
+                     automated computational analysis using gene prediction
+                     method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="4-hydroxy-2-oxovalerate aldolase"
+                     /protein_id="KRC03212.1"
+                     /translation="MKLQGKKVSVHDMTLRDGMHPKRHLMTLEQMKSIACGLDAAGVP
+                     LIEVTHGDGLGGSSVNYGFPAHSDEEYLGAVIPLMKQAKVSALLIPGIGTVEHLLMAK
+                     DLGVATIRVATHCTEADVSEQHITQSRKLGLDTVGFLMMAHMASPEKLVSQALLMQGY
+                     GANCIYVTDSAGYMLPDDVKARLSAVRAALKPETELGFHGHHNLAMGVANSIAAIEAG
+                     ATRIDAAAAGLGAGAGNTPMEVFIAVCARMGIETGVDVFKIQDVAEDLVVPIMDHIIR
+                     IDRDSLTLGYAGVYSSFLLFAKRASAKYGVPARDILVELGRRGMVGGQEDMIEDTAMT
+                     MARERGLTLTVA"
+     gene            10713..11573
+                     /locus_tag="ASE11_24900"
+     CDS             10713..11573
+                     /locus_tag="ASE11_24900"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_003450973.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="2-hydroxy-6-oxo-6-phenylhexa-2,4-dienoate
+                     hydrolase"
+                     /protein_id="KRC03213.1"
+                     /translation="MTALTESSTSKFVKINEKGFSDFKIHYNEAGNGETVIMLHGGGP
+                     GAGGWSNYYRNIGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALG
+                     IDQAHLIGNSMGGATALNFAIEYPERIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLY
+                     AEPSYETLKQMIQVFLYDQSLITEELLQGRWEAIQRHPEHLKNFLISAQKAPLSSWDV
+                     SARLGEIKAKTFITWGRDDRFVPLDHGLKLVWNIDDARLHVFSKCGHWAQWEHADEFN
+                     RLVIDFLRQA"
+     gene            11665..13038
+                     /locus_tag="ASE11_24905"
+     CDS             11665..13038
+                     /locus_tag="ASE11_24905"
+                     /inference="EXISTENCE: similar to AA
+                     sequence:RefSeq:WP_003450972.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="aromatic hydrocarbon degradation protein"
+                     /protein_id="KRC03214.1"
+                     /translation="MKHGFIGPITVGVLAITSQSALAVSDVFRFVGHGPVSAAMGGAA
+                     TAFDVGAAGMMTNPATLSLMPQGSEFHLGMDFIFADLLIRNPETGEVARSKTHSNNRG
+                     PYAAPQLAYTHRSGSLALGVGLFPQGGVGTEYGNSSFLSRATGGLATGLENSSRLLTL
+                     NIPFAASYEVDDKLTVGASLDVMWQAMNLEMLLGADQVGSLIGSGRASGSLVPVLGGL
+                     PDLRGAHLSFTKNQPAASGADAWGIGGRLGLTYKASKETVLGAAYSMKSRIGDMKGDA
+                     TLTAIDAVAGQVPLKGMISVRDFQTPAQLNLGISHRLNEKWMIAADVSRIFWKDAMKN
+                     INVGFVADSGANIDILLPLNFKDQTALSLGAAYQTGKWTLRGGARFTTQALRSETMLA
+                     VMPGITTTFGSAGFSYQVSPASKLDFAWTHSFKKKMTNASLPNTSAPIRAEHAQDSIG
+                     LAYSHRF"

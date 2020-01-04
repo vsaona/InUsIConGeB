@@ -1,5 +1,10 @@
 <div class="container">
     <div class="row">
+            <form action="/read/angularFile" method="post" enctype="multipart/form-data">
+                <input  (change)="fileChange($event)"  type="file"  class="custom-file-input"  id="inputGroupFile01"  aria-describedby="inputGroupFileAddon01">
+            </form>
+            <button  class="input-group-text upload"  (click)="subir()"  id="btnUpload">Upload</button>
+            <div>De aquí hacia arriba son experimentos del 04/01/2019</div>
         <div class="col-6 align-self-center">
             <!--
             <div id = "files" *ngFor = "let file of files">
