@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { GenomasService } from '../genomas.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-genomic-context-editor',
@@ -22,6 +23,7 @@ export class GenomicContextEditorComponent implements OnInit {
   localBounds = [];
   viewBox = [];
   genomaElement = null;
+  filePaths: string;
 
   selectArrow(element, type) {
     console.log(element);
@@ -71,12 +73,15 @@ export class GenomicContextEditorComponent implements OnInit {
   }
   
 
-  constructor(private http: HttpClient, private genomasService: GenomasService) {
+  constructor(private http: HttpClient, private activatedRoute: ActivatedRoute, private router: Router) {
     const headers = new HttpHeaders()
           .set("Authorization", "my-auth-token")
           .set("Content-Type", "application/json");
     // Los datos utilizados en este http.post deberian extraerse de genomas.service
-    this.http.post("http://127.0.0.1:3000/read/prueba", JSON.stringify({filePath: ["./data/operon_bphA.gbff"]}), {headers: headers}).subscribe(data => {
+    console.log("filePaths");
+    console.log(this.filePaths);
+    console.log(this.router.getCurrentNavigation().extras.state.filePaths);
+    this.http.post("http://localhost:3000/read/prueba", JSON.stringify({filePath: this.router.getCurrentNavigation().extras.state.filePaths}), {headers: headers}).subscribe(data => {
       this.genomas = data["genomas"];
       this.genomas.forEach(genoma => {
         this.localBounds = this.align(genoma);
@@ -104,5 +109,9 @@ export class GenomicContextEditorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.filePaths = this.activatedRoute.snapshot.queryParamMap.get("paths");
+    this.activatedRoute.queryParamMap.subscribe(queryParams => {
+      this.filePaths = queryParams.get("paths")
+    });
   }
 }

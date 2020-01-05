@@ -5,22 +5,6 @@
             </form>
             <button  class="input-group-text upload"  (click)="subir()"  id="btnUpload">Upload</button>
             <div>De aquí hacia arriba son experimentos del 04/01/2019</div>
-        <div class="col-6 align-self-center">
-            <!--
-            <div id = "files" *ngFor = "let file of files">
-                <input type = "file" class = "form-control-file" [name] = "file.id" [value] = "file.name" />
-            </div>
-            -->
-            <button type="submit" class="btn btn-primary" (click)="upload()"> Enviar archivos </button> <br>
-            <button class="btn btn-secondary" onClick="newFile()"> Subir otro archivo </button>
-        </div>
     </div>
 </div>
-<input
-  type="file"
-  #file
-  style="display: block"
-  (change)="onFilesAdded()"
-  multiple
-/>
 <router-outlet></router-outlet>

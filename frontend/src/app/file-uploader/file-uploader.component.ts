@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse, HttpRequest, HttpEventType } from '@angular/common/http';
 import { GenomasService } from '../genomas.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-file-uploader',
@@ -13,6 +14,8 @@ export class FileUploaderComponent implements OnInit {
   public files: Set<File> = new Set();
   @ViewChild('file', {static: true}) file;
   uploadedFiles: Array<File>;
+
+  constructor(private http: HttpClient, private genomasService: GenomasService, private router: Router) { }
 
   // La idea de esta funcion es enviar los datos a Node, recibir la respuesta, y luego cargar la vista genomic-context-editor
   upload() {
@@ -46,8 +49,6 @@ export class FileUploaderComponent implements OnInit {
       document.getElementById("files").appendChild(newButton);
   }
 
-  constructor(private http: HttpClient, private genomasService: GenomasService) { }
-
   ngOnInit() {
   }
   fileChange(element) {
@@ -62,6 +63,7 @@ export class FileUploaderComponent implements OnInit {
     this.http.post('/read/angularFile', formData)
     .subscribe((response) => {
          console.log('response received is ', response);
+         this.router.navigate(['/genomic-context-editor'], { state: {filePaths: response['filePaths'] } });
     })
   }
 }

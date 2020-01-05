@@ -19,9 +19,15 @@ router.all("/*", function(req, res, next){
   next();
 });
 
+/* Esta funcion retorna las rutas de los archivos subidos a través de angular. */
 router.post('/angularFile', multipartMiddleware, (req, res) => {
+  var filePaths = [];
+  req.files.uploads.forEach(function(file){
+    console.log(file.originalFilename + "   -   path:   " + file.path);
+    filePaths.push(file.path);
+  });
   res.json({
-      'message': 'File uploaded successfully'
+      'filePaths': filePaths
   });
 });
 
@@ -95,37 +101,4 @@ router.post('/fileUploadAndRender', function(req, res, next) {
   });
 });
 
-// Esta es la funcion en construccion para ser llamada desde angular. No se si funciona como deberia (no tengo como probarla).
-router.post('/fileupload', function(req, res, next) {
-  console.log("DEBUG: POST FUNCTION /fileUpload");
-  var returnable = {fileNames: []};
-  var form = new formidable.IncomingForm();
-  form.uploadDir = "./data"
-
-  form.on('file', (field, file) => {
-    console.log("DEBUG: form.on(file)");
-    console.log(field);
-  });
-  form.on('end', () => {
-    console.log("DEBUG: form.on(end)");
-  });
-  form.parse(req, function (err, fields, files){
-    console.log("DEBUG: form.parse");
-    if(err) throw err;
-    res.header("Content-Type", "application/json");
-    //res.writeHead(200,{'Content-Type':'application/json'});
-    for(j = 0; files["file" + j]; j++) {
-      var oldpath = files["file" + j].path;
-      var newpath = './data/' + files["file" + j].name;
-      fs.renameSync(oldpath, newpath);
-      returnable.fileNames.push(newpath);
-    }
-    console.log("Viene el returnable");
-    console.log(JSON.stringify(returnable));
-    res.write(JSON.stringify(returnable));
-    res.end();
-  });
-  console.log("DEBUG: outside form.parse");
-  res.end();
-});
 module.exports = router;
