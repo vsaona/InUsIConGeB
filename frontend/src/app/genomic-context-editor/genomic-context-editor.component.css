@@ -34,3 +34,6 @@ text {
 text:active {
     cursor: grabbing;
 }
+.selected {
+    stroke: #AA0033;
+}

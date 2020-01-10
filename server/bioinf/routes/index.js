@@ -47,6 +47,7 @@ router.post('/prueba', function(req, res, next) {
     genes = []
     for(var i = 0; i < array.length;i++){
       json = {};
+      json["color"] = "#D7D7D7";
       fields = array[i].match(/.+/g);
       if (fields != null){
         large = array[i].match(/\d+/g);

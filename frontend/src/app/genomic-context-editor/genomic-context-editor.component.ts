@@ -24,16 +24,25 @@ export class GenomicContextEditorComponent implements OnInit {
   viewBox = [];
   genomaElement = null;
   filePaths: string;
+  currentType = 'none';
 
-  selectArrow(element, type) {
-    console.log(element);
+  select(element, type) {
+    if(type == 'arrow' && this.currentType == 'none') {
+      this.currentType = 'arrow';
+    }
     if(this.selectedElements.includes(element)) {
-      console.log("si");
       this.selectedElements.splice(this.selectedElements.indexOf(element));
     } else {
       this.selectedElements.push(element);
     }
+    console.log("Currently selected elements are:");
     console.log(this.selectedElements);
+  }
+
+  updateColor(input) {
+    for(var i = 0; i < this.selectedElements.length ;i++) {
+      this.selectedElements[i].color = input.value; /* Do something about this */
+    }
   }
 
   // This function aligns a genoma in the canvas, setting the interesting gene at x = 0

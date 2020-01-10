@@ -3,17 +3,17 @@
         Sorry, looks like your web browser doesn't support this technology. We suggest using Mozilla Firefox
         <g *ngFor = "let genoma of genomas">
             <g *ngFor = "let gene of genoma.genes">
-                <polygon class = "arrow" *ngIf = 'arrowStyle == "triangle"' (click) = "selectArrow($event.target, 'arrow')" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/4)+" "+gene.start+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y'>
+                <polygon class = "arrow" [ngClass] = "{'selected' : selectedElements.includes(gene)}" *ngIf = 'arrowStyle == "triangle"' (click) = "select(gene, 'arrow')" [ngStyle]="{'fill': gene.color}" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/4)+" "+gene.start+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y'>
                 </polygon>
-                <polygon class = "arrow" *ngIf = 'arrowStyle != "triangle"' (click) = "selectArrow($event.target, 'arrow')" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/6)+" "+gene.start+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y+" "+gene.middle+","+(genoma.y - genomaHeight/4)+" "+gene.middle+","+(genoma.y - genomaHeight/6)'>
+                <polygon class = "arrow" [ngClass] = "{'selected' : selectedElements.includes(gene)}" *ngIf = 'arrowStyle != "triangle"' (click) = "select(gene, 'arrow')" [ngStyle]="{'fill': gene.color}" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/6)+" "+gene.start+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y+" "+gene.middle+","+(genoma.y - genomaHeight/4)+" "+gene.middle+","+(genoma.y - genomaHeight/6)'>
                 </polygon>
             </g>
         </g>
     </svg>
 </div>
 <a class="download btn btn-primary" href="javascript:(function () { var e = document.createElement('script'); e.setAttribute('src', '../svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e); })();">⇩ Download</a>
-<div id = "arrowToolBar" class = "invisible toolBar">
-    Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">
+<div id = "arrowToolBar" class = "toolBar" [ngClass]="{'invisible': currentType!='arrow'}">
+    Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" (change) = "updateColor($event.target)">
     Stroke width: <input value = "5" type = "number" onchange = "updateStrokeWidth(this)">
     Identity percentage: <input value = "100" type = "number" onchange = "updateIdentity(this)">
     Arrow style: <select id = "#arrowStyleSelector" onchange = "updateArrowStyle(this)">
