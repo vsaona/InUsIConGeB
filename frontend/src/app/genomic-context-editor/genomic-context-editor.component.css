@@ -30,6 +30,7 @@
 }
 text {
     cursor: grab;
+    font-size: 143px;
 }
 text:active {
     cursor: grabbing;

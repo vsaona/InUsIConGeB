@@ -14,7 +14,7 @@ export class GenomicContextEditorComponent implements OnInit {
 
   genomas = [];
   genomaHeight = 862;
-  fontSize = 24;
+  fontSize = 144;
   selectedElements = [];
   arrowStyle = "triangle";
   difference = -1;
@@ -111,6 +111,7 @@ export class GenomicContextEditorComponent implements OnInit {
           }
           gene.middle = (gene.start + (gene.end * 3)) / 4;
         });
+        this.fontSize = Math.round(((this.maxEnd- this.minStart) / genoma.genes.length) / 6);
       });
       this.viewBox = ["" + this.minStart + " " + -this.genomaHeight/2 + " " + (this.maxEnd - this.minStart) + " " + (this.genomas.length + 1) * this.genomaHeight];
       document.getElementById("canvas").setAttribute("viewBox", this.viewBox[0]); // Esto es necesario para refresacar la propiedad viewBox en la página

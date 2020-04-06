@@ -3,9 +3,10 @@
         Sorry, looks like your web browser doesn't support this technology. We suggest using Mozilla Firefox
         <g *ngFor = "let genoma of genomas">
             <g *ngFor = "let gene of genoma.genes">
-                <polygon class = "arrow" [ngClass] = "{'selected' : selectedElements.includes(gene)}" *ngIf = 'arrowStyle == "triangle"' (click) = "select(gene, 'arrow')" [ngStyle]="{'fill': gene.color}" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/4)+" "+gene.start+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y'>
+                <text [attr.x] = "(gene.start + gene.end) / 2 - gene.name.length * fontSize / 2" [attr.y] = "genoma.y - genomaHeight / 4" class = "geneTag"> {{ gene.name }} </text>
+                <polygon class = "arrow" [ngClass] = "{'selected' : selectedElements.includes(gene)}" *ngIf = 'arrowStyleSelector.value == "triangle"' (click) = "select(gene, 'arrow')" [ngStyle]="{'fill': gene.color}" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/4)+" "+gene.start+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y'>
                 </polygon>
-                <polygon class = "arrow" [ngClass] = "{'selected' : selectedElements.includes(gene)}" *ngIf = 'arrowStyle != "triangle"' (click) = "select(gene, 'arrow')" [ngStyle]="{'fill': gene.color}" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/6)+" "+gene.start+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y+" "+gene.middle+","+(genoma.y - genomaHeight/4)+" "+gene.middle+","+(genoma.y - genomaHeight/6)'>
+                <polygon class = "arrow" [ngClass] = "{'selected' : selectedElements.includes(gene)}" *ngIf = 'arrowStyleSelector.value != "triangle"' (click) = "select(gene, 'arrow')" [ngStyle]="{'fill': gene.color}" [attr.points] = 'gene.start+","+(genoma.y - genomaHeight/6)+" "+gene.start+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/6)+" "+gene.middle+","+(genoma.y + genomaHeight/4)+" "+gene.end+","+genoma.y+" "+gene.middle+","+(genoma.y - genomaHeight/4)+" "+gene.middle+","+(genoma.y - genomaHeight/6)'>
                 </polygon>
             </g>
         </g>
@@ -16,7 +17,7 @@
     Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" (change) = "updateColor($event.target)">
     Stroke width: <input value = "5" type = "number" onchange = "updateStrokeWidth(this)">
     Identity percentage: <input value = "100" type = "number" onchange = "updateIdentity(this)">
-    Arrow style: <select id = "#arrowStyleSelector" onchange = "updateArrowStyle(this)">
+    Arrow style: <select #arrowStyleSelector id = "#arrowStyleSelector" (change)="0">
                     <option value = "arrow"> Arrows </option>
                     <option value = "triangle"> Triangles </option>
                 </select>
