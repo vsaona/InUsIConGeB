@@ -60,8 +60,11 @@ router.post('/prueba', function(req, res, next) {
           json["complement"] = true;
         }
         name = fields[1].match(/\/gene=.+/g);
+        locus = fields[1].match(/\/locus_tag=.+/g);
         if(name != null) {
           json["name"] = name[0].match(/[^(")]\w+?(?=")/g)[0];
+        } else if(locus != null) {
+          json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
         } else {
           json["name"] = "no";
         }
