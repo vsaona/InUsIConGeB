@@ -1,0 +1,36 @@
+@keyframes appear {
+  0% {opacity: 0;}
+  100% {opacity: 100;}
+}
+.arrow {
+  fill: #D7D7D7;
+  stroke: black;
+  stroke-width:5;
+  border-radius: 50%;
+}
+.canvas {
+  flex: 1 1 auto;
+
+}
+.container {
+  display: flex;
+  max-width: none;
+}
+#toolBar {
+  background: black;
+  color: white;
+  padding: 20px;
+}
+.invisible {
+  display: none
+}
+.toolBar {
+  animation: appear 1s;
+  padding: 10px;
+}
+text {
+  cursor: grab;
+}
+text:active {
+  cursor: grabbing;
+}

@@ -90,7 +90,7 @@ export class GenomicContextEditorComponent implements OnInit {
     console.log("filePaths");
     console.log(this.filePaths);
     console.log(this.router.getCurrentNavigation().extras.state.filePaths);
-    this.http.post("http://localhost:3000/read/prueba", JSON.stringify({filePath: this.router.getCurrentNavigation().extras.state.filePaths}), {headers: headers}).subscribe(data => {
+    this.http.post("http://localhost:3000/read/processFile", JSON.stringify({filePath: this.router.getCurrentNavigation().extras.state.filePaths}), {headers: headers}).subscribe(data => {
       this.genomas = data["genomas"];
       this.genomas.forEach(genoma => {
         this.localBounds = this.align(genoma);

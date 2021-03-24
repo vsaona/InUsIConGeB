@@ -31,7 +31,7 @@ router.post('/angularFile', multipartMiddleware, (req, res) => {
   });
 });
 
-router.post('/prueba', function(req, res, next) {
+router.post('/processFile', function(req, res, next) {
   console.log(req.body);
   if(!(Array.isArray(req.body["filePath"]))) {
     filePath = [req.body["filePath"]];
@@ -93,6 +93,7 @@ router.post('/fileUploadAndRender', function(req, res, next) {
       res.write((j?", '":"'")+ newpath + "'");    // Esto escribe la coma al principio si j != 0
     }
     fs.readFile('./public/render.html', null, function(error,data){
+      res.write(" ]; </script>");
       if(error){
         res.writeHead(404);
         res.write('File not found!');
