@@ -59,12 +59,15 @@ router.post('/processFile', function(req, res, next) {
         } else {
           json["complement"] = true;
         }
-        name = fields[1].match(/\/gene=.+/g);
+        nombre = fields[1].match(/\/gene=.+/g);
         locus = fields[1].match(/\/locus_tag=.+/g);
-        if(name != null) {
-          json["name"] = name[0].match(/[^(")]\w+?(?=")/g)[0];
+        old_locus = fields[1].match(/\/old_locus_tag=.+/g);
+        if(nombre != null) {
+          json["name"] = nombre[0].match(/[^(")]\w+?(?=")/g)[0];
         } else if(locus != null) {
           json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
+        } else if(old_locus != null) {
+          json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
         } else {
           json["name"] = "no";
         }
@@ -98,7 +101,6 @@ router.post('/fileUploadAndRender', function(req, res, next) {
         res.writeHead(404);
         res.write('File not found!');
       } else {
-        res.write(" ]; </script>");
         res.write(data);
         res.end();
       }

@@ -242,9 +242,9 @@ function redraw(genoma, y, el) {
     });
     return(0);
 }
-
+var d3Genomas;
 function drawAll(genomas) {
-    d3.select("#canvas").selectAll("g").data(genomas).enter().append("g").each(function(data, index) {
+    d3Genomas = d3.select("#canvas").selectAll("g").data(genomas).enter().append("g").each(function(data, index) {
         difference = -1;
         var localMaxEnd = 0;
         var reverseAll = false;
@@ -284,6 +284,11 @@ function drawAll(genomas) {
         this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1].addEventListener("click", function(){activate("global", this, data);}, false);
         dragHandler(d3.select(this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1]));
     });
+    // Le annadimos la linea central al genoma
+    d3Genomas.each(function (data,index,c) {
+        d3.select(this).insert("rect", ":first-child").attr("x", minStart).attr("width", maxEnd - minStart).attr("y", index*genomaHeight - genomaHeight / 40.0).attr("height", genomaHeight / 20.0);
+    });
+    console.log(d3Genomas);
     // We build the scale indicator arrow
     scaleGroup = d3.select("#canvas").append("g");
     scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)"}], name: " "}
