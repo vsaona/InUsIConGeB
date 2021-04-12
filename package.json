@@ -1,0 +1,35 @@
+{
+  "name": "inusicongeb",
+  "version": "0.0.1",
+  "description": "A tool for genomic context visualization",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vsaona/InUsIConGeB.git"
+  },
+  "keywords": [
+    "Genomic",
+    "context",
+    "data",
+    "visualization",
+    "database",
+    "access"
+  ],
+  "author": "Vicente Saona",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vsaona/InUsIConGeB/issues"
+  },
+  "homepage": "https://github.com/vsaona/InUsIConGeB#readme",
+  "dependencies": {
+    "@webcomponents/webcomponentsjs": "^2.5.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "formidable": "^1.2.2",
+    "fs": "0.0.1-security"
+  }
+}

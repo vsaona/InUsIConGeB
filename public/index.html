@@ -1,0 +1,40 @@
+<html>
+<head>
+  <title>InusiCongeb</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <meta charset="UTF-8">
+  <script src="../mwc_bundle/mwc-material-bundle.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+  <!-- Your application must load the Roboto and Material Icons fonts. -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+        <div class="col-6 align-self-center">
+            <form id = "filesForm" action="fileUploadAndRender" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <div id = "files">
+                        <input type="file" class="form-control-file" name="file0">
+                    </div>
+                    <input type="submit" class="btn btn-primary">
+                </div>
+            </form>
+            <mwc-button class="btn btn-secondary" raised onClick="newFile()"> Subir otro archivo </mwc-button> <br>
+        </div>
+    </div>
+  </div>
+  <mwc-button id="myButton" label="Click Me!" raised></mwc-button>
+
+  <!-- The Material Web Components use standard JavaScript modules. -->
+  <script type="module">
+
+    const button = document.querySelector('#myButton');
+    button.addEventListener('click', () => {
+      alert('You clicked!');
+    });
+  </script>
+  </body>
+</html>

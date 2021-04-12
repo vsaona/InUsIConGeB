@@ -13,6 +13,7 @@ var viewBox = [];
 var genomaElement = null;
 
 $.ajaxSetup({ traditional: true });
+console.log(filePath);
 $.post( "processFile", {"filePath": filePath}, function( data ) {
     genomas = data.genomas;
     console.log(filePath);
@@ -29,7 +30,7 @@ var dragHandler = d3.drag().on("start", function () {
         .attr("y", d3.event.y + deltaY);
 });            
 
-/*getJSONP('/read/prueba', function(data){
+/*getJSONP('/prueba', function(data){
     console.log(data);
     drawAll([{name: "prueba", genes: data.genomas}])
     
