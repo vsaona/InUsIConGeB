@@ -5,28 +5,171 @@
   <meta charset="UTF-8">
   <script src="../mwc_bundle/mwc-material-bundle.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-
+  <link rel="stylesheet" href="../stylesheets/editor.css">
   <!-- Your application must load the Roboto and Material Icons fonts. -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
 </head>
 <body>
+
+  
   <div class="container">
-    <div class="row">
-        <div class="col-6 align-self-center">
-            <form id = "filesForm" action="fileUploadAndRender" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <div id = "files">
-                        <input type="file" class="form-control-file" name="file0">
-                    </div>
-                    <input type="submit" class="btn btn-primary">
-                </div>
-            </form>
-            <mwc-button class="btn btn-secondary" raised onClick="newFile()"> Subir otro archivo </mwc-button> <br>
+    <div class="main">
+      <div class = "genomaData" id = "genomaData0">
+        <div id = genomaSource0">
+          <mwc-select outlined label="Genoma 1"id = genomaSourceType0">
+            <mwc-list-item value="file">Desde archivo</mwc-list-item>
+            <mwc-list-item value="gi">gi</mwc-list-item>
+            <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
+            <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
+          </mwc-select>
+          <div
+            id = "file0">
+            File placeholder
+          </div>
+          <mwc-textfield
+            outlined
+            id = "gi0"
+            label="gi">
+          </mwc-textfield>
+          <mwc-textfield
+            outlined
+            id = "accesion0"
+            label="número de acceso">
+          </mwc-textfield>
+          <mwc-textarea
+            outlined
+            id = "fasta0"
+            label="secuencia fasta">
+          </mwc-textarea>
         </div>
+
+        <div class = "genomaBoundaries" id = "genomaBoundaries0">
+          <mwc-textfield
+            outlined
+            label = "Desde"
+            type = "number">
+          </mwc-textfield>
+          <mwc-textfield
+            outlined
+            label = "Hasta"
+            type = "number">
+          </mwc-textfield>
+          (codones)
+        </div>
+        <div class = "genomaBoundaries" id = "genomaBoundaries0">
+          <div class = "row mwc-typography">
+            Incluir
+            <mwc-textfield
+              outlined
+              label="genes"
+              type = "number"
+              min = "0">
+            </mwc-textfield>
+            antes
+          </div>
+          <div class = "row">
+            y
+            <mwc-textfield
+              outlined
+              label="genes"
+              type = "number"
+              min = "0">
+            </mwc-textfield>
+            después
+          </div>
+        </div>
+      </div>
+      <div>
+        Añadir genoma
+      </div>
+      <div>
+        <mwc-formfield label="Buscar semejantes">
+          <mwc-checkbox></mwc-checkbox>
+        </mwc-formfield>
+      </div>
+      <div class = "searchCustomization">
+        <div class = "option-column">
+          <div class = "search-option">
+            Los
+            <mwc-textfield
+              outlined
+              type = "number"
+              min = "0"
+              value = "10">
+            </mwc-textfield>
+            más parecidos
+          </div>
+          <div class = "search-option">
+            <mwc-formfield label="Sólo uno de cada género">
+              <mwc-checkbox></mwc-checkbox>
+            </mwc-formfield>
+          </div>
+          <div class = "search-option">
+            Covertura mínima:
+            <mwc-textfield
+              outlined
+              iconTrailing = "%"
+              label = "Covertura"
+              type = "number"
+              min = "0"
+              max = "100"
+              value = "70">
+            </mwc-textfield>
+          </div>
+          <div class = "search-option">
+            Identidad mínima:
+            <mwc-textfield
+              outlined
+              iconTrailing = "%"
+              label = "Identidad"
+              type = "number"
+              min = "0"
+              max = "100"
+              value = "30">
+            </mwc-textfield>
+          </div>
+        </div>
+        <div class = "option-column">
+          <div class = "search-option">
+            Base de Datos:
+            <mwc-select outlined label="Base de datos" id = genomaSourceType0">
+              <mwc-list-item value="nr">Non-redundant protein sequences</mwc-list-item>
+              <mwc-list-item value="refseq_select">RefSeq Select proteins</mwc-list-item>
+              <mwc-list-item value="refseq_protein">Reference proteins</mwc-list-item>
+              <mwc-list-item value="landmark">Model Organisms</mwc-list-item>
+              <mwc-list-item value="swissprot">UniProtKB/Swiss-Prot</mwc-list-item>
+              <mwc-list-item value="pataa">Patented protein sequences</mwc-list-item>
+              <mwc-list-item value="pdb">Protein Data Bank proteins</mwc-list-item>
+              <mwc-list-item value="env_nr">Metagenomic proteins</mwc-list-item>
+              <mwc-list-item value="tsa_nr">Transcriptome Shotgun Assembly proteins</mwc-list-item>
+            </mwc-select>
+          </div>
+          <div class = "search-option">
+            <mwc-formfield label="Sólo del mismo reino (filo)">
+              <mwc-checkbox></mwc-checkbox>
+            </mwc-formfield>
+          </div>
+          <div class = "search-option">
+            <mwc-formfield label="Sólo del mismo género">
+              <mwc-checkbox></mwc-checkbox>
+            </mwc-formfield>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <mwc-button id="myButton" label="Click Me!" raised></mwc-button>
+  <mwc-button id="myButton" label="Draw it!" raised></mwc-button>
+  <form id = "filesForm" action="fileUploadAndRender" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <div id = "files">
+            <input type="file" class="form-control-file" name="file0">
+        </div>
+        <input type="submit" class="btn btn-primary">
+    </div>
+  </form>
+  <mwc-button class="btn btn-secondary" raised onClick="newFile()"> Subir otro archivo </mwc-button> <br>
+  
 
   <!-- The Material Web Components use standard JavaScript modules. -->
   <script type="module">
@@ -36,5 +179,5 @@
       alert('You clicked!');
     });
   </script>
-  </body>
+</body>
 </html>
