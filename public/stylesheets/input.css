@@ -1,0 +1,77 @@
+@keyframes fade-in {
+    0% { opacity: 0 }
+    100% { opacity: 100 }
+}
+@keyframes build-up {
+    0% {
+        opacity: 0;
+        transform: translate(0, -50px);
+    }
+    100% {
+        opacity: 100;
+        transform: translate(0, 0);
+    }
+}
+
+* {
+    margin: 5px;
+}
+
+body {
+    padding: 20px;
+}
+
+.mdc-theme--secondary-bg {
+    background-color: #E2D0FF;
+}
+
+.container {
+    display: flex;
+    max-width: none;
+    flex-direction: column;
+}
+.main {
+    display: flex;
+    max-width: none;
+    flex-direction: column;
+}
+
+.genomaData {
+    display: flex;
+    max-width: none;
+    flex-direction: row;
+    padding: 20px;
+    justify-content: space-around;
+    animation: build-up .3  s ease-in-out 0s;
+}
+
+.extraInput {
+    width: 300px;
+}
+
+.searchCustomization {
+    display: flex;
+    max-width: none;
+    flex-direction: row;
+    justify-content: space-around;
+    border: solid #6200EE;
+    border-radius: 20px;
+}
+
+.genomaSpec, .searchCustomization, .extraInput {
+    animation: fade-in .5s ease-in-out 0s;
+}
+
+.option-column {
+    display: flex;
+    max-width: none;
+    flex-direction: column;
+}
+
+.search-option {
+    padding: 10px;
+}
+
+.invisible {
+    display: none;
+}

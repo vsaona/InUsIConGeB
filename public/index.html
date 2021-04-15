@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <script src="../mwc_bundle/mwc-material-bundle.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <link rel="stylesheet" href="../stylesheets/editor.css">
+  <script src="../scripts/input.js"></script>
+  <link rel="stylesheet" href="../stylesheets/input.css">
   <!-- Your application must load the Roboto and Material Icons fonts. -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
@@ -15,80 +16,92 @@
   
   <div class="container">
     <div class="main">
-      <div class = "genomaData" id = "genomaData0">
-        <div id = genomaSource0">
-          <mwc-select outlined label="Genoma 1"id = genomaSourceType0">
-            <mwc-list-item value="file">Desde archivo</mwc-list-item>
-            <mwc-list-item value="gi">gi</mwc-list-item>
-            <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
-            <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
-          </mwc-select>
-          <div
-            id = "file0">
-            File placeholder
+      <div class = "main" id = "genomaList">
+        <div class = "genomaData" id = "genomaData0">
+          <div id = "genomaSource0">
+            <mwc-select outlined label="Genoma 1"id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);">
+              <mwc-list-item value="file">Desde archivo</mwc-list-item>
+              <mwc-list-item value="gi">gi</mwc-list-item>
+              <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
+              <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
+            </mwc-select>
+            <br>
+            <div
+              id = "file0"
+              class = "genomaSpec file invisible">
+              File placeholder
+            </div>
+            <mwc-textfield
+              outlined
+              id = "gi0"
+              label="gi"
+              class = "genomaSpec gi invisible">
+            </mwc-textfield>
+            <mwc-textfield
+              outlined
+              id = "accesion0"
+              label="número de acceso"
+              class = "genomaSpec accesion invisible">
+            </mwc-textfield>
+            <mwc-textarea
+              outlined
+              id = "fasta0"
+              label="secuencia fasta"
+              class = "genomaSpec fasta invisible">
+            </mwc-textarea>
           </div>
-          <mwc-textfield
-            outlined
-            id = "gi0"
-            label="gi">
-          </mwc-textfield>
-          <mwc-textfield
-            outlined
-            id = "accesion0"
-            label="número de acceso">
-          </mwc-textfield>
-          <mwc-textarea
-            outlined
-            id = "fasta0"
-            label="secuencia fasta">
-          </mwc-textarea>
-        </div>
 
-        <div class = "genomaBoundaries" id = "genomaBoundaries0">
-          <mwc-textfield
-            outlined
-            label = "Desde"
-            type = "number">
-          </mwc-textfield>
-          <mwc-textfield
-            outlined
-            label = "Hasta"
-            type = "number">
-          </mwc-textfield>
-          (codones)
-        </div>
-        <div class = "genomaBoundaries" id = "genomaBoundaries0">
-          <div class = "row mwc-typography">
-            Incluir
-            <mwc-textfield
-              outlined
-              label="genes"
-              type = "number"
-              min = "0">
-            </mwc-textfield>
-            antes
-          </div>
-          <div class = "row">
-            y
-            <mwc-textfield
-              outlined
-              label="genes"
-              type = "number"
-              min = "0">
-            </mwc-textfield>
-            después
+          <div class = "extraInput">
+            <div class = "genomaBoundaries invisible" id = "genomaBoundaries0">
+              <mwc-textfield
+                outlined
+                label = "Desde"
+                type = "number">
+              </mwc-textfield>
+              <mwc-textfield
+                outlined
+                label = "Hasta"
+                type = "number">
+              </mwc-textfield>
+              (codones)
+            </div>
+
+            <div class = "genomaContext invisible" id = "genomaContext0">
+              <div class = "row mwc-typography">
+                Incluir
+                <mwc-textfield
+                  outlined
+                  label="genes"
+                  type = "number"
+                  min = "0">
+                </mwc-textfield>
+                antes
+              </div>
+              <div class = "row">
+                y
+                <mwc-textfield
+                  outlined
+                  label="genes"
+                  type = "number"
+                  min = "0">
+                </mwc-textfield>
+                después
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <div>
-        Añadir genoma
+        <mwc-button onClick = "addGenoma()" id = "addGenomaButton" label = "Añadir genoma" icon = "add" outlined></mwc-button>
       </div>
       <div>
-        <mwc-formfield label="Buscar semejantes">
+        <mwc-formfield label="Buscar semejantes" onClick="searchCustomizationChangeVisibility();">
           <mwc-checkbox></mwc-checkbox>
         </mwc-formfield>
       </div>
-      <div class = "searchCustomization">
+    </div>
+    <div class = "main">
+      <div class = "searchCustomization invisible" id = "searchCustomization">
         <div class = "option-column">
           <div class = "search-option">
             Los
