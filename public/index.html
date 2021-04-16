@@ -5,7 +5,10 @@
   <meta charset="UTF-8">
   <script src="../mwc_bundle/mwc-material-bundle.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="../scripts/genomaData.js"></script>
   <script src="../scripts/input.js"></script>
+  
+  <link rel="stylesheet" href="../stylesheets/mdc.css">
   <link rel="stylesheet" href="../stylesheets/input.css">
   <!-- Your application must load the Roboto and Material Icons fonts. -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
@@ -13,8 +16,15 @@
 </head>
 <body>
 
+  <div id = "Explicacion" class = "mdc-typography">
+    ¡Bienvenido! Esta herramienta te permite generar gráficos de contexto genómico de alta calidad.
+    A continuación debes elegir los <b>segmentos de genoma</b> que deseas graficar. Puedes especificarlos
+    subiendo archivos de tu computador, con un identificador del <b>GenBank</b> o directamente escribiendo la secuencia fasta
+    <br>
+    En cualquier caso, puedes pedir más genomas parecidos con la opción de más abajo (en caso de que hayas ingresado una secuencia fasta, esto es obligatorio).
+  </div>
   
-  <div class="container">
+  <form id = "filesForm" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="container">
     <div class="main">
       <div class = "main" id = "genomaList">
         <div class = "genomaData" id = "genomaData0">
@@ -26,11 +36,12 @@
               <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
             </mwc-select>
             <br>
-            <div
+            <span
               id = "file0"
               class = "genomaSpec file invisible">
               File placeholder
-            </div>
+              <input type="file" class="form-control-file" name="file0">
+            </span>
             <mwc-textfield
               outlined
               id = "gi0"
@@ -63,7 +74,6 @@
                 label = "Hasta"
                 type = "number">
               </mwc-textfield>
-              (codones)
             </div>
 
             <div class = "genomaContext invisible" id = "genomaContext0">
@@ -144,9 +154,8 @@
           </div>
         </div>
         <div class = "option-column">
-          <div class = "search-option">
-            Base de Datos:
-            <mwc-select outlined label="Base de datos" id = genomaSourceType0">
+          <div class = "search-option" >
+            <mwc-select outlined label="Base de datos" id = "genomaSourceType0" naturalMenuWidth="true">
               <mwc-list-item value="nr">Non-redundant protein sequences</mwc-list-item>
               <mwc-list-item value="refseq_select">RefSeq Select proteins</mwc-list-item>
               <mwc-list-item value="refseq_protein">Reference proteins</mwc-list-item>
@@ -171,26 +180,8 @@
         </div>
       </div>
     </div>
-  </div>
-  <mwc-button id="myButton" label="Draw it!" raised></mwc-button>
-  <form id = "filesForm" action="fileUploadAndRender" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <div id = "files">
-            <input type="file" class="form-control-file" name="file0">
-        </div>
-        <input type="submit" class="btn btn-primary">
-    </div>
+    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submit">
   </form>
-  <mwc-button class="btn btn-secondary" raised onClick="newFile()"> Subir otro archivo </mwc-button> <br>
-  
-
-  <!-- The Material Web Components use standard JavaScript modules. -->
-  <script type="module">
-
-    const button = document.querySelector('#myButton');
-    button.addEventListener('click', () => {
-      alert('You clicked!');
-    });
-  </script>
+  <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById('submit').click();"></mwc-button>
 </body>
 </html>
