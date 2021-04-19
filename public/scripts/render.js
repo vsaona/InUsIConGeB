@@ -16,7 +16,7 @@ $.ajaxSetup({ traditional: true });
 console.log(filePath);
 $.post( "processFile", {"filePath": filePath}, function( data ) {
     genomas = data.genomas;
-    console.log(filePath);
+    console.log(genomas);
     drawAll(genomas);
 });
 
@@ -69,7 +69,7 @@ function activate(type, element, data) {
         d3.select("#globalToolBar").classed("invisible", false);
         d3.select("#globalToolBar").select("#genomaName").attr("value", data.name);
     } else {
-        console.log("You should implement this thing!");
+        console.log("You should implement '" + type + "' now!");
     }
     activeElement = element;
 }
@@ -94,6 +94,7 @@ function draw(genoma, y, group){
             arrow.style("fill", gene.color);
         } else {
             gene.color = "#D7D7D7";
+            arrow.style("fill", gene.color);
         }
         if(gene.identity) {
             arrow.style("fill-opacity", gene.identity);

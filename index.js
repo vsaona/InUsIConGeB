@@ -6,6 +6,37 @@ import formidable from "formidable";
 
 //import bodyParser from "body-parser"; //var bodyParser = require('body-parser')
  
+function generateColor() {
+  var colorType = Math.random() * 3;
+  var a = Math.round(96 + 144 * Math.random())
+  var b = Math.round(96 + 144 * Math.random())
+  var c = (Math.round(96 + ((336 - a - b)/* % 255*/)) % 255).toString(16);
+  a = a.toString(16);
+  b = b.toString(16);
+  if(colorType < 1) { // yellow
+      return("#"+a+b+c);
+  } else if(colorType < 2) {
+      return("#"+c+a+b);
+  } else {
+      return("#"+b+c+a);
+  }
+}
+
+function generateColorPalette(genes) {
+  var colors = [];
+  var names = [];
+  for(var i = 0; i < genes.length; i++) {
+      if(names.includes(genes[i].name)) {
+          genes[i].color = colors[names.indexOf(genes[i].name)];
+      } else {
+          names.push(genes[i].name);
+          genes[i].color = generateColor();
+          colors.push(genes[i].color);
+      }
+  }
+  return(genes);
+}
+
 // create application/json parser
 app.use(express.json());
 app.use(express.urlencoded({
@@ -109,7 +140,7 @@ app.post('/processFile', function(req, res, next) {
         genes.push(json);
       }
     }
-    genomas.push({genes:genes, name: fileName});
+    genomas.push({genes:generateColorPalette(genes), name: fileName});
   }
   res.json({genomas: genomas});
 });
