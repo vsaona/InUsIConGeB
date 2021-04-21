@@ -3,10 +3,11 @@ var app = express();
 import fs from "fs"; //"var fs = require('fs');
 import path from "path";
 import formidable from "formidable";
+import colorsys from "colorsys";
 
 //import bodyParser from "body-parser"; //var bodyParser = require('body-parser')
  
-function generateColor() {
+function generateRandomColor() {
   var colorType = Math.random() * 3;
   var a = Math.round(96 + 144 * Math.random())
   var b = Math.round(96 + 144 * Math.random())
@@ -22,20 +23,27 @@ function generateColor() {
   }
 }
 
-function generateColorPalette(genes) {
-  var colors = [];
-  var names = [];
+function generateColorPalette(genes, names, colors) {
+  var j = 0;
   for(var i = 0; i < genes.length; i++) {
       if(names.includes(genes[i].name)) {
           genes[i].color = colors[names.indexOf(genes[i].name)];
       } else {
           names.push(genes[i].name);
-          genes[i].color = generateColor();
-          colors.push(genes[i].color);
+          //genes[i].color = generateRandomColor();
+          var colors = [];
+          var color = colorsys.hsv2Hex(j++ * 0.618033988749895 % 1.0 * 240, 50, 100);
+          while(colors.includes(color)) {
+            color = colorsys.hsv2Hex(j++ * 0.618033988749895 % 1.0 * 240, 50, 100);
+          }
+          genes[i].color = color;
+          colors.push(color);
       }
   }
   return(genes);
 }
+
+app.use('/favicon.ico', express.static('public/images/favicon.png'));
 
 // create application/json parser
 app.use(express.json());
@@ -105,6 +113,8 @@ app.post('/processFile', function(req, res, next) {
     filePath = req.body.filePath;
   }
   var genomas = [];
+  var names = [];
+  var colors =[];
   for(var j = 0; j < filePath.length; j++) {
     var fileName = filePath[j].split("/")[filePath[j].split("/").length - 1]
     var contents = fs.readFileSync(filePath[j],'utf8');
@@ -140,7 +150,9 @@ app.post('/processFile', function(req, res, next) {
         genes.push(json);
       }
     }
-    genomas.push({genes:generateColorPalette(genes), name: fileName});
+    var genomaName = fileName.split(".");
+    genomaName = genomaName.slice(0, genomaName.length - 1).join('');
+    genomas.push({genes:generateColorPalette(genes, names, colors), name: genomaName});
   }
   res.json({genomas: genomas});
 });

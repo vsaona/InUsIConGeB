@@ -30,7 +30,7 @@ function newGenomaData(id) {
     genomaSourceType.appendChild(sourceFile);
     genomaSourceType.appendChild(sourceGi);
     genomaSourceType.appendChild(sourceAccesion);
-    genomaSourceType.appendChild(sourceFasta);
+    //genomaSourceType.appendChild(sourceFasta);
 
     genomaSource.appendChild(genomaSourceType);
     genomaSource.appendChild(document.createElement("br"));

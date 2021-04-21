@@ -13,6 +13,7 @@
   <!-- Your application must load the Roboto and Material Icons fonts. -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
+  <link rel="icon" href="/images/favicon.png">
 </head>
 <body>
 
@@ -24,94 +25,14 @@
     En cualquier caso, puedes pedir más genomas parecidos con la opción de más abajo (en caso de que hayas ingresado una secuencia fasta, esto es obligatorio).
   </div>
   
-  <form id = "filesForm" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="container">
-    <div class="main">
-      <div class = "main" id = "genomaList">
-        <div class = "genomaData" id = "genomaData0">
-          <div id = "genomaSource0">
-            <mwc-select outlined label="Genoma 1"id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);">
-              <mwc-list-item value="file">Desde archivo</mwc-list-item>
-              <mwc-list-item value="gi">gi</mwc-list-item>
-              <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
-              <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
-            </mwc-select>
-            <br>
-            <span
-              id = "file0"
-              class = "genomaSpec file invisible">
-              File placeholder
-              <input type="file" class="form-control-file" name="file0">
-            </span>
-            <mwc-textfield
-              outlined
-              id = "gi0"
-              label="gi"
-              class = "genomaSpec gi invisible">
-            </mwc-textfield>
-            <mwc-textfield
-              outlined
-              id = "accesion0"
-              label="número de acceso"
-              class = "genomaSpec accesion invisible">
-            </mwc-textfield>
-            <mwc-textarea
-              outlined
-              id = "fasta0"
-              label="secuencia fasta"
-              class = "genomaSpec fasta invisible">
-            </mwc-textarea>
-          </div>
-
-          <div class = "extraInput">
-            <div class = "genomaBoundaries invisible" id = "genomaBoundaries0">
-              <mwc-textfield
-                outlined
-                label = "Desde"
-                type = "number">
-              </mwc-textfield>
-              <mwc-textfield
-                outlined
-                label = "Hasta"
-                type = "number">
-              </mwc-textfield>
-            </div>
-
-            <div class = "genomaContext invisible" id = "genomaContext0">
-              <div class = "row mwc-typography">
-                Incluir
-                <mwc-textfield
-                  outlined
-                  label="genes"
-                  type = "number"
-                  min = "0">
-                </mwc-textfield>
-                antes
-              </div>
-              <div class = "row">
-                y
-                <mwc-textfield
-                  outlined
-                  label="genes"
-                  type = "number"
-                  min = "0">
-                </mwc-textfield>
-                después
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div>
-        <mwc-button onClick = "addGenoma()" id = "addGenomaButton" label = "Añadir genoma" icon = "add" outlined></mwc-button>
-      </div>
-      <div>
-        <mwc-formfield label="Buscar semejantes" onClick="searchCustomizationChangeVisibility();">
-          <mwc-checkbox></mwc-checkbox>
-        </mwc-formfield>
-      </div>
-    </div>
+  <mwc-tab-bar onclick = "changeTab(this.activeIndex)">
+    <mwc-tab label = "Búsqueda de homólogos" onchange = "changeTab(this.activeIndex)"> </mwc-tab>
+    <mwc-tab label = "Graficar mis contextos" onchange = "changeTab(this.activeIndex)"> </mwc-tab>
+  </mwc-tab-bar>
+  
+  <form id = "tab1" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container invisible">
     <div class = "main">
-      <div class = "searchCustomization invisible" id = "searchCustomization">
+      <div class = "searchCustomization" id = "searchCustomization">
         <div class = "option-column">
           <div class = "search-option">
             Los
@@ -181,6 +102,87 @@
       </div>
     </div>
     <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submit">
+  </form>
+  <form id = "tab0" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container">
+    <div class="main">
+      <div class = "main" id = "genomaList">
+        <div class = "genomaData" id = "genomaData0">
+          <div id = "genomaSource0">
+            <mwc-select outlined label="Genoma 1"id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);">
+              <mwc-list-item value="file">Desde archivo</mwc-list-item>
+              <mwc-list-item value="gi">gi</mwc-list-item>
+              <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
+              <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
+            </mwc-select>
+            <br>
+            <span
+              id = "file0"
+              class = "genomaSpec file invisible">
+              <input type="file" class="form-control-file" name="file0">
+            </span>
+            <mwc-textfield
+              outlined
+              id = "gi0"
+              label="gi"
+              class = "genomaSpec gi invisible">
+            </mwc-textfield>
+            <mwc-textfield
+              outlined
+              id = "accesion0"
+              label="número de acceso"
+              class = "genomaSpec accesion invisible">
+            </mwc-textfield>
+            <mwc-textarea
+              outlined
+              id = "fasta0"
+              label="secuencia fasta"
+              class = "genomaSpec fasta invisible">
+            </mwc-textarea>
+          </div>
+
+          <div class = "extraInput">
+            <div class = "genomaBoundaries invisible" id = "genomaBoundaries0">
+              <mwc-textfield
+                outlined
+                label = "Desde"
+                type = "number">
+              </mwc-textfield>
+              <mwc-textfield
+                outlined
+                label = "Hasta"
+                type = "number">
+              </mwc-textfield>
+            </div>
+
+            <div class = "genomaContext invisible" id = "genomaContext0">
+              <div class = "row mwc-typography">
+                Incluir
+                <mwc-textfield
+                  outlined
+                  label="genes"
+                  value = "0"
+                  >
+                </mwc-textfield>
+                antes
+              </div>
+              <div class = "row">
+                y
+                <mwc-textfield
+                  outlined
+                  label="genes"
+                  type = "number"
+                  min = "0">
+                </mwc-textfield>
+                después
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <mwc-button onClick = "addGenoma()" id = "addGenomaButton" label = "Añadir genoma" icon = "add" outlined></mwc-button>
+      </div>
+    </div>
   </form>
   <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById('submit').click();"></mwc-button>
 </body>

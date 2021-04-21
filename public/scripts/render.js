@@ -59,12 +59,16 @@ function activate(type, element, data) {
     if(type == "arrow") {
         d3.select("#arrowToolBar").classed("invisible", false);
         var arrowColor = document.getElementById("arrowColor");
+        document.getElementById("arrowStrokeWidthMwcTextField").layout();
+        document.getElementById("arrowOpacity").layout();
+        document.getElementById("arrowColor").layout();
         arrowColor.value = data.color;
         d3.select(arrowColor).style("background-color", arrowColor.value);
     } else if (type == "arrowText") {
         d3.select("#arrowTextToolBar").classed("invisible", false);
         d3.select("#arrowTextToolBar").select("#geneName").attr("value", data.name);
         d3.select("#geneFontSize").attr("value", $(element).css("font-size").slice(0,-2));
+        document.getElementById("geneFontSize").layout();
     } else if (type == "global") {
         d3.select("#globalToolBar").classed("invisible", false);
         d3.select("#globalToolBar").select("#genomaName").attr("value", data.name);

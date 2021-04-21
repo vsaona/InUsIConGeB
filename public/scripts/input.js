@@ -1,3 +1,14 @@
+function changeTab(activeTabIndex) {
+    console.log(activeTabIndex);
+    for(let tabContent of document.getElementsByClassName("tabContent")) {
+        if(tabContent.id == "tab" + activeTabIndex) {
+            tabContent.classList.remove("invisible");
+        } else {
+            tabContent.classList.add("invisible");
+        }
+    }
+}
+
 var addedInputGenomaisEven = true;
 var genomas = 1;
 function addGenoma() {
@@ -9,15 +20,6 @@ function addGenoma() {
     addedInputGenomaisEven = !addedInputGenomaisEven;
     document.getElementById("genomaList").appendChild(clone);
     genomas++;
-}
-
-function searchCustomizationChangeVisibility() {
-    var original = document.getElementById("searchCustomization");
-    if(original.classList.contains("invisible")) {
-        original.classList.remove("invisible");
-    } else {
-        original.classList.add("invisible");
-    }
 }
 
 function changeGenomaSource(value, id) {
@@ -36,9 +38,9 @@ function changeGenomaSource(value, id) {
     console.log(element.getElementsByClassName("extraInput")[0].children);
     for(let el of element.getElementsByClassName("extraInput")[0].children) {
         el.classList.add("invisible");
-        if(value == "file" && el.classList.contains("genomaBoundaries")) {
+        if((value == "file" || value == "accesion") && el.classList.contains("genomaBoundaries")) {
             el.classList.remove("invisible");
-        } else if((value == "gi" || value == "accesion") && el.classList.contains("genomaContext")) {
+        } else if(value == "gi" && el.classList.contains("genomaContext")) {
             el.classList.remove("invisible");
         }
     }
