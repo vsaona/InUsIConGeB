@@ -2,19 +2,7 @@
 <style>
     .invisible { display: none; }
 </style>
-<script>
-  function foo () {
-    document.getElementById("1").classList.remove("invisible");
-  }
-</script>
-<div class = "invisible" id="1">
-  <mwc-textfield
-    outlined
-    label="something"
-    value = "0"
-    onchange = "doSomething(this)">
-  </mwc-textfield>
-</div>
-<button onClick = "foo()">
-    Make it appear
-</button>
+<mwc-tab-bar id = "tab-bar">
+  <mwc-tab label = "Búsqueda de homólogos"> </mwc-tab>
+  <mwc-tab label = "Graficar mis contextos"> </mwc-tab>
+</mwc-tab-bar>

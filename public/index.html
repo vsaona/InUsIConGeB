@@ -25,13 +25,64 @@
     En cualquier caso, puedes pedir más genomas parecidos con la opción de más abajo (en caso de que hayas ingresado una secuencia fasta, esto es obligatorio).
   </div>
   
-  <mwc-tab-bar onclick = "changeTab(this.activeIndex)">
-    <mwc-tab label = "Búsqueda de homólogos" onchange = "changeTab(this.activeIndex)"> </mwc-tab>
-    <mwc-tab label = "Graficar mis contextos" onchange = "changeTab(this.activeIndex)"> </mwc-tab>
+  <mwc-tab-bar onclick = "changeTab(this.activeIndex)" id = "tab-bar" activeIndex = "0">
+    <mwc-tab label = "Búsqueda de homólogos" id = "tabIndicator0"> </mwc-tab>
+    <mwc-tab label = "Graficar mis contextos" id = "tabIndicator1"> </mwc-tab>
   </mwc-tab-bar>
   
-  <form id = "tab1" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container invisible">
+  <form id = "tab0" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container">
     <div class = "main">
+      <div class = "genomaData" id = "genomaSearchData">
+        <div id = "genomaSearchSource">
+          <mwc-select outlined label="Secuencia de origen" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');">
+            <mwc-list-item value="file">Desde archivo</mwc-list-item>
+            <mwc-list-item value="locus">locus tag</mwc-list-item>
+            <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
+            <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
+          </mwc-select>
+          <br>
+          <span
+            id = "fileSearchSource"
+            class = "genomaSpec file invisible">
+            <input type="file" class="form-control-file" name="fileSearchSource">
+          </span>
+          <mwc-textfield
+            outlined
+            id = "locusSearchSource"
+            label="locus tag"
+            class = "genomaSpec locus invisible">
+          </mwc-textfield>
+          <mwc-textfield
+            outlined
+            id = "accesionSearchSource"
+            label="número de acceso"
+            class = "genomaSpec accesion invisible">
+          </mwc-textfield>
+          <mwc-textarea
+            outlined
+            id = "fastaSearchSource"
+            label="secuencia fasta"
+            class = "genomaSpec fasta invisible"
+            rows = "6"
+            cols = "80">
+          </mwc-textarea>
+        </div>
+
+        <div class = "extraInput">
+          <div class = "genomaBoundaries invisible" id = "genomaBoundariesSearchSource">
+            <mwc-textfield
+              outlined
+              label = "locus inicial"
+              type = "number">
+            </mwc-textfield>
+            <mwc-textfield
+              outlined
+              label = "locus final"
+              type = "number">
+            </mwc-textfield>
+          </div>
+        </div>
+      </div>
       <div class = "searchCustomization" id = "searchCustomization">
         <div class = "option-column">
           <div class = "search-option">
@@ -45,9 +96,16 @@
             más parecidos
           </div>
           <div class = "search-option">
-            <mwc-formfield label="Sólo uno de cada género">
-              <mwc-checkbox></mwc-checkbox>
-            </mwc-formfield>
+            <mwc-select outlined label="Sólo uno de cada" id = "oneOfEach">
+              <mwc-list-item value="entry">Entrada</mwc-list-item>
+              <mwc-list-item value="specie">Especie</mwc-list-item> <!-- selected  // This has a bug -->
+              <mwc-list-item value="genre">género</mwc-list-item>
+              <mwc-list-item value="family">familia</mwc-list-item>
+              <mwc-list-item value="order">orden</mwc-list-item>
+              <mwc-list-item value="class">clase</mwc-list-item>
+              <mwc-list-item value="filo">filo</mwc-list-item>
+              <mwc-list-item value="kingdom">reino</mwc-list-item>
+            </mwc-select>
           </div>
           <div class = "search-option">
             Covertura mínima:
@@ -89,30 +147,30 @@
             </mwc-select>
           </div>
           <div class = "search-option">
-            <mwc-formfield label="Sólo del mismo reino (filo)">
-              <mwc-checkbox></mwc-checkbox>
-            </mwc-formfield>
+            <mwc-textfield
+              outlined
+              label="Sólo incluir">
+            </mwc-textfield>
           </div>
           <div class = "search-option">
-            <mwc-formfield label="Sólo del mismo género">
-              <mwc-checkbox></mwc-checkbox>
+            <mwc-formfield label="Sólo cepas tipo">
+              <mwc-checkbox checked>
+              </mwc-checkbox>
             </mwc-formfield>
           </div>
         </div>
       </div>
     </div>
-    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submit">
   </form>
-  <form id = "tab0" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container">
+  <form id = "tab1" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container invisible">
     <div class="main">
       <div class = "main" id = "genomaList">
         <div class = "genomaData" id = "genomaData0">
           <div id = "genomaSource0">
-            <mwc-select outlined label="Genoma 1"id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);">
+            <mwc-select outlined label="Contexto 1"id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);">
               <mwc-list-item value="file">Desde archivo</mwc-list-item>
-              <mwc-list-item value="gi">gi</mwc-list-item>
+              <mwc-list-item value="locus">locus tag</mwc-list-item>
               <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
-              <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
             </mwc-select>
             <br>
             <span
@@ -122,9 +180,9 @@
             </span>
             <mwc-textfield
               outlined
-              id = "gi0"
-              label="gi"
-              class = "genomaSpec gi invisible">
+              id = "locus0"
+              label="locus tag"
+              class = "genomaSpec locus invisible">
             </mwc-textfield>
             <mwc-textfield
               outlined
@@ -132,12 +190,6 @@
               label="número de acceso"
               class = "genomaSpec accesion invisible">
             </mwc-textfield>
-            <mwc-textarea
-              outlined
-              id = "fasta0"
-              label="secuencia fasta"
-              class = "genomaSpec fasta invisible">
-            </mwc-textarea>
           </div>
 
           <div class = "extraInput">
@@ -183,7 +235,12 @@
         <mwc-button onClick = "addGenoma()" id = "addGenomaButton" label = "Añadir genoma" icon = "add" outlined></mwc-button>
       </div>
     </div>
+    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submit">
   </form>
   <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById('submit').click();"></mwc-button>
+  <script>
+    
+    document.getElementById("oneOfEach").value = "specie";
+  </script>
 </body>
 </html>

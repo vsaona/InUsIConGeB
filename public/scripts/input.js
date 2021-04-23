@@ -23,7 +23,11 @@ function addGenoma() {
 }
 
 function changeGenomaSource(value, id) {
-    var element = document.getElementById("genomaList").children[id];
+    if(id != 'SearchSource') {
+        var element = document.getElementById("genomaList").children[id];
+    } else {
+        var element = document.getElementById("genomaSearchData");
+    }
     for(let el of element.children[0].children) {
         if(el.classList.contains("genomaSpec")) {
             el.classList.add("invisible");
@@ -40,8 +44,9 @@ function changeGenomaSource(value, id) {
         el.classList.add("invisible");
         if((value == "file" || value == "accesion") && el.classList.contains("genomaBoundaries")) {
             el.classList.remove("invisible");
-        } else if(value == "gi" && el.classList.contains("genomaContext")) {
+        } else if(value == "locus" && el.classList.contains("genomaContext")) {
             el.classList.remove("invisible");
         }
     }
 }
+document.getElementById("tabIndicator0").click();

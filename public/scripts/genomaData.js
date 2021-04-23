@@ -8,7 +8,7 @@ function newGenomaData(id) {
 
     var genomaSourceType = document.createElement("mwc-select");
     genomaSourceType.outlined = true;
-    genomaSourceType.label = "Genoma " + (id + 1);
+    genomaSourceType.label = "Contexto " + (id + 1);
     genomaSourceType.id = "GenomaSourceType" + id;
     genomaSourceType.onchange = (function() {
         changeGenomaSource(genomaSourceType.value, id);
@@ -17,9 +17,9 @@ function newGenomaData(id) {
     var sourceFile = document.createElement("mwc-list-item");
     sourceFile.value = "file";
     sourceFile.innerText = "Desde archivo";
-    var sourceGi = document.createElement("mwc-list-item");
-    sourceGi.value = "gi";
-    sourceGi.innerText = "gi";
+    var sourceLocus = document.createElement("mwc-list-item");
+    sourceLocus.value = "locus";
+    sourceLocus.innerText = "locus tag";
     var sourceAccesion = document.createElement("mwc-list-item");
     sourceAccesion.value = "accesion";
     sourceAccesion.innerText = "Número de acceso";
@@ -28,7 +28,7 @@ function newGenomaData(id) {
     sourceFasta.innerText = "secuencia fasta";
 
     genomaSourceType.appendChild(sourceFile);
-    genomaSourceType.appendChild(sourceGi);
+    genomaSourceType.appendChild(sourceLocus);
     genomaSourceType.appendChild(sourceAccesion);
     //genomaSourceType.appendChild(sourceFasta);
 
@@ -47,14 +47,14 @@ function newGenomaData(id) {
     fileSpan.appendChild(fileInput);
     genomaSource.appendChild(fileSpan);
 
-    var giDef = document.createElement("mwc-textfield");
-    giDef.outlined = true;
-    giDef.id = "gi" + id;
-    giDef.label = "gi";
-    giDef.classList.add("genomaSpec");
-    giDef.classList.add("gi");
-    giDef.classList.add("invisible");
-    genomaSource.appendChild(giDef);
+    var locusDef = document.createElement("mwc-textfield");
+    locusDef.outlined = true;
+    locusDef.id = "locus" + id;
+    locusDef.label = "locus tag";
+    locusDef.classList.add("genomaSpec");
+    locusDef.classList.add("locus");
+    locusDef.classList.add("invisible");
+    genomaSource.appendChild(locusDef);
 
     var accesionDef = document.createElement("mwc-textfield");
     accesionDef.outlined = true;
@@ -64,18 +64,6 @@ function newGenomaData(id) {
     accesionDef.classList.add("accesion");
     accesionDef.classList.add("invisible");
     genomaSource.appendChild(accesionDef);
-
-    /*
-        // No se debería poder especificar más de un fasta, pero lo dejo aca por si acaso.
-        var fastaDef = document.createElement("mwc-textarea");
-        fastaDef.outlined = true;
-        fastaDef.id = "fasta" + id;
-        fastaDef.label = "secuencia fasta";
-        fastaDef.classList.add("genomaSpec");
-        fastaDef.classList.add("fasta");
-        fastaDef.classList.add("invisible");
-        genomaSource.appendChild(fastaDef);
-    */
 
     genomaData.appendChild(genomaSource);
 
