@@ -671,7 +671,7 @@ var jsc = {
 
 	dispatchChange : function (thisObj) {
 		if (thisObj.valueElement) {
-			if (jsc.isElementType(thisObj.valueElement, 'input')) {
+			if (jsc.isElementType(thisObj.valueElement, 'input') || jsc.isElementType(thisObj.valueElement, 'mwc-textfield')) {
 				jsc.fireEvent(thisObj.valueElement, 'change');
 			}
 		}
@@ -1060,7 +1060,7 @@ var jsc = {
 			if (!this.valueElement) {
 				this.exportColor();
 			} else {
-				if (jsc.isElementType(this.valueElement, 'input')) {
+				if (jsc.isElementType(this.valueElement, 'input')  || jsc.isElementType(this.valueElement, 'mwc-textfield')) {
 					if (!this.refine) {
 						if (!this.fromString(this.valueElement.value, jsc.leaveValue)) {
 							if (this.styleElement) {
@@ -1098,7 +1098,7 @@ var jsc = {
 				if (this.uppercase) { value = value.toUpperCase(); }
 				if (this.hash) { value = '#' + value; }
 
-				if (jsc.isElementType(this.valueElement, 'input')) {
+				if (jsc.isElementType(this.valueElement, 'input')  || jsc.isElementType(this.valueElement, 'mwc-textfield')) {
 					this.valueElement.value = value;
 				} else {
 					this.valueElement.innerHTML = value;
@@ -1791,7 +1791,7 @@ var jsc = {
 
 		// valueElement
 		if (this.valueElement) {
-			if (jsc.isElementType(this.valueElement, 'input')) {
+			if (jsc.isElementType(this.valueElement, 'input')  || jsc.isElementType(this.valueElement, 'mwc-textfield')) {
 				var updateField = function () {
 					THIS.fromString(THIS.valueElement.value, jsc.leaveValue);
 					jsc.dispatchFineChange(THIS);
@@ -1840,11 +1840,13 @@ jsc.jscolor.lookupClass = 'jscolor';
 jsc.jscolor.installByClassName = function (className) {
 	var inputElms = document.getElementsByTagName('input');
 	var buttonElms = document.getElementsByTagName('button');
+		var mwc_inputElms = document.getElementsByTagName('mwc-textfield');
         var polygonElms = document.getElementsByTagName('polygon');
 
 	jsc.tryInstallOnElements(inputElms, className);
 	jsc.tryInstallOnElements(buttonElms, className);
         jsc.tryInstallOnElements(polygonElms, className);
+		jsc.tryInstallOnElements(mwc_inputElms, className);
 };
 
 

@@ -78,13 +78,11 @@ function newGenomaData(id) {
     var desde = document.createElement("mwc-textfield");
     desde.outlined = true;
     desde.label = "Desde";
-    desde.type = "number";
     desde.id = "desde" + id;
     genomaBoundaries.appendChild(desde);
     var hasta = document.createElement("mwc-textfield");
     hasta.outlined = true;
     hasta.label = "Hasta";
-    hasta.type = "number";
     hasta.id = "hasta" + id;
     genomaBoundaries.appendChild(hasta);
     extraInput.appendChild(genomaBoundaries);

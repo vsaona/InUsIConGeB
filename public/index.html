@@ -16,7 +16,7 @@
   <link rel="icon" href="/images/favicon.png">
 </head>
 <body>
-
+<!--
   <div id = "Explicacion" class = "mdc-typography">
     ¡Bienvenido! Esta herramienta te permite generar gráficos de contexto genómico de alta calidad.
     A continuación debes elegir los <b>segmentos de genoma</b> que deseas graficar. Puedes especificarlos
@@ -24,7 +24,7 @@
     <br>
     En cualquier caso, puedes pedir más genomas parecidos con la opción de más abajo (en caso de que hayas ingresado una secuencia fasta, esto es obligatorio).
   </div>
-  
+-->
   <mwc-tab-bar onclick = "changeTab(this.activeIndex)" id = "tab-bar" activeIndex = "0">
     <mwc-tab label = "Búsqueda de homólogos" id = "tabIndicator0"> </mwc-tab>
     <mwc-tab label = "Graficar mis contextos" id = "tabIndicator1"> </mwc-tab>
@@ -37,14 +37,18 @@
           <mwc-select outlined label="Secuencia de origen" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');">
             <mwc-list-item value="file">Desde archivo</mwc-list-item>
             <mwc-list-item value="locus">locus tag</mwc-list-item>
-            <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
+            <!-- <mwc-list-item value="accesion">Número de acceso (como de todas formas se debe especificar el locus tag, esto no debería tener sentido)</mwc-list-item> -->
             <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
           </mwc-select>
           <br>
           <span
             id = "fileSearchSource"
             class = "genomaSpec file invisible">
-            <input type="file" class="form-control-file" name="fileSearchSource">
+            <div>
+              <input id = "fileSelectButtonSearchSource" onChange = "updateFileName(this.value, 'SearchSource')" type="file" class="form-control-file" name="fileSearchSource" style="opacity: 0; margin-bottom: -100%;">
+            </div>
+            <mwc-button onclick = "selectFile('SearchSource')" label = "Elegir archivo" outlined></mwc-button>
+            <div id = "fileNameSearchSource">No file selected</div>
           </span>
           <mwc-textfield
             outlined
@@ -72,13 +76,9 @@
           <div class = "genomaBoundaries invisible" id = "genomaBoundariesSearchSource">
             <mwc-textfield
               outlined
-              label = "locus inicial"
-              type = "number">
-            </mwc-textfield>
-            <mwc-textfield
-              outlined
-              label = "locus final"
-              type = "number">
+              label = "locus tag"
+              type = "text">
+              <!-- autocompletar -->
             </mwc-textfield>
           </div>
         </div>
@@ -112,7 +112,6 @@
             <mwc-textfield
               outlined
               iconTrailing = "%"
-              label = "Covertura"
               type = "number"
               min = "0"
               max = "100"
@@ -124,7 +123,6 @@
             <mwc-textfield
               outlined
               iconTrailing = "%"
-              label = "Identidad"
               type = "number"
               min = "0"
               max = "100"
@@ -176,7 +174,11 @@
             <span
               id = "file0"
               class = "genomaSpec file invisible">
-              <input type="file" class="form-control-file" name="file0">
+              <div>
+                <input id = "fileSelectButton0" onChange = "updateFileName(this.value, '0')" type="file" class="form-control-file" name="file0" style="opacity: 0; margin-bottom: -100%;">
+              </div>
+              <mwc-button onclick = "selectFile('0')" label = "Elegir archivo" outlined></mwc-button>
+              <div id = "fileName0">No file selected</div>
             </span>
             <mwc-textfield
               outlined
@@ -196,13 +198,11 @@
             <div class = "genomaBoundaries invisible" id = "genomaBoundaries0">
               <mwc-textfield
                 outlined
-                label = "Desde"
-                type = "number">
+                label = "Desde">
               </mwc-textfield>
               <mwc-textfield
                 outlined
-                label = "Hasta"
-                type = "number">
+                label = "Hasta">
               </mwc-textfield>
             </div>
 
@@ -211,21 +211,19 @@
                 Incluir
                 <mwc-textfield
                   outlined
-                  label="genes"
-                  value = "0"
-                  >
-                </mwc-textfield>
-                antes
+                  type = "number"
+                  min = "0"
+                  value = "3">
+                </mwc-textfield> genes antes
               </div>
               <div class = "row">
                 y
                 <mwc-textfield
                   outlined
-                  label="genes"
                   type = "number"
-                  min = "0">
-                </mwc-textfield>
-                después
+                  min = "0"
+                  value = "3">
+                </mwc-textfield> genes después
               </div>
             </div>
           </div>
@@ -239,7 +237,7 @@
   </form>
   <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById('submit').click();"></mwc-button>
   <script>
-    
+    document.getElementById("tabIndicator0").click();
     document.getElementById("oneOfEach").value = "specie";
   </script>
 </body>

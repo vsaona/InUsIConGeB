@@ -1,5 +1,4 @@
 function changeTab(activeTabIndex) {
-    console.log(activeTabIndex);
     for(let tabContent of document.getElementsByClassName("tabContent")) {
         if(tabContent.id == "tab" + activeTabIndex) {
             tabContent.classList.remove("invisible");
@@ -12,7 +11,6 @@ function changeTab(activeTabIndex) {
 var addedInputGenomaisEven = true;
 var genomas = 1;
 function addGenoma() {
-    var original = document.getElementById("genomaData0");
     var clone = newGenomaData(genomas);
     if(addedInputGenomaisEven) {
         clone.classList.add("mdc-theme--secondary-bg");
@@ -23,6 +21,7 @@ function addGenoma() {
 }
 
 function changeGenomaSource(value, id) {
+    if(!value) return;
     if(id != 'SearchSource') {
         var element = document.getElementById("genomaList").children[id];
     } else {
@@ -36,10 +35,6 @@ function changeGenomaSource(value, id) {
             }
         }
     }
-    console.log(element);
-    console.log(element.getElementsByClassName("extraInput"));
-    console.log(element.getElementsByClassName("extraInput")[0]);
-    console.log(element.getElementsByClassName("extraInput")[0].children);
     for(let el of element.getElementsByClassName("extraInput")[0].children) {
         el.classList.add("invisible");
         if((value == "file" || value == "accesion") && el.classList.contains("genomaBoundaries")) {
@@ -49,4 +44,11 @@ function changeGenomaSource(value, id) {
         }
     }
 }
-document.getElementById("tabIndicator0").click();
+
+function selectFile(id) {
+    document.getElementById('fileSelectButton' + id).click();
+}
+function updateFileName(value, id) {
+    var path = value.split('\\');
+    document.getElementById('fileName' + id).innerText = path[path.length - 1];
+}

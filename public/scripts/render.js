@@ -72,6 +72,8 @@ function activate(type, element, data) {
     } else if (type == "global") {
         d3.select("#globalToolBar").classed("invisible", false);
         d3.select("#globalToolBar").select("#genomaName").attr("value", data.name);
+        d3.select("#genomaTextSizeInput").attr("value", $(element).css("font-size").slice(0,-2));
+        document.getElementById("genomaTextSizeInput").layout();
     } else {
         console.log("You should implement '" + type + "' now!");
     }
@@ -106,7 +108,14 @@ function draw(genoma, y, group){
             gene.identity = 1;
         }
         this.getElementsByTagName("polygon")[0].addEventListener("click", function(){activate("arrow", this, gene);}, false);
-        d3.select(this).append("text").attr("x", (gene.start + gene.end) / 2 - gene.name.length*fontSize/2).attr("y", (y - genomaHeight/4)).text(gene.name).classed("geneTag", true);
+        var textGeneX = (gene.start + gene.end) / 2 - ((gene.end - gene.start) / 3);
+        var textGeneY = y - genomaHeight/4;
+        d3.select(this).append("text")
+          .attr("x", textGeneX).attr("y", textGeneY)
+          .text(gene.name)
+          .classed("geneTag", true)
+          .attr("text-anchor", "start")
+          .attr("transform", "rotate(-15,"+textGeneX+","+textGeneY+")");
         d3.selectAll(".geneTag").style("font-size", fontSize+"px");
         text = this.getElementsByTagName("text")[0];
         text.addEventListener("click", function(){activate("arrowText", this, gene);}, false);
@@ -244,7 +253,7 @@ function redraw(genoma, y, el) {
             middle = (start + end * 3) / 4
             arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
         }
-        d3.select(this).select("text").attr("x", (start + end) / 2 - gene.name.length*fontSize/2);
+        d3.select(this).select("text").attr("x", (start + end) / 2 - (end-start)/3);
     });
     return(0);
 }
@@ -300,9 +309,9 @@ function drawAll(genomas) {
     scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)"}], name: " "}
     draw(scaleData, genomas.length * genomaHeight, scaleGroup);
     // Setting viewbox
-    var begin = minStart - 10;
+    var begin = minStart - 100;
     var width = maxEnd + 10 - begin  + 15*fontSize;
-    viewBox = [begin, (-(genomaHeight/2)), width, (genomaHeight*(genomas.length + 1))];
+    viewBox = [begin, (-(genomaHeight)), width, (genomaHeight*(genomas.length + 1.5))];
     document.getElementById("canvas").setAttribute("viewBox", ""+viewBox[0]+" "+viewBox[1]+" "+viewBox[2]+" "+viewBox[3]);
     return(true);
 }

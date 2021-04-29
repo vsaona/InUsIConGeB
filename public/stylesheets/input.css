@@ -19,7 +19,7 @@
 }
 
 body {
-    padding: 20px;
+    padding: 20px, 0px;
 }
 
 .mdc-theme--secondary-bg {
@@ -41,7 +41,7 @@ body {
     display: flex;
     max-width: none;
     flex-direction: row;
-    padding: 20px;
+    padding: 0px;
     justify-content: space-around;
     animation: build-up .3  s ease-in-out 0s;
 }

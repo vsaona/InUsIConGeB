@@ -22,15 +22,15 @@
         </div>
         <a class = "download btn btn-primary" href = "javascript:(function () { var e = document.createElement('script'); e.setAttribute('src', '../svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e); })();"><big>⇩</big> Download</a>
         <div id = "arrowToolBar" class = "invisible toolBar">
-            Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">
-            <!--<mwc-textfield
+            <!--Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">-->
+            <mwc-textfield
                 id = "arrowColor"
                 outlined
                 label = "Color"
                 value = "#FFFFFF"
                 class = "jscolor {hash:true}"
                 onchange = "updateColor(this)">
-            </mwc-textfield>-->
+            </mwc-textfield>
             <mwc-textfield
                 id = "arrowStrokeWidthMwcTextField"
                 outlined
@@ -72,8 +72,21 @@
             </mwc-textfield>
         </div>
         <div id = "globalToolBar" class = "invisible toolBar">
-            Font size: <input value = "24" type = "number" onchange = "updateGenomaFontSize(this)">
-            Genoma name: <input id = "genomaName" value = "" onchange = "updateName(this)">
+            <mwc-textfield
+                id = "genomaTextSizeInput"
+                outlined
+                label = "Font size"
+                value = "24"
+                type = "number"
+                onchange = "updateGenomaFontSize(this)">
+            </mwc-textfield>
+            <mwc-textfield
+                id = "genomaName"
+                outlined
+                label = "Context name"
+                value = ""
+                onchange = "updateName(this)">
+            </mwc-textfield>
         </div>
     </body>
 </html>
