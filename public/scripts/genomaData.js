@@ -40,11 +40,26 @@ function newGenomaData(id) {
     fileSpan.classList.add("genomaSpec");
     fileSpan.classList.add("file");
     fileSpan.classList.add("invisible");
+
+    var fileInputDiv = document.createElement("div");
     var fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.classList.add("form-control-file");
     fileInput.name = "file" + id;
-    fileSpan.appendChild(fileInput);
+    fileInputDiv.appendChild(fileInput);
+    fileSpan.appendChild(fileInputDiv);
+
+    var fileButton = document.createElement("mwc-button");
+    fileButton.onclick = "selectFile('"+id+"')";
+    fileButton.label = "Elegir archivo";
+    fileButton.outlined = true;
+    fileSpan.appendChild(fileButton);
+
+    var fileNameDiv = document.createElement("div");
+    fileNameDiv.id = "fileName" + id;
+    fileNameDiv.innerText = "No file selected";
+    fileSpan.appendChild(fileNameDiv);
+
     genomaSource.appendChild(fileSpan);
 
     var locusDef = document.createElement("mwc-textfield");
@@ -97,7 +112,6 @@ function newGenomaData(id) {
                 <mwc-textfield
                   outlined
                   label="genes"
-                  type = "number"
                   id = "contextoAntes` + id + `"
                   min = "0">
                 </mwc-textfield>
@@ -108,7 +122,6 @@ function newGenomaData(id) {
                 <mwc-textfield
                   outlined
                   label="genes"
-                  type = "number"
                   id = "contextoDespues` + id + `"
                   min = "0">
                 </mwc-textfield>

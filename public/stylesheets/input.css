@@ -45,7 +45,10 @@ body {
     justify-content: space-around;
     animation: build-up .3  s ease-in-out 0s;
 }
-
+.form-control-file {
+    opacity: 0;
+    margin-bottom: -100%;
+}
 .extraInput {
     width: 300px;
 }
