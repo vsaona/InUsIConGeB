@@ -4,6 +4,7 @@ import fs from "fs"; //"var fs = require('fs');
 import path from "path";
 import formidable from "formidable";
 import colorsys from "colorsys";
+import shelljs from "shelljs";
 
 //import bodyParser from "body-parser"; //var bodyParser = require('body-parser')
  
@@ -156,6 +157,19 @@ app.post('/processFile', function(req, res, next) {
   }
   res.json({genomas: genomas});
 });
+
+app.post('/searchHomologous', function(req, res, next) {
+  var identifier = Date.now()
+  // Get genomic data
+  var query = "blast_inputs/.fsa"; // Must be modified
+
+  // Search homologous
+  var outFileName = "blast_outputs/results_" + identifier + ".out";
+  shelljs.exec("blastp -db ../blast/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt 15 -num_threads 8 -max_target_seqs 10");
+
+  res.end();
+});
+
 
 app.listen(3000, function () {
   console.log('Listening on port 3000');

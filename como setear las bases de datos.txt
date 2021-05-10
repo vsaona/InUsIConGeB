@@ -1,0 +1,15 @@
+download BLAST+ from https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
+download the database downloader from https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.msi
+
+opciones de interés:
+	-db
+	-query
+	-out
+		*formatting options*
+	outfmt
+	num_alignments
+		*Query filtering options*
+	taxids/taxidlist
+	entrez_query
+	culling_limit
+	max_target_seqs

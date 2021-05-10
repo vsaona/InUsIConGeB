@@ -1,0 +1,350 @@
+{
+"BlastOutput2": [
+{
+    "report": {
+      "program": "blastp",
+      "version": "BLASTP 2.11.0+",
+      "reference": "Stephen F. Altschul, Thomas L. Madden, Alejandro A. Sch&auml;ffer, Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), \"Gapped BLAST and PSI-BLAST: a new generation of protein database search programs\", Nucleic Acids Res. 25:3389-3402.",
+      "search_target": {
+        "db": "../blast/refseq_protein.00"
+      },
+      "params": {
+        "matrix": "BLOSUM62",
+        "expect": 10,
+        "gap_open": 11,
+        "gap_extend": 1,
+        "filter": "F",
+        "cbs": 2
+      },
+      "results": {
+        "search": {
+          "query_id": "Query_1",
+          "query_title": "BXE_RS42260|bphD",
+          "query_len": 286,
+          "hits": [
+            {
+              "num": 1,
+              "description": [
+                {
+                  "id": "ref|WP_038803266.1|",
+                  "accession": "WP_038803266",
+                  "title": "2-hydroxy-6-oxo-6-phenylhexa-2,4-dienoate hydrolase [Pseudomonas nitroreducens]",
+                  "taxid": 46680
+                }
+              ],
+              "len": 285,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 397.127,
+                  "score": 1019,
+                  "evalue": 3.51909e-138,
+                  "identity": 181,
+                  "positive": 226,
+                  "query_from": 1,
+                  "query_to": 285,
+                  "hit_from": 1,
+                  "hit_to": 285,
+                  "align_len": 285,
+                  "gaps": 0,
+                  "qseq": "MTALTESSTSKFVKINEKGFSDFNIHYNEAGNGETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "MPKYTEADTSNYLVIDEPGLSNFRLHYNEAGQGEAVIMLHGGGPGASGWSNYYKNIEALADAGFRVILLDCPGFNKTDEVVTDTQRGLLNARAVKGLMDGLSIEKAHLVGNSMGGATALNFALEFPDRLDRLVLMGPAGMGKSLLQPNPQEGLRHMFRLYSDPTPENFAEMLNVFVFDPSAITEELRQNRWNNILSRPGHLKNFVASSKLTPVTAWDVVDQVHKIPNKTLVTWGRDDRFVPLDNGLKLINFMPDAQLHVFSRCGHWAQWEHADAFNRLVIDFLRN",
+                  "midline": "M   TE+ TS ++ I+E G S+F +HYNEAG GE VIMLHGGGPGA GWSNYY+N+    DAG+RVIL D PGFNK+D VV D QRGL+NARAVKGLMD L I++AHLVGNSMGGATALNFALE+PDR+ +L+LMGP G+G S+  P P EG++ +F+LY++P+ E   +ML VF++D S ITEEL Q RW  I  +P HLKNF+ S++  P++ WDV  ++ +I  KT +TWGRDDRFVPLD+GLKL+  + DA+LHVFS+CGHWAQWEHAD FNRLVIDFLR+"
+                }
+              ]
+            },
+            {
+              "num": 2,
+              "description": [
+                {
+                  "id": "ref|WP_112176597.1|",
+                  "accession": "WP_112176597",
+                  "title": "alpha/beta fold hydrolase [Paraburkholderia unamae]",
+                  "taxid": 219649
+                }
+              ],
+              "len": 285,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 362.844,
+                  "score": 930,
+                  "evalue": 1.28772e-124,
+                  "identity": 171,
+                  "positive": 225,
+                  "query_from": 1,
+                  "query_to": 285,
+                  "hit_from": 1,
+                  "hit_to": 285,
+                  "align_len": 286,
+                  "gaps": 2,
+                  "qseq": "MTALTESSTSKFVKINEKGFSDFNIHYNEAGNGETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDE-QRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "MAALTEAGTSKFARIKE-GDLDAQVHYNDAGTGETVVMMHGSGPGASGWSNFHRNIDTFVEAGYRVILLDSPGWNKSDPIVVTRGARSEINARALKGLLDVLDIDRVHILGNSMGGVNALSFALNYPERLARMVIMGGGGVGPSLFQPMPLEGIKLLFGAYKNPTMESLRRMLDVFVFDPSTITEELIQGRFANMMARRDHLENFVKSLEVNPNQFPDLSGRLPEISAPTLVTWGRDDRFVPLDNGLRMIWGLRDAQFHVFNRCGHWAQWEHAQAFNRLVIDFLKH",
+                  "midline": "M ALTE+ TSKF +I E G  D  +HYN+AG GETV+M+HG GPGA GWSN++RN+  FV+AGYRVIL DSPG+NKSD +V+    R  +NARA+KGL+D LDIDR H++GNSMGG  AL+FAL YP+R+ ++++MG GG+GPS+F PMP+EGIKLLF  Y  P+ E+L++ML VF++D S ITEEL+QGR+  +  + +HL+NF+ S +  P    D++ RL EI A T +TWGRDDRFVPLD+GL+++W + DA+ HVF++CGHWAQWEHA  FNRLVIDFL+H"
+                }
+              ]
+            },
+            {
+              "num": 3,
+              "description": [
+                {
+                  "id": "ref|WP_172152160.1|",
+                  "accession": "WP_172152160",
+                  "title": "alpha/beta fold hydrolase [Pseudomonas sp. LAM-KW06]",
+                  "taxid": 2715755
+                }
+              ],
+              "len": 285,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 349.747,
+                  "score": 896,
+                  "evalue": 1.58954e-119,
+                  "identity": 167,
+                  "positive": 214,
+                  "query_from": 1,
+                  "query_to": 285,
+                  "hit_from": 1,
+                  "hit_to": 285,
+                  "align_len": 286,
+                  "gaps": 2,
+                  "qseq": "MTALTESSTSKFVKINEKGFSDFNIHYNEAGNG-ETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "MTAFTEASSSRFARIRE-GERELNIHYNDCGQGAETVVMLHGSGPGASGWANFNRNIEPLVDAGYRVILLDCPGWSKSDSIVCDGSRSDLNARVLKDLVDQLDLDRVHLLGNSMGGHSAVAFALSWPERVGKLVLMGGGTGGASPFVPMPTEGIKLLQGLYREPTLDNLKQMMDVFVYDTRDLTEGLFQARLDNMLSRPEHLENFVKSLSANPRQFPDFSARLGEIQAETLVIWGRNDRFVPMDTGLRLIAGIPRSELHVFNGCGHWAQWEHADKFNRLVLDFLNH",
+                  "midline": "MTA TE+S+S+F +I E G  + NIHYN+ G G ETV+MLHG GPGA GW+N+ RN+ P VDAGYRVIL D PG++KSD++V D  R  +NAR +K L+D LD+DR HL+GNSMGG +A+ FAL +P+R+GKL+LMG G  G S F PMP EGIKLL  LY EP+ + LKQM+ VF+YD   +TE L Q R + +  +PEHL+NF+ S    P    D +ARLGEI+A+T + WGR+DRFVP+D GL+L+  I  + LHVF+ CGHWAQWEHAD+FNRLV+DFL H"
+                }
+              ]
+            },
+            {
+              "num": 4,
+              "description": [
+                {
+                  "id": "ref|WP_092433946.1|",
+                  "accession": "WP_092433946",
+                  "title": "alpha/beta fold hydrolase [Pseudomonas sagittaria]",
+                  "taxid": 1135990
+                }
+              ],
+              "len": 287,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 348.977,
+                  "score": 894,
+                  "evalue": 4.08419e-119,
+                  "identity": 167,
+                  "positive": 215,
+                  "query_from": 3,
+                  "query_to": 285,
+                  "hit_from": 5,
+                  "hit_to": 287,
+                  "align_len": 284,
+                  "gaps": 2,
+                  "qseq": "ALTESSTSKFVKINEKGFSDFNIHYNEAGNG-ETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "ALTEASTSKFVRI-QDGELDLNIHYNDCGDGAETVVMLHGSGPGASGWANFNRNIEPLVAAGYRVILMDCPGWSKSDSIVCTGSRSDLNARVLKGLVDALDLDRVHILGNSMGGHSAVAFALANPERVGKLVLMGGGTGGMSPFVPMPSEGIKLLQGLYREPTIENLKKMMNIFVYDTSDLTEELFQARLDNMLNRRDHLENFVKSLDANPKQFPDFSPRLGEIKAKTLVIWGRNDRFVPMDTGLRLIAGIANSELHVFNGCGHWAQWEHADKFNRMVLDFLTH",
+                  "midline": "ALTE+STSKFV+I + G  D NIHYN+ G+G ETV+MLHG GPGA GW+N+ RN+ P V AGYRVIL D PG++KSD++V    R  +NAR +KGL+DALD+DR H++GNSMGG +A+ FAL  P+R+GKL+LMG G  G S F PMP EGIKLL  LY EP+ E LK+M+ +F+YD S +TEEL Q R + +  + +HL+NF+ S    P    D + RLGEIKAKT + WGR+DRFVP+D GL+L+  I ++ LHVF+ CGHWAQWEHAD+FNR+V+DFL H"
+                }
+              ]
+            },
+            {
+              "num": 5,
+              "description": [
+                {
+                  "id": "ref|WP_062884023.1|",
+                  "accession": "WP_062884023",
+                  "title": "MULTISPECIES: alpha/beta fold hydrolase [Burkholderia]",
+                  "taxid": 32008
+                }
+              ],
+              "len": 289,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 345.51,
+                  "score": 885,
+                  "evalue": 9.3414e-118,
+                  "identity": 163,
+                  "positive": 211,
+                  "query_from": 3,
+                  "query_to": 283,
+                  "hit_from": 7,
+                  "hit_to": 287,
+                  "align_len": 282,
+                  "gaps": 2,
+                  "qseq": "ALTESSTSKFVKINEKGFSDFNIHYNEAGNG-ETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFL",
+                  "hseq": "TLTEESTSRFVQVT-VGEHDLKLHYNDAGRGRETVVMLHGSGPGASGWANFHRNVGAFVDAGYRVVLLDCPGWSKSDTIINTGSRSELNARALKALLDALGIERVHIIGNSMGGHSAVAFALLYPHQVGRLVLMGGGTGGPSQFVPMPTEGIKLLQKVYREPTLDNLKQMLNIFVYDTSSLTDELLQTRLANILARRDHLENFVKSLAANPKQFTDYGPRLGEIAAPTLVIWGRDDRFVPLDTGLRLVWGMPNAEMHVFSRCGHWAQWEHAGKFNRMVLEFL",
+                  "midline": " LTE STS+FV++   G  D  +HYN+AG G ETV+MLHG GPGA GW+N++RNVG FVDAGYRV+L D PG++KSD ++    R  +NARA+K L+DAL I+R H++GNSMGG +A+ FAL YP ++G+L+LMG G  GPS F PMP EGIKLL K+Y EP+ + LKQML +F+YD S +T+ELLQ R   I  + +HL+NF+ S    P    D   RLGEI A T + WGRDDRFVPLD GL+L+W + +A +HVFS+CGHWAQWEHA +FNR+V++FL"
+                }
+              ]
+            },
+            {
+              "num": 6,
+              "description": [
+                {
+                  "id": "ref|WP_011286676.1|",
+                  "accession": "WP_011286676",
+                  "title": "alpha/beta fold hydrolase [Dechloromonas aromatica]",
+                  "taxid": 259537
+                }
+              ],
+              "len": 289,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 343.199,
+                  "score": 879,
+                  "evalue": 9.58499e-117,
+                  "identity": 160,
+                  "positive": 210,
+                  "query_from": 3,
+                  "query_to": 285,
+                  "hit_from": 7,
+                  "hit_to": 289,
+                  "align_len": 284,
+                  "gaps": 2,
+                  "qseq": "ALTESSTSKFVKINEKGFSDFNIHYNEAGNG-ETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "TLTEAATSKFVRIKE-GDLDLQLHYNDCGSGVETVVMLHGSGPGASGWANFNRNVEPLVAAGYRVVLMDCPGWSKSDPIVCSGSRSELNARALKGLLDAIGLDKVHIIGNSMGGHSAVAFALANPSRVGKLILMGGGTGGPSQFVPMPTEGIKLLQGLYREPTIDNLKKMMAVFVFDSSSLTEELYQARLDNMMSRRDHLENFVKSLAINPKQFTDYGPRLGEVTAPALVIWGRDDRFVPMDAGLRLIWGMPNAELHIFNRCGHWAQWEHADKFNRMVLDFLTH",
+                  "midline": " LTE++TSKFV+I E G  D  +HYN+ G+G ETV+MLHG GPGA GW+N+ RNV P V AGYRV+L D PG++KSD +V    R  +NARA+KGL+DA+ +D+ H++GNSMGG +A+ FAL  P R+GKLILMG G  GPS F PMP EGIKLL  LY EP+ + LK+M+ VF++D S +TEEL Q R + +  + +HL+NF+ S    P    D   RLGE+ A   + WGRDDRFVP+D GL+L+W + +A LH+F++CGHWAQWEHAD+FNR+V+DFL H"
+                }
+              ]
+            },
+            {
+              "num": 7,
+              "description": [
+                {
+                  "id": "ref|WP_011491025.1|",
+                  "accession": "WP_011491025",
+                  "title": "alpha/beta fold hydrolase [Paraburkholderia xenovorans]",
+                  "taxid": 36873
+                }
+              ],
+              "len": 289,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 342.813,
+                  "score": 878,
+                  "evalue": 1.316e-116,
+                  "identity": 162,
+                  "positive": 215,
+                  "query_from": 1,
+                  "query_to": 285,
+                  "hit_from": 5,
+                  "hit_to": 289,
+                  "align_len": 286,
+                  "gaps": 2,
+                  "qseq": "MTALTESSTSKFVKINEKGFSDFNIHYNEAGNG-ETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "VSAITEASTSKFVRIKE-GDGEVQLHYNDAGQGAETVVMLHGSGPGASGWANFNRNVEPLVAAGYRVILLDCLGWSKSDPVVCDGSRSELNARSLKGLLDALDIERVHIIGNSMGGHSAVAFALANPQRVGKLVLMGGGTGGPSQFVPMPTEGIKLLQGLYREPTIDNLKRMMNVFVFDASALTDDLMQARLDNMLARRDHLENFVKSLAANPKQFNDFGPRLGEIAAPTLVIWGRDDRFVPMDVGLRLVAGMQNAEMHIFSRCGHWAQWEHAEKFNRMVVDFLAH",
+                  "midline": "++A+TE+STSKFV+I E G  +  +HYN+AG G ETV+MLHG GPGA GW+N+ RNV P V AGYRVIL D  G++KSD VV D  R  +NAR++KGL+DALDI+R H++GNSMGG +A+ FAL  P R+GKL+LMG G  GPS F PMP EGIKLL  LY EP+ + LK+M+ VF++D S +T++L+Q R + +  + +HL+NF+ S    P    D   RLGEI A T + WGRDDRFVP+D GL+L+  + +A +H+FS+CGHWAQWEHA++FNR+V+DFL H"
+                }
+              ]
+            },
+            {
+              "num": 8,
+              "description": [
+                {
+                  "id": "ref|WP_105645600.1|",
+                  "accession": "WP_105645600",
+                  "title": "alpha/beta fold hydrolase [Pseudomonas sp. MYb185]",
+                  "taxid": 1848729
+                }
+              ],
+              "len": 281,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 342.428,
+                  "score": 877,
+                  "evalue": 1.34281e-116,
+                  "identity": 165,
+                  "positive": 210,
+                  "query_from": 1,
+                  "query_to": 285,
+                  "hit_from": 1,
+                  "hit_to": 281,
+                  "align_len": 286,
+                  "gaps": 6,
+                  "qseq": "MTALTESSTSKFVKINEKGFSDFNIHYNEAGNGETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLG-PSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "MSKFTNEGTGRFVQTEE-----WKLHYNEAGEGDVVLMIHGSGAGATGWANFHRNVDPLVDAGYRVILMDCPGWGKSDPIVTGEPRFDVNGRAIKQLMDALDIDKAHLIGNSMGGGSALAFVKDYPERVGKLILMGSGGVGKTSIFTPLPMEGIKLLFDVYKNPSPESLRKMLDVFVYDPSALTDELIQLRYDAMMENGHHLDNFLKSVAQSQFNMGDYTDDLPNIPNKTLVVWGRDDRFVPIDWSLKLLNMIPNSTLHVFSQCGHWAQWEHAEEFNRLVIDFIKH",
+                  "midline": "M+  T   T +FV+  E     + +HYNEAG G+ V+M+HG G GA GW+N++RNV P VDAGYRVIL D PG+ KSD +V  E R  VN RA+K LMDALDID+AHL+GNSMGG +AL F  +YP+R+GKLILMG GG+G  S+F P+PMEGIKLLF +Y  PS E+L++ML VF+YD S +T+EL+Q R++A+     HL NFL S  ++  +  D T  L  I  KT + WGRDDRFVP+D  LKLL  I ++ LHVFS+CGHWAQWEHA+EFNRLVIDF++H"
+                }
+              ]
+            },
+            {
+              "num": 9,
+              "description": [
+                {
+                  "id": "ref|WP_177100673.1|",
+                  "accession": "WP_177100673",
+                  "title": "alpha/beta fold hydrolase [Pseudomonas gingeri]",
+                  "taxid": 117681
+                }
+              ],
+              "len": 289,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 341.658,
+                  "score": 875,
+                  "evalue": 3.12082e-116,
+                  "identity": 161,
+                  "positive": 209,
+                  "query_from": 4,
+                  "query_to": 285,
+                  "hit_from": 8,
+                  "hit_to": 289,
+                  "align_len": 283,
+                  "gaps": 2,
+                  "qseq": "LTESSTSKFVKINEKGFSDFNIHYNEAGNG-ETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "LTEAATSKFARITE-GELDLQLHYNDAGQGTETVVMLHGSGPGASGWANFNRNIESLTEAGYRVILMDCPGWSKSDPIVCSGSRSDLNARALKGLLDVLGLERVHILGNSMGGHSAVAFALTNPQRVGKLVLMGGGTGGPSAFTPMPTEGIKLLQGLYREPTIENLKKMMNVFIYDAGSLTEELFQTRLDNMLSRRDHLENFVASLKANPKQFPDFSPRLGEISAQTLVIWGRDDRFVPMDTGLRLIAGLPNAQLHVFSRCGHWAQWEHADAFNRMVLDFLSH",
+                  "midline": "LTE++TSKF +I E G  D  +HYN+AG G ETV+MLHG GPGA GW+N+ RN+    +AGYRVIL D PG++KSD +V    R  +NARA+KGL+D L ++R H++GNSMGG +A+ FAL  P R+GKL+LMG G  GPS F PMP EGIKLL  LY EP+ E LK+M+ VF+YD   +TEEL Q R + +  + +HL+NF+ S +  P    D + RLGEI A+T + WGRDDRFVP+D GL+L+  + +A+LHVFS+CGHWAQWEHAD FNR+V+DFL H"
+                }
+              ]
+            },
+            {
+              "num": 10,
+              "description": [
+                {
+                  "id": "ref|WP_201696046.1|",
+                  "accession": "WP_201696046",
+                  "title": "alpha/beta fold hydrolase [Paraburkholderia hiiakae]",
+                  "taxid": 1081782
+                }
+              ],
+              "len": 289,
+              "hsps": [
+                {
+                  "num": 1,
+                  "bit_score": 338.961,
+                  "score": 868,
+                  "evalue": 4.4922e-115,
+                  "identity": 162,
+                  "positive": 209,
+                  "query_from": 3,
+                  "query_to": 285,
+                  "hit_from": 7,
+                  "hit_to": 289,
+                  "align_len": 284,
+                  "gaps": 2,
+                  "qseq": "ALTESSTSKFVKINEKGFSDFNIHYNEAGNG-ETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRH",
+                  "hseq": "AITEASTSRFARVKD-GDVEFQIHYNDAGEGAETVVMLHGSGPGASGWANFNRNVEPLVAAGYRVILMDCPGWSKSDPIVCTNSRSDLNGRVLKGLLDVLDIERVHILGNSMGGHSAVAFALANPQRVGKLVLMGGGTGGPSSFVPMPTEGIKLLQGLYRDPTIENLKRMMNVFVYDASALTDELMQTRLDNMLARRDHLENFVRSLAAFPKQFSDYGPRLGEIAAPTLVIWGRDDRFVPMDIGLRLLAGMQNAQLHVFNRCGHWAQWEHAQAFNRMVIDFLGH",
+                  "midline": "A+TE+STS+F ++ + G  +F IHYN+AG G ETV+MLHG GPGA GW+N+ RNV P V AGYRVIL D PG++KSD +V    R  +N R +KGL+D LDI+R H++GNSMGG +A+ FAL  P R+GKL+LMG G  GPS F PMP EGIKLL  LY +P+ E LK+M+ VF+YD S +T+EL+Q R + +  + +HL+NF+ S    P    D   RLGEI A T + WGRDDRFVP+D GL+LL  + +A+LHVF++CGHWAQWEHA  FNR+VIDFL H"
+                }
+              ]
+            }
+          ],
+          "stat": {
+            "db_num": 7817357,
+            "db_len": 2992182108,
+            "hsp_len": 135,
+            "eff_space": 292462675863,
+            "kappa": 0.041,
+            "lambda": 0.267,
+            "entropy": 0.14
+          }
+        }
+      }
+    }
+  }
+]
+}

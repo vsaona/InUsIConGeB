@@ -32,6 +32,7 @@
     "colorsys": "^1.0.22",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
-    "fs": "0.0.1-security"
+    "fs": "0.0.1-security",
+    "shelljs": "^0.8.4"
   }
 }
