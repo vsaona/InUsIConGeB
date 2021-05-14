@@ -21,16 +21,20 @@
 <header>
   <div id = "Explicacion" class = "mdc-typography">
     ¡Bienvenido! Esta herramienta te permite generar gráficos de contexto genómico de alta calidad.
-    A continuación debes elegir los contextos que deseas graficar. Puedes especificarlos directamente en "mis contextos"
-    o, a partir de un gen de tu interés, buscar homólogos en las bases de datos públicamente disponibles.
+    A continuación debes elegir los <b>segmentos de genoma</b> que deseas graficar. Puedes especificarlos
+    subiendo archivos de tu computador, con un identificador del <b>GenBank</b> o directamente escribiendo la secuencia fasta
+    <br>
+    En cualquier caso, puedes pedir más genomas parecidos con la opción de más abajo (en caso de que hayas ingresado una secuencia fasta, esto es obligatorio).
   </div>
   <div id = "opciones">
-    <mwc-button id = "language" label = "Ver en español" onclick = "document.getElementById('submit').click();">
-    </mwc-button>
+    <mwc-select value = "en" id = "language" onchange = "window.location.replace(this.value+'-index.html');">
+      <mwc-list-item selected value="en"><img source="images/en.png"></mwc-list-item>
+      <mwc-list-item value="es"><img source="images/es.png"></mwc-list-item>
+    </mwc-select>
   </div>
 </header>
   <mwc-tab-bar onclick = "changeTab(this.activeIndex)" id = "tab-bar" activeIndex = "0">
-    <mwc-tab label = "Búsqueda de homólogos" id = "tabIndicator0" > </mwc-tab>
+    <mwc-tab label = "Búsqueda de homólogos" id = "tabIndicator0"> </mwc-tab>
     <mwc-tab label = "Graficar mis contextos" id = "tabIndicator1"> </mwc-tab>
   </mwc-tab-bar>
   
@@ -44,7 +48,6 @@
             <!-- <mwc-list-item value="accesion">Número de acceso (como de todas formas se debe especificar el locus tag, esto no debería tener sentido)</mwc-list-item> -->
             <mwc-list-item value="fasta">secuencia fasta</mwc-list-item>
           </mwc-select>
-          <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'> La secuencia a partir de la cual se buscarán los homólogos. Puede estar dentro de un gen bank flat file (.gbff), puedes indicar el Locus tag para extraer la secuencia de la base de datos, o puedes escribir directamente la secuencia de aminoácidos en formato fasta. </span> </span>
           <br>
           <span
             id = "fileSearchSource"
@@ -85,9 +88,6 @@
               type = "text">
               <!-- autocompletar -->
             </mwc-textfield>
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              El locus tag identifica qué parte del genoma es de nuestro interés.
-            </span> </span>
           </div>
         </div>
       </div>
@@ -102,9 +102,6 @@
               value = "10">
             </mwc-textfield>
             más parecidos <!-- .blastp -max_target_seqs -->
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Cuántos contextos deseas graficar.
-            </span> </span>
           </div>
           <div class = "search-option">
             <mwc-select outlined label="Sólo uno de cada" id = "oneOfEach">
@@ -117,12 +114,9 @@
               <mwc-list-item value="filo">filo</mwc-list-item>
               <mwc-list-item value="kingdom">reino</mwc-list-item>
             </mwc-select>
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Limitar los resultados para no graficar varios contextos del mismo grupo filogenético
-            </span> </span>
           </div>
           <div class = "search-option">
-            Cobertura mínima:
+            Covertura mínima:
             <mwc-textfield
               outlined
               iconTrailing = "%"
@@ -131,10 +125,6 @@
               max = "100"
               value = "70">
             </mwc-textfield> <!-- blastp -qcov_hsp_perc -->
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Limitar los resultados para no graficar contextos muy distintos a los originales.<br>
-              La cobertura indica cuánto de la secuencia original aparece en el resultado de la búsqueda.
-            </span> </span>
           </div>
           <div class = "search-option">
             Identidad mínima:
@@ -146,10 +136,6 @@
               max = "100"
               value = "30">
             </mwc-textfield>
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Limitar los resultados para no graficar contextos muy distintos a los originales.<br>
-              La identidad indica cuánto se parece una secuencia a la original.
-            </span> </span>
           </div>
         </div>
         <div class = "option-column">
@@ -165,27 +151,18 @@
               <mwc-list-item value="env_nr">Metagenomic proteins</mwc-list-item>
               <mwc-list-item value="tsa_nr">Transcriptome Shotgun Assembly proteins</mwc-list-item>
             </mwc-select>
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              En qué conjunto de datos buscar homólogos para graficar
-            </span> </span>
           </div>
           <div class = "search-option">
             <mwc-textfield
               outlined
               label="Sólo incluir">
             </mwc-textfield> <!-- blastp -taxids  -->
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Reducir la búsqueda a un determinado grupo filogenético
-            </span> </span>
           </div>
           <div class = "search-option">
             <mwc-formfield label="Sólo cepas tipo">
               <mwc-checkbox checked>
               </mwc-checkbox>
             </mwc-formfield>
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Las cepas tipo son aquellas que se han utilizado para determinar la composición genética de cierta especie.
-            </span> </span>
           </div>
         </div>
       </div>
@@ -196,20 +173,17 @@
       <div class = "main" id = "genomaList">
         <div class = "genomaData" id = "genomaData0">
           <div id = "genomaSource0">
-            <mwc-select outlined label="Contexto 1" id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);" class = "formData">
+            <mwc-select outlined label="Contexto 1"id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);">
               <mwc-list-item value="file">Desde archivo</mwc-list-item>
               <mwc-list-item value="locus">locus tag</mwc-list-item>
               <mwc-list-item value="accesion">Número de acceso</mwc-list-item>
             </mwc-select>
-            <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-              La secuencia a partir de la cual se buscarán los homólogos. Puede estar dentro de un gen bank flat file (.gbff), puedes indicar el Locus tag para extraer la secuencia de la base de datos, o puedes escribir directamente la secuencia de aminoácidos en formato fasta.
-            </span> </span>
             <br>
             <span
               id = "file0"
               class = "genomaSpec file invisible">
               <div>
-                <input id = "fileSelectButton0" onChange = "updateFileName(this.value, '0')" type="file" class="form-control-file" name="file0">
+                <input id = "fileSelectButton0" onChange = "updateFileName(this.value, '0')" type="file" class="form-control-file" name="file0" style="opacity: 0; margin-bottom: -100%;">
               </div>
               <mwc-button onclick = "selectFile('0')" label = "Elegir archivo" outlined></mwc-button>
               <div id = "fileName0">No file selected</div>
@@ -218,13 +192,13 @@
               outlined
               id = "locus0"
               label="locus tag"
-              class = "genomaSpec locus invisible formData">
+              class = "genomaSpec locus invisible">
             </mwc-textfield>
             <mwc-textfield
               outlined
               id = "accesion0"
               label="número de acceso"
-              class = "genomaSpec accesion invisible formData">
+              class = "genomaSpec accesion invisible">
             </mwc-textfield>
           </div>
 
@@ -232,19 +206,12 @@
             <div class = "genomaBoundaries invisible" id = "genomaBoundaries0">
               <mwc-textfield
                 outlined
-                id = "desde0"
-                label = "Desde"
-                class = "formData">
+                label = "Desde">
               </mwc-textfield>
               <mwc-textfield
                 outlined
-                label = "Hasta"
-                id = "hasta0"
-                class = "formData">
+                label = "Hasta">
               </mwc-textfield>
-              <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-                Qué grupo de genes adyacentes desea incluir en el gráfico. Especifique el locus tag del primer y el último gen a incluir, respectivamente.
-              </span> </span>
             </div>
 
             <div class = "genomaContext invisible" id = "genomaContext0">
@@ -254,9 +221,7 @@
                   outlined
                   type = "number"
                   min = "0"
-                  value = "3"
-                  id = "contextoAntes0"
-                  class = "formData">
+                  value = "3">
                 </mwc-textfield> genes antes
               </div>
               <div class = "row">
@@ -265,13 +230,8 @@
                   outlined
                   type = "number"
                   min = "0"
-                  value = "3"
-                  id = "contextoDespues0"
-                  class = "formData">
+                  value = "3">
                 </mwc-textfield> genes después
-                <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-                  A partir del gen especificado, cuántos más se desean graficar río arriba y río abajo.
-                </span> </span>
               </div>
             </div>
           </div>
@@ -279,34 +239,14 @@
       </div>
       <div>
         <mwc-button onClick = "addGenoma()" id = "addGenomaButton" label = "Añadir genoma" icon = "add" outlined></mwc-button>
-        <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-          Añadir otro contexto a incluir en el gráfico
-        </span> </span>
       </div>
     </div>
-    
     <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submit">
   </form>
   <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById('submit').click();"></mwc-button>
-  <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
-    Utilizar los contextos indicados para generar el gráfico de contexto genómico.
-  </span> </span>
   <script>
     document.getElementById("tabIndicator0").click();
     document.getElementById("oneOfEach").value = "specie";
-
-    /* set event listeners for form uploading */
-    var tab1 = document.getElementById("tab1");
-    tab1.addEventListener("submit", function(event) {
-      new FormData(tab1);
-    });
-    
-    tab1.addEventListener('formdata', event => {
-      var formElements = document.getElementById("tab1").getElementsByClassName("formData");
-      for(let el of formElements) {
-        event.formData.append(el.id, el.value);
-      }
-    });
   </script>
 </body>
 </html>

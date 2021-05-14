@@ -78,10 +78,12 @@ app.get("/", function(req, res, next) {
 // Esta es la funcion original, responde correctamente a las vistas de Node.
 app.post('/fileUploadAndRender', function(req, res, next) {
   console.log("DEBUG: POST FUNCTION /fileUpload");
+  
   var form = new formidable.IncomingForm();
   form.uploadDir = "./data"
   form.parse(req, function (err, fields, files){
     if(err) throw err;
+    console.log(fields);
     res.writeHead(200,{'Content-Type':'text/html'});
     res.write("<script> ");
     res.write("var filePath = [");

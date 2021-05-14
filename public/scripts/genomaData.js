@@ -4,12 +4,13 @@ function newGenomaData(id) {
     genomaData.id = "genomaData" + id;
 
     var genomaSource = document.createElement("div");
-    genomaSource.id = "genomaSource0";
+    genomaSource.id = "genomaSource" + id;
 
     var genomaSourceType = document.createElement("mwc-select");
     genomaSourceType.outlined = true;
     genomaSourceType.label = "Contexto " + (id + 1);
     genomaSourceType.id = "GenomaSourceType" + id;
+    genomaSourceType.classList.add("formData");
     genomaSourceType.onchange = (function() {
         changeGenomaSource(genomaSourceType.value, id);
     });
@@ -41,16 +42,27 @@ function newGenomaData(id) {
     fileSpan.classList.add("file");
     fileSpan.classList.add("invisible");
 
+    fileSpan.innerHTML = `
+              <div>
+                <input id = "fileSelectButton`+id+`" onChange = "updateFileName(this.value, `+id+`)" type="file" class="form-control-file" name="file`+id+`">
+              </div>
+              <mwc-button onclick = "selectFile(`+id+`)" label = "Elegir archivo" outlined></mwc-button>
+              <div id = "fileName`+id+`">No file selected</div>
+    `;
+    /*
     var fileInputDiv = document.createElement("div");
     var fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.classList.add("form-control-file");
     fileInput.name = "file" + id;
+    fileInput.id = "fileSelectButton" + id;
+    fileInput.onChange = "updateFileName(this.value, " + id + ")";
     fileInputDiv.appendChild(fileInput);
     fileSpan.appendChild(fileInputDiv);
 
     var fileButton = document.createElement("mwc-button");
-    fileButton.onclick = "selectFile('"+id+"')";
+    fileButton.onclick = "selectFile(" + id + ")";
+    console.log(id)
     fileButton.label = "Elegir archivo";
     fileButton.outlined = true;
     fileSpan.appendChild(fileButton);
@@ -59,7 +71,7 @@ function newGenomaData(id) {
     fileNameDiv.id = "fileName" + id;
     fileNameDiv.innerText = "No file selected";
     fileSpan.appendChild(fileNameDiv);
-
+    */
     genomaSource.appendChild(fileSpan);
 
     var locusDef = document.createElement("mwc-textfield");
@@ -69,6 +81,7 @@ function newGenomaData(id) {
     locusDef.classList.add("genomaSpec");
     locusDef.classList.add("locus");
     locusDef.classList.add("invisible");
+    locusDef.classList.add("formData");
     genomaSource.appendChild(locusDef);
 
     var accesionDef = document.createElement("mwc-textfield");
@@ -78,6 +91,7 @@ function newGenomaData(id) {
     accesionDef.classList.add("genomaSpec");
     accesionDef.classList.add("accesion");
     accesionDef.classList.add("invisible");
+    accesionDef.classList.add("formData");
     genomaSource.appendChild(accesionDef);
 
     genomaData.appendChild(genomaSource);
@@ -94,11 +108,13 @@ function newGenomaData(id) {
     desde.outlined = true;
     desde.label = "Desde";
     desde.id = "desde" + id;
+    desde.classList.add("formData");
     genomaBoundaries.appendChild(desde);
     var hasta = document.createElement("mwc-textfield");
     hasta.outlined = true;
     hasta.label = "Hasta";
     hasta.id = "hasta" + id;
+    hasta.classList.add("formData");
     genomaBoundaries.appendChild(hasta);
     extraInput.appendChild(genomaBoundaries);
 
@@ -112,8 +128,10 @@ function newGenomaData(id) {
                 <mwc-textfield
                   outlined
                   label="genes"
+                  
+                  min = "0"
                   id = "contextoAntes` + id + `"
-                  min = "0">
+                  class = "formData">
                 </mwc-textfield>
                 antes
               </div>
@@ -122,8 +140,9 @@ function newGenomaData(id) {
                 <mwc-textfield
                   outlined
                   label="genes"
-                  id = "contextoDespues` + id + `"
-                  min = "0">
+                  min = "0"
+                  id = "contextDespues` + id + `"
+                  class = "formData">
                 </mwc-textfield>
                 después
               </div>

@@ -18,12 +18,36 @@
     font-family: Roboto;
 }
 
+html, input {
+    margin: 0;
+}
+
 body {
     padding: 20px, 0px;
+    margin: 0;
+}
+
+header {
+    background-color: #6200EE;
+    color: aliceblue;
+    margin: 0;
+    padding: 20px;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+#explicacion {
+    max-width: 80%;
 }
 
 .mdc-theme--secondary-bg {
     background-color: #E2D0FF;
+}
+
+#language {
+  --mdc-theme-primary: white;
+  --mdc-theme-on-primary: #6200EE;
 }
 
 .container {
@@ -75,6 +99,59 @@ body {
 .search-option {
     padding: 10px;
 }
+
+/*
+ * Tooltip logic 
+ */
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  
+  /* Tooltip text */
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 400px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+  
+    /* Position the tooltip text */
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -200px;
+  
+    /* Fade in tooltip */
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  /* Tooltip arrow */
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+  }
+  
+  /* Show the tooltip text when you mouse over the tooltip container */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
+/*
+ * End of tooltip logic
+ */
 
 .invisible {
     display: none;
