@@ -300,12 +300,12 @@
     tab1.addEventListener("submit", function(event) {
       new FormData(tab1);
     });
-    
     tab1.addEventListener('formdata', event => {
       var formElements = document.getElementById("tab1").getElementsByClassName("formData");
       for(let el of formElements) {
         event.formData.append(el.id, el.value);
       }
+      event.formData.append("amountOfContexts", amountOfContexts);
     });
   </script>
 </body>

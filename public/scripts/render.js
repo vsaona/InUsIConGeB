@@ -14,8 +14,8 @@ var genomaElement = null;
 var d3Genomas;
 
 $.ajaxSetup({ traditional: true });
-console.log(filePath);
-$.post( "processFile", {"filePath": filePath}, function( data ) {
+console.log(contextSources);
+$.post( "processFile", {"contextSources": JSON.stringify(contextSources)}, function( data ) {
     genomas = data.genomas;
     console.log(genomas);
     drawAll(genomas);

@@ -6,24 +6,6 @@ import formidable from "formidable";
 import colorsys from "colorsys";
 import shelljs from "shelljs";
 
-//import bodyParser from "body-parser"; //var bodyParser = require('body-parser')
- 
-function generateRandomColor() {
-  var colorType = Math.random() * 3;
-  var a = Math.round(96 + 144 * Math.random())
-  var b = Math.round(96 + 144 * Math.random())
-  var c = (Math.round(96 + ((336 - a - b)/* % 255*/)) % 255).toString(16);
-  a = a.toString(16);
-  b = b.toString(16);
-  if(colorType < 1) { // yellow
-      return("#"+a+b+c);
-  } else if(colorType < 2) {
-      return("#"+c+a+b);
-  } else {
-      return("#"+b+c+a);
-  }
-}
-
 function generateColorPalette(genes, names, colors) {
   var j = 0;
   for(var i = 0; i < genes.length; i++) {
@@ -86,12 +68,19 @@ app.post('/fileUploadAndRender', function(req, res, next) {
     console.log(fields);
     res.writeHead(200,{'Content-Type':'text/html'});
     res.write("<script> ");
-    res.write("var filePath = [");
-    for(var j = 0; files["file" + j]; j++) {
-      var oldpath = files["file" + j].path;
-      var newpath = './data/' + files["file" + j].name;
-      fs.renameSync(oldpath, newpath);
-      res.write((j?", '":"'")+ newpath + "'");    // Esto escribe la coma al principio si j != 0
+    res.write("var contextSources = [");
+    console.log(fields["amountOfContexts"]);
+    for(var j = 0; j < fields["amountOfContexts"]; j++) {
+      if(fields["genomaSourceType" + j] == "file") {
+        var oldpath = files["file" + j].path;
+        var newpath = './data/' + files["file" + j].name;
+        fs.renameSync(oldpath, newpath);
+        res.write((j? `, `: ``) + `{ "type": "${fields["genomaSourceType"+j]}", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);    // Todo lo que se necesita saber del formulario
+      } else if(fields["genomaSourceType" + j] == "locus") {
+        res.write((j? `, `: ``) + `{ "type": "${fields["genomaSourceType"+j]}", "locusTag": "${field["locus"+j]}", "genesBefore": "${fields["contextoAntes"+j]}", "genesAfter": "${fields["contextoDespues"+j]}"}`);
+      }else if(fields["genomaSourceType" + j] == "accesion") {
+        res.write((j? `, `: ``) + `{ "type": "${fields["genomaSourceType"+j]}", "accesion": "${field["accesion"+j]}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);
+      }
     }
     fs.readFile('./public/render.html', null, function(error,data){
       res.write(" ]; </script>");
@@ -108,19 +97,19 @@ app.post('/fileUploadAndRender', function(req, res, next) {
 
 app.post('/processFile', function(req, res, next) {
   console.log(req.body);
-  console.log(req.body.filePath);
-  var filePath;
-  if(!(Array.isArray(req.body.filePath))) {
-    filePath = [req.body.filePath];
-  } else {
-    filePath = req.body.filePath;
-  }
+  console.log(req.body.contextSources);
+  var contextSources;
+  contextSources = JSON.parse(req.body.contextSources);
   var genomas = [];
   var names = [];
   var colors =[];
-  for(var j = 0; j < filePath.length; j++) {
-    var fileName = filePath[j].split("/")[filePath[j].split("/").length - 1]
-    var contents = fs.readFileSync(filePath[j],'utf8');
+  for(var j = 0; j < contextSources.length; j++) {
+    console.log("\nhere comes context source \n");
+
+    console.log(contextSources);
+    console.log(contextSources[j]);
+    var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1]
+    var contents = fs.readFileSync(contextSources[j]["fileName"],'utf8');
     var array = contents.split(/gene\u0020\u0020+/g);//\u0020 -> caracter espacio
     array = array.slice(1);
     var genes = []

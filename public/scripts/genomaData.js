@@ -1,4 +1,6 @@
+amountOfContexts = 1;
 function newGenomaData(id) {
+  amountOfContexts++;
     var genomaData = document.createElement("div");
     genomaData.classList.add("genomaData");
     genomaData.id = "genomaData" + id;
@@ -9,7 +11,7 @@ function newGenomaData(id) {
     var genomaSourceType = document.createElement("mwc-select");
     genomaSourceType.outlined = true;
     genomaSourceType.label = "Contexto " + (id + 1);
-    genomaSourceType.id = "GenomaSourceType" + id;
+    genomaSourceType.id = "genomaSourceType" + id;
     genomaSourceType.classList.add("formData");
     genomaSourceType.onchange = (function() {
         changeGenomaSource(genomaSourceType.value, id);
