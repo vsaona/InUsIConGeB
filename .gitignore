@@ -76,6 +76,6 @@ typings/
 .fusebox/
 
 # Uploaded files
-server/bioinf/data/*
 blast_inputs/*
 blast_outputs/*
+data/*
