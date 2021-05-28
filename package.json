@@ -33,6 +33,7 @@
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",
+    "n-readlines": "^1.0.1",
     "shelljs": "^0.8.4"
   }
 }

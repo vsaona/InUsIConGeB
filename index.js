@@ -5,6 +5,7 @@ import path from "path";
 import formidable from "formidable";
 import colorsys from "colorsys";
 import shelljs from "shelljs";
+import readlines from "n-readlines";
 
 function generateColorPalette(genes, names, colors) {
   var j = 0;
@@ -60,7 +61,6 @@ app.get("/", function(req, res, next) {
 // Esta es la funcion original, responde correctamente a las vistas de Node.
 app.post('/fileUploadAndRender', function(req, res, next) {
   console.log("DEBUG: POST FUNCTION /fileUpload");
-  
   var form = new formidable.IncomingForm();
   form.uploadDir = "./data"
   form.parse(req, function (err, fields, files){
@@ -75,11 +75,11 @@ app.post('/fileUploadAndRender', function(req, res, next) {
         var oldpath = files["file" + j].path;
         var newpath = './data/' + files["file" + j].name;
         fs.renameSync(oldpath, newpath);
-        res.write((j? `, `: ``) + `{ "type": "${fields["genomaSourceType"+j]}", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);    // Todo lo que se necesita saber del formulario
+        res.write((j? `, `: ``) + `{ "type": "file", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);    // Todo lo que se necesita saber del formulario
       } else if(fields["genomaSourceType" + j] == "locus") {
-        res.write((j? `, `: ``) + `{ "type": "${fields["genomaSourceType"+j]}", "locusTag": "${field["locus"+j]}", "genesBefore": "${fields["contextoAntes"+j]}", "genesAfter": "${fields["contextoDespues"+j]}"}`);
+        res.write((j? `, `: ``) + `{ "type": "locus", "locusTag": "${fields["locus"+j]}", "genesBefore": "${fields["contextoAntes"+j]}", "genesAfter": "${fields["contextoDespues"+j]}"}`);
       }else if(fields["genomaSourceType" + j] == "accesion") {
-        res.write((j? `, `: ``) + `{ "type": "${fields["genomaSourceType"+j]}", "accesion": "${field["accesion"+j]}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);
+        res.write((j? `, `: ``) + `{ "type": "accesion", "accesion": "${fields["accesion"+j]}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);
       }
     }
     fs.readFile('./public/render.html', null, function(error,data){
@@ -96,48 +96,133 @@ app.post('/fileUploadAndRender', function(req, res, next) {
 });
 
 app.post('/processFile', function(req, res, next) {
-  console.log(req.body);
-  console.log(req.body.contextSources);
   var contextSources;
+  var UPSTREAMCONTEXTAMOUNT = 5;
+  var DOWNSTREAMCONTEXTAMOUNT = 5;
   contextSources = JSON.parse(req.body.contextSources);
   var genomas = [];
   var names = [];
   var colors =[];
   for(var j = 0; j < contextSources.length; j++) {
-    console.log("\nhere comes context source \n");
+    var liner;
+    if(contextSources[j]["type"] == "accesion") { // || contextSources[j]["type"] == "midAccesion") {
+      liner = new readlines("../blast/assembly_summary_refseq.txt");
+      if(contextSources[j]["accesion"].includes("GCA")) {
+        liner = new readlines("../blast/assembly_summary_genbank.txt");
+      }
+      var line;
+      /*if (contextSources[j]["type"] == "midAccesion") {
+        while (line = liner.next()) {
+          line = line.toString("UTF-8");
+          if(line.match(contextSources[j]["taxid"])) {
+            var ftpPath = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]+)\t/)[1];
+            contextSources[j]["fileName"] = "../blast/" + ftpPath.substring(6) + "/" + ftpPath.split("/")[ftpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
+            break;
+          }
+        }
+      } else {*/
+        while (line = liner.next()) {
+          line = line.toString("UTF-8");
+          if(line.match(contextSources[j]["accesion"])) {
+            var ftpPath = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]+)\t/)[1];
+            contextSources[j]["fileName"] = "../blast/" + ftpPath.substring(6) + "/" + ftpPath.split("/")[ftpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
+            break;
+          }
+        }
+      //}
+      liner.close();
+    }
 
-    console.log(contextSources);
-    console.log(contextSources[j]);
-    var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1]
-    var contents = fs.readFileSync(contextSources[j]["fileName"],'utf8');
+    var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
+    var interestGenes = false;
+    var lastGene = false;
+    var contents = "";
+    liner = new readlines(contextSources[j]["fileName"]);
+    
+    var line;
+    if (contextSources[j]["type"] == "midAccesion") {
+      var interestIndex = -1;
+      console.log(contextSources[j]["midLocus"]);
+      while (line = liner.next()) {
+        line = line.toString("UTF-8");
+        
+        if(line.match(contextSources[j]["midLocus"])) {
+          console.log("---\n\n\nbreaking!\n\n\n---");
+          break;
+        } else if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
+          interestIndex++;
+        }
+      }
+      liner.reset();
+      var minInterest = interestIndex - UPSTREAMCONTEXTAMOUNT;
+      var maxInterest = interestIndex + DOWNSTREAMCONTEXTAMOUNT;
+      interestIndex = -1;
+      while (line = liner.next()) {
+        line = line.toString("UTF-8");
+        if(interestIndex >= minInterest && interestIndex <= maxInterest) {
+          contents = contents + line;
+        } else if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
+          interestIndex++;
+        }
+      }
+    } else {
+      while (line = liner.next()) {
+        line = line.toString("UTF-8");
+        
+        if(line.includes(contextSources[j]["locusBegin"])) {
+          interestGenes = true;
+        }
+        if(interestGenes && line.includes(contextSources[j]["locusEnd"])) {
+          lastGene = true;
+        }
+        if(lastGene && line.includes("gene\u0020\u0020")) {
+          break;
+        }
+        if(interestGenes) {
+          contents = contents + line + "\n";
+        }
+      }
+    }
+    
+    console.log(contents);
+    console.log("These are");
+    // var contents = fs.readFileSync(contextSources[j]["fileName"], 'utf8');
+
+    //for(var i = 0; fileStream.)
     var array = contents.split(/gene\u0020\u0020+/g);//\u0020 -> caracter espacio
-    array = array.slice(1);
+    //array = array.slice(1);
     var genes = []
     for(var i = 0; i < array.length;i++){
       var json = {};
       json["color"] = "#D7D7D7";
       var fields = array[i].match(/.+/g);
       if (fields != null){
-        var large = array[i].match(/\d+/g);
-        json["start"] = large[0];
-        json["end"] = large[1];
-        var complement = fields[0].match(/complement/);
+        var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g);
+        console.log(length[0]);
+        console.log(length[0].match(/\d+/g));
+        json["start"] = length[0].match(/\d+/g)[0];
+        json["end"] = length[0].match(/\d+/g)[1];
+        var complement = array[i].match("complement(" + length[0] + ")");
         if(complement == null){
           json["complement"] = false;
         } else {
           json["complement"] = true;
         }
-        var nombre = fields[1].match(/\/gene=.+/g);
-        var locus = fields[1].match(/\/locus_tag=.+/g);
-        var old_locus = fields[1].match(/\/old_locus_tag=.+/g);
+        var nombre = array[i].match(/\/gene=.+/g);
         if(nombre != null) {
           json["name"] = nombre[0].match(/[^(")]\w+?(?=")/g)[0];
-        } else if(locus != null) {
-          json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
-        } else if(old_locus != null) {
-          json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
         } else {
-          json["name"] = "no";
+          var locus = array[i].match(/\/locus_tag=.+/g);
+          if(locus != null && !json["name"]) {
+            json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
+          } else {
+            var old_locus = array[i].match(/\/old_locus_tag=.+/g);
+            if(old_locus != null && !json["name"]) {
+              json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
+            } else {
+              json["name"] = "no";
+            }
+          }
         }
         genes.push(json);
       }
@@ -150,17 +235,104 @@ app.post('/processFile', function(req, res, next) {
 });
 
 app.post('/searchHomologous', function(req, res, next) {
-  var identifier = Date.now()
-  // Get genomic data
-  var query = "blast_inputs/.fsa"; // Must be modified
+  var form = new formidable.IncomingForm();
+  var filePath;
+  var identifier = Date.now() + Math.random();
+  form.uploadDir = "./data"
+  form.parse(req, function (err, fields, files){
+    console.log(fields);
+    var fastaSequence;
+    if(fields["genomaSearchSourceType"] == "file") {
+      filePath = files["fileSearchSource"].path;
+      
+      // We extract the fasta sequence
+      var liner = new readlines(filePath);
+      var interestGene = false;
+      var line;
+      while (line = liner.next()) {
+        line = line.toString("UTF-8");
+        if(line.includes(fields["searchFileLocusTag"])) {
+          interestGene = true;
+        }
+        if(interestGene) console.log(line);
+        if(interestGene && line.match(/\/translation\s*=/)) {
+          fastaSequence = line.match(/translation\s*=\s*"(\w+)/)[1];
+          while (line = liner.next()) {
+            line = line.toString("UTF-8");
+            fastaSequence = fastaSequence + line.match(/\s*(\w+)"?/)[1];
+            if(line.includes('"')) {
+              break;
+            }
+          }
+          break;
+        }
+      }
+      // End of fasta extracting
+    } else if(fields["genomaSearchSourceType"] == "fasta") {
+      fastaSequence = fields["fastaSearchSource"];
+    } else if(fields["genomaSearchSourceType"] == "accesion") {
+      console.log("To be implemented: Get the file path, get the file and do the staff from above");
+    }
+    
+    var query = "blast_inputs/" + identifier + ".fas";
+    fs.writeFileSync(query, ">" + identifier + "\n" + fastaSequence);
 
-  // Search homologous
-  var outFileName = "blast_outputs/results_" + identifier + ".out";
-  shelljs.exec("blastp -db ../blast/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt 15 -num_threads 8 -max_target_seqs 10");
+    // Search homologous
+    var outFileName = "blast_outputs/results_" + identifier + ".out";
 
-  res.end();
+    shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8 -max_target_seqs " + fields["contextsQuantity"]);
+
+    var liner = new readlines(outFileName);
+    var line;
+    var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = [];
+    while (line = liner.next()) {
+      line = line.toString("UTF-8");
+      console.log(line);
+      var fields = line.match(/(\d+)\t(\d+)\t((?:\d|\.)+)\t(.*)/);
+      taxids.push(fields[1]);
+      coverages.push(parseFloat(fields[2]));
+      identities.push(parseFloat(fields[3]));
+      accesions.push(fields[4]);
+    }
+    
+    var summaryLiner = new readlines("../blast/assembly_summary_refseq.txt");
+    var contextsToDraw = taxids.length;
+    while ((line = summaryLiner.next()) && contextsToDraw) {
+      line = line.toString("UTF-8");
+      if(line[0] == "#") {
+        continue;
+      }
+      var fields = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]+)/);
+      if(taxids.includes(fields[1])) {
+        console.log(line);
+        contextsToDraw--;
+        paths.push("../blast/" + fields[2].substring(6) + "/" + fields[2].split("/")[fields[2].split("/").length - 1] + "_genomic.gbff");
+      }
+    }
+    console.log(paths);
+   
+    // We need to get the specific locus of interest
+
+    // This part is identical to the "fileUploadAndRender" function
+
+    res.writeHead(200,{'Content-Type':'text/html'});
+    res.write("<script> ");
+    res.write("var contextSources = [");
+    for(var j = 0; j < paths.length; j++) {
+      res.write((j? `, `: ``) + `{ "type": "midAccesion", "fileName": "${paths[j]}", "taxid": "${taxids[j]}", "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5"}`);
+    }
+    fs.readFile('./public/render.html', null, function(error,data){
+      res.write(" ]; </script>");
+      if(error){
+        //res.writeHead(404);
+        res.write('File not found!');
+      } else {
+        res.write(data);
+        res.end();
+      }
+    });
+  });
 });
-
 
 app.listen(3000, function () {
   console.log('Listening on port 3000');

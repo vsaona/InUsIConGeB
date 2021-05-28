@@ -1,0 +1,304 @@
+     gene            complement(1243994..1244854)
+                     /gene="bphD"
+                     /locus_tag="BXE_RS42260"
+                     /old_locus_tag="Bxe_C1186"
+                     /db_xref="GeneID:4010698"
+     CDS             complement(1243994..1244854)
+                     /gene="bphD"
+                     /locus_tag="BXE_RS42260"
+                     /old_locus_tag="Bxe_C1186"
+                     /EC_number="3.7.1.8"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_003450973.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="2-hydroxy-6-oxo-6-phenylhexa-2,4-dienoate
+                     hydrolase"
+                     /protein_id="WP_011494293.1"
+                     /db_xref="GeneID:4010698"
+                     /translation="MTALTESSTSKFVKINEKGFSDFNIHYNEAGNGETVIMLHGGGP
+                     GAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALD
+                     IDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLY
+                     AEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDV
+                     TARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFN
+                     RLVIDFLRHA"
+     gene            complement(1244925..1245965)
+                     /gene="dmpG"
+                     /locus_tag="BXE_RS42265"
+                     /old_locus_tag="Bxe_C1187"
+                     /db_xref="GeneID:4010699"
+     CDS             complement(1244925..1245965)
+                     /gene="dmpG"
+                     /locus_tag="BXE_RS42265"
+                     /old_locus_tag="Bxe_C1187"
+                     /EC_number="4.1.3.-"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_003450974.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="4-hydroxy-2-oxovalerate aldolase"
+                     /protein_id="WP_003450974.1"
+                     /db_xref="GeneID:4010699"
+                     /translation="MKLEGKKVTVHDMTLRDGMHPKRHQMTLEQMKSIACGLDAAGIP
+                     LIEVTHGDGLGGSSVNYGFPAHSDEEYLGAVIPLMKQAKVSALLLPGIGTVEHLKMAK
+                     DLGVNTIRVATHCTEADVSEQHITQSRKLGLDTVGFLMMAHMASPEKLVSQALLMQGY
+                     GANCIYVTDSAGYMLPDDVKARLSAVRAALKPETELGFHGHHNLAMGVANSIAAIEAG
+                     ATRIDAAAAGLGAGAGNTPMEVFIAVCARMGIETGVDVFKIQDVAEDLVVPIMDHVIR
+                     IDRDSLTLGYAGVYSSFLLFAKRASAKYGVPARDILVELGRRGMVGGQEDMIEDTAMT
+                     MARERGLTLTAA"
+     gene            complement(1245985..1246899)
+                     /locus_tag="BXE_RS42270"
+                     /old_locus_tag="Bxe_C1188"
+                     /db_xref="GeneID:4010700"
+     CDS             complement(1245985..1246899)
+                     /locus_tag="BXE_RS42270"
+                     /old_locus_tag="Bxe_C1188"
+                     /EC_number="1.2.1.10"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_013517250.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="acetaldehyde dehydrogenase"
+                     /protein_id="WP_003450975.1"
+                     /db_xref="GeneID:4010700"
+                     /translation="MTKKIKCALIGPGNIGTDLLAKLQRSPVLEPIWMVGIDPESDGL
+                     KRAREMGIKTTADGVDGLIPHMQADGVQIVFDATSAYVHADNSRKVNALGALMIDLTP
+                     AAIGPFCVPTVNLKEHVGKGEMNVNMVTCGGQATIPMVAAVSRVQPVAYGEIVATVSS
+                     KSAGPGTRKNIDEFTRTTAGAVEKVGGAKKGKAIIILNPAEPPLIMRDTVHCLLESEP
+                     DQAKITESIHAMIKEVQKYVPGYKLVNGPVFDGLRVSVYLEVEGLGDYLPKYAGNLDI
+                     MTAAAARTAEMFAEEILAGQLTLQPVHA"
+     gene            complement(1246921..1247703)
+                     /gene="dmpE"
+                     /locus_tag="BXE_RS42275"
+                     /old_locus_tag="Bxe_C1189"
+                     /db_xref="GeneID:4010701"
+     CDS             complement(1246921..1247703)
+                     /gene="dmpE"
+                     /locus_tag="BXE_RS42275"
+                     /old_locus_tag="Bxe_C1189"
+                     /EC_number="4.2.1.80"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_020206177.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="2-oxopent-4-enoate hydratase"
+                     /protein_id="WP_003450985.1"
+                     /db_xref="GeneID:4010701"
+                     /translation="MTPELIGTLGDELYSALCTRTVVEPLTSRHPEITVEDAYHIQQR
+                     MISRRLQAGERVVGKKIGVTSAAVMNMLGVYQPDFGYMLDGMIVSDGGSIAMSSLIQP
+                     KAEGEIAFVLKKDLMGPGVTNADVLAATDFVMPCFEIVDSRIGDWKIKIQDTVADNAS
+                     CGMFVLGSSAADPRRIDLMTCGMVLEKNGEIIATGAGAAALGSPVNSVAWLANTLGRL
+                     GIGLKAGEVILSGALAAMFPAQAGDHFRVTIGGIGGCSVRFH"
+     gene            complement(1247786..1248397)
+                     /locus_tag="BXE_RS42280"
+                     /old_locus_tag="Bxe_C1190"
+                     /db_xref="GeneID:4010702"
+     CDS             complement(1247786..1248397)
+                     /locus_tag="BXE_RS42280"
+                     /old_locus_tag="Bxe_C1190"
+                     /EC_number="2.5.1.18"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_003450988.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="glutathione transferase GstA"
+                     /protein_id="WP_003450988.1"
+                     /db_xref="GeneID:4010702"
+                     /translation="MKLYYSPGACSLSPHIALREAGLNFELVQVDLASKKTASGQDYL
+                     EINPAGYVPCLQLDDGRTLTEGPAIVQYVADQVPGKQLAPANGSFERYHLQQWLNFIS
+                     SELHKSFSPLFNPASSDEWKNAVRQSLNTRLGQVARQLEHAPYLLGDQLSVADIYLFV
+                     VLGWSAYVNIDLSPWPSLQAFQGRVGGREAVQSALRAEGLIKE"
+     gene            complement(1248429..1249325)
+                     /gene="bphC"
+                     /locus_tag="BXE_RS42285"
+                     /old_locus_tag="Bxe_C1191"
+                     /db_xref="GeneID:4010703"
+     CDS             complement(1248429..1249325)
+                     /gene="bphC"
+                     /locus_tag="BXE_RS42285"
+                     /old_locus_tag="Bxe_C1191"
+                     /EC_number="1.13.11.39"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_011494295.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="3-methylcatechol 2,3-dioxygenase"
+                     /protein_id="WP_011494295.1"
+                     /db_xref="GeneID:4010703"
+                     /translation="MSIRSLGYMGFAVSDVAAWRSFLTQKLGLMEAGTTDNGDLFRID
+                     SRAWRIAVQQGEVDDLAFAGYEVADAAGLAQMADKLKQAGIAVTTGDASLARRRGVTG
+                     LITFADPFGLPLEIYYGASEVFEKPFLPGAAVSGFLTGEQGLGHFVRCVPDSDKALAF
+                     YTDVLGFQLSDVIDMKMGPDVTVPAYFLHCNERHHTLAIAAFPLPKRIHHFMLEVASL
+                     DDVGFAFDRVDADGLITSTLGRHTNDHMVSFYASTPSGVEVEYGWSARTVDRSWVVVR
+                     HDSPSMWGHKSVRDKAAARNKA"
+     gene            complement(1249347..1250180)
+                     /locus_tag="BXE_RS42290"
+                     /old_locus_tag="Bxe_C1192"
+                     /db_xref="GeneID:4010704"
+     CDS             complement(1249347..1250180)
+                     /locus_tag="BXE_RS42290"
+                     /old_locus_tag="Bxe_C1192"
+                     /EC_number="1.3.1.56"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_019752920.1"
+                     /note="Converts
+                     cis-3-(3-carboxyethyl)-3,5-cyclohexadiene-1,2-diol
+                     (PP-dihydrodiol) into 3-(2,3-dihydroxylphenyl)propionate;
+                     Derived by automated computational analysis using gene
+                     prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="cis-2,3-dihydrobiphenyl-2,3-diol dehydrogenase"
+                     /protein_id="WP_011494296.1"
+                     /db_xref="GeneID:4010704"
+                     /translation="MKLKGEAVLITGGASGLGRALVDRFVAEGAKVAVLDKSAERLAE
+                     LETDHGDNVLGIVGDVRSLEDQKQAASRCVARFGKIDTLIPNAGIWDYSTALVDLPEE
+                     SLDAAFDEVFHINVKGYIHAVKACLPALVASRGNVIFTISNAGFYPNGGGPLYTAAKH
+                     AIVGLVRELAFELAPYVRVNGVGSGGINSDLRGPSSLGMGSKAISTVPLADMLKSVLP
+                     IGRMPEVEEYTGAYVFFATRGDAAPATGALLNYDGGLGVRGFFSGAGGNDLLEQLNIH
+                     P"
+     gene            complement(1250227..1251453)
+                     /locus_tag="BXE_RS42295"
+                     /old_locus_tag="Bxe_C1193"
+                     /db_xref="GeneID:4010705"
+     CDS             complement(1250227..1251453)
+                     /locus_tag="BXE_RS42295"
+                     /old_locus_tag="Bxe_C1193"
+                     /EC_number="1.18.1.3"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_003450997.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="biphenyl dioxygenase system ferredoxin--NAD+
+                     reductase component"
+                     /protein_id="WP_003450997.1"
+                     /db_xref="GeneID:4010705"
+                     /translation="MIDTIAIIGAGLAGSTAARALRAQGYEGRIHLLGDESHQAYDRT
+                     TLSKTVLAGEQPEPPAILDSAWYASAHVDVQLGRRVSCLDLANRQIQFESGAPLAYDR
+                     LLLATGARARRMAIRGGDLAGIHTLRDLADSQALRQALQPGQSLVIVGGGLIGCEVAT
+                     TARKLSVHVTILEAGDELLVRVLGHRTGAWCRAELERMGVRVERNAQAARFEGQGQVR
+                     AVICADGRRVPADVVLVSIGAEPADELARAAGIACARGVLVDATGATSCPEVFAAGDV
+                     AAWPLRQGGQRSLETYLNSQMEAEIAASAMLSQPVPAPQVPTSWTEIAGHRIQMIGDA
+                     EGPGEIVVRGDAQSGQPIVLLRLLDGCVEAATAINATREFSVATRLVGTRVSVSAEQL
+                     QDVGSNLRDLLKAKPN"
+     gene            complement(1251450..1251779)
+                     /locus_tag="BXE_RS42300"
+                     /old_locus_tag="Bxe_C1194"
+                     /db_xref="GeneID:4010706"
+     CDS             complement(1251450..1251779)
+                     /locus_tag="BXE_RS42300"
+                     /old_locus_tag="Bxe_C1194"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_011797815.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="3-phenylpropionate dioxygenase"
+                     /protein_id="WP_011494297.1"
+                     /db_xref="GeneID:4010706"
+                     /translation="MKFTRVCDRRDVPEGEALKVESGGTSVAIFNVDGELFATQDRCT
+                     HGDWSLSDGGYLEGDVVECSLHMGKFCVRTGKVKSPPPCEALKIFPIRIEDNDVLVDF
+                     EAGYLAP"
+     gene            complement(1251854..1252273)
+                     /locus_tag="BXE_RS42305"
+                     /old_locus_tag="Bxe_C1195"
+                     /db_xref="GeneID:4010707"
+     CDS             complement(1251854..1252273)
+                     /locus_tag="BXE_RS42305"
+                     /old_locus_tag="Bxe_C1195"
+                     /EC_number="1.14.12.18"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_003451002.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="hypothetical protein"
+                     /protein_id="WP_003451002.1"
+                     /db_xref="GeneID:4010707"
+                     /translation="MKNARLFLIAIGVFYIINLIGTLPFSTLGLFGRMYPGVELHVGA
+                     PIFTLLQDAWAVVGLQLGAIGAVALWGARDPGRYRAVIPVVIATEVVDGLWDFYSIVW
+                     SHEALWFGLVTLVIHVLWIGWGLHAWRALASKSLRTL"
+     gene            complement(1252311..1252877)
+                     /locus_tag="BXE_RS42310"
+                     /old_locus_tag="Bxe_C1196"
+                     /db_xref="GeneID:4010708"
+     CDS             complement(1252311..1252877)
+                     /locus_tag="BXE_RS42310"
+                     /old_locus_tag="Bxe_C1196"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_019752919.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="biphenyl dioxygenase subunit beta"
+                     /protein_id="WP_040123616.1"
+                     /db_xref="GeneID:4010708"
+                     /translation="MTNPSPHFFKTFEWPSKAAGLELQNEIEQFYYREAQLLDHRAYE
+                     AWFALLDKDIHYFMPLRTNRMIREGELEYSGDQDLAHFDETHETMYGRIRKVTSDVGW
+                     AENPPSRTRHLVSNVIVKETATPDTFEVNSAFILYRNRLERQVDIFAGERRDVLRRAD
+                     NNLGFSIAKRTILLDASTLLSNNLSMFF"
+     gene            complement(1252995..1254374)
+                     /locus_tag="BXE_RS42315"
+                     /old_locus_tag="Bxe_C1197"
+                     /db_xref="GeneID:4010709"
+     CDS             complement(1252995..1254374)
+                     /locus_tag="BXE_RS42315"
+                     /old_locus_tag="Bxe_C1197"
+                     /EC_number="1.14.12.18"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_011797818.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="biphenyl dioxygenase subunit alpha"
+                     /protein_id="WP_011494299.1"
+                     /db_xref="GeneID:4010709"
+                     /translation="MSSAIKEVQGAPVKWVTNWTPEAIRGLVDQEKGLLDPRIYADQS
+                     LYELELERVFGRSWLLLGHESHVPETGDFLATYMGEDPVVMVRQKDKSIKVFLNQCRH
+                     RGMRICRSDAGNAKAFTCSYHGWAYDIAGKLVNVPFEKEAFCDKKEGDCGFDKAEWGP
+                     LQARVATYKGLVFANWDVQAPDLETYLGDARPYMDVMLDRTPAGTVAIGGMQKWVIPC
+                     NWKFAAEQFCSDMYHAGTTTHLSGILAGIPPEMDLSQAQIPTKGNQFRAAWGGHGSGW
+                     YVDEPGSLLAVMGPKVTQYWTEGPAAELAEQRLGHTGMPVRRMVGQHMTIFPTCSFLP
+                     TFNNIRIWHPRGPNEIEVWAFTLVDADAPAEIKEEYRRHNIRNFSAGGVFEQDDGENW
+                     VEIQKGLRGYKAKSQPLNAQMGLGRSQTGHPDFPGNVGYVYAEEAARGMYHHWMRMMS
+                     EPSWATLKP"
+     gene            complement(1254465..1255202)
+                     /locus_tag="BXE_RS42320"
+                     /old_locus_tag="Bxe_C1198"
+                     /db_xref="GeneID:4010710"
+     CDS             complement(1254465..1255202)
+                     /locus_tag="BXE_RS42320"
+                     /old_locus_tag="Bxe_C1198"
+                     /function="Transcriptional regulator of biphenyl pathway"
+                     /inference="COORDINATES: similar to AA
+                     sequence:RefSeq:WP_011494300.1"
+                     /note="Derived by automated computational analysis using
+                     gene prediction method: Protein Homology."
+                     /codon_start=1
+                     /transl_table=11
+                     /product="transcriptional regulator"
+                     /protein_id="WP_011494300.1"
+                     /db_xref="GeneID:4010710"
+                     /translation="MNARTPNSLTMGGDKSFADASPVPIANVRSLIEATFQRLRADIV
+                     EGRLAAGSRLAIEDLKSRYEVSGGTVREALSLLVANNLVQTQAQRGFHVTPMSLDDMR
+                     DLAATRIALECEALRQSVLNGDAEWEARVVSSYHRLSLLDERTMRDPVHLFNQWEQAN
+                     RDFHEALISACSSAWTQRFLSILYLQMERYRRLTAMHNRPARNVHEEHLALRDSALAR
+                     DAERCTELLRMHIESSISVVRQFGLLR"

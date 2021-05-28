@@ -34,11 +34,11 @@
     <mwc-tab label = "Graficar mis contextos" id = "tabIndicator1"> </mwc-tab>
   </mwc-tab-bar>
   
-  <form id = "tab0" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container">
+  <form id = "tab0" action="searchHomologous" method="post" enctype="multipart/form-data" class="tabContent container">
     <div class = "main">
       <div class = "genomaData" id = "genomaSearchData">
         <div id = "genomaSearchSource">
-          <mwc-select outlined label="Secuencia de origen" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');">
+          <mwc-select outlined label="Secuencia de origen" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');" class = "formData">
             <mwc-list-item value="file">Desde archivo</mwc-list-item>
             <mwc-list-item value="locus">locus tag</mwc-list-item>
             <!-- <mwc-list-item value="accesion">Número de acceso (como de todas formas se debe especificar el locus tag, esto no debería tener sentido)</mwc-list-item> -->
@@ -59,19 +59,19 @@
             outlined
             id = "locusSearchSource"
             label="locus tag"
-            class = "genomaSpec locus invisible">
+            class = "genomaSpec locus invisible formData">
           </mwc-textfield>
           <mwc-textfield
             outlined
             id = "accesionSearchSource"
             label="número de acceso"
-            class = "genomaSpec accesion invisible">
+            class = "genomaSpec accesion invisible formData">
           </mwc-textfield>
           <mwc-textarea
             outlined
             id = "fastaSearchSource"
             label="secuencia fasta"
-            class = "genomaSpec fasta invisible"
+            class = "genomaSpec fasta invisible formData"
             rows = "6"
             cols = "80">
           </mwc-textarea>
@@ -82,7 +82,9 @@
             <mwc-textfield
               outlined
               label = "locus tag"
-              type = "text">
+              type = "text"
+              id = "searchFileLocusTag"
+              class = "formData">
               <!-- autocompletar -->
             </mwc-textfield>
             <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -97,9 +99,11 @@
             Los
             <mwc-textfield
               outlined
+              id = "contextsQuantity"
               type = "number"
               min = "0"
-              value = "10">
+              value = "10"
+              class = "formData">
             </mwc-textfield>
             más parecidos <!-- .blastp -max_target_seqs -->
             <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -107,7 +111,7 @@
             </span> </span>
           </div>
           <div class = "search-option">
-            <mwc-select outlined label="Sólo uno de cada" id = "oneOfEach">
+            <mwc-select outlined label="Sólo uno de cada" id = "oneOfEach" class = "formData">
               <mwc-list-item value="entry">Entrada</mwc-list-item>
               <mwc-list-item value="specie">Especie</mwc-list-item> <!-- selected  // This has a bug -->
               <mwc-list-item value="genre">género</mwc-list-item>
@@ -125,11 +129,13 @@
             Cobertura mínima:
             <mwc-textfield
               outlined
+              id = "minCoverage"
               iconTrailing = "%"
               type = "number"
               min = "0"
               max = "100"
-              value = "70">
+              value = "70"
+              class = "formData">
             </mwc-textfield> <!-- blastp -qcov_hsp_perc -->
             <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
               Limitar los resultados para no graficar contextos muy distintos a los originales.<br>
@@ -140,11 +146,13 @@
             Identidad mínima:
             <mwc-textfield
               outlined
+              id = "minIdentity"
               iconTrailing = "%"
               type = "number"
               min = "0"
               max = "100"
-              value = "30">
+              value = "30"
+              class = "formData">
             </mwc-textfield>
             <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
               Limitar los resultados para no graficar contextos muy distintos a los originales.<br>
@@ -154,7 +162,7 @@
         </div>
         <div class = "option-column">
           <div class = "search-option" >
-            <mwc-select outlined label="Base de datos" id = "genomaSourceType0" naturalMenuWidth="true">
+            <mwc-select outlined label="Base de datos" id = "databaseToSearch" naturalMenuWidth="true" class = "formData">
               <mwc-list-item value="nr">Non-redundant protein sequences</mwc-list-item>
               <mwc-list-item value="refseq_select">RefSeq Select proteins</mwc-list-item>
               <mwc-list-item value="refseq_protein">Reference proteins</mwc-list-item>
@@ -172,7 +180,9 @@
           <div class = "search-option">
             <mwc-textfield
               outlined
-              label="Sólo incluir">
+              id = "includeOnly"
+              label="Sólo incluir"
+              class = "formData"> <!-- Autocompletar -->
             </mwc-textfield> <!-- blastp -taxids  -->
             <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
               Reducir la búsqueda a un determinado grupo filogenético
@@ -180,7 +190,7 @@
           </div>
           <div class = "search-option">
             <mwc-formfield label="Sólo cepas tipo">
-              <mwc-checkbox checked>
+              <mwc-checkbox checked id = "typeStrainsOnly" class = "formData" >
               </mwc-checkbox>
             </mwc-formfield>
             <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -190,6 +200,7 @@
         </div>
       </div>
     </div>
+    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submitSearchHomologous">
   </form>
   <form id = "tab1" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container invisible">
     <div class="main">
@@ -285,9 +296,9 @@
       </div>
     </div>
     
-    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submit">
+    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submitMyContexts">
   </form>
-  <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById('submit').click();"></mwc-button>
+  <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById(document.getElementById('tab-bar').activeIndex?'submitMyContexts':'submitSearchHomologous').click();"></mwc-button>
   <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
     Utilizar los contextos indicados para generar el gráfico de contexto genómico.
   </span> </span>
@@ -296,6 +307,18 @@
     document.getElementById("oneOfEach").value = "specie";
 
     /* set event listeners for form uploading */
+    var tab0 = document.getElementById("tab0");
+    tab0.addEventListener("submit", function(event) {
+      console.log("si");
+      new FormData(tab0);
+    });
+    tab0.addEventListener('formdata', event => {
+      var formElements = document.getElementById("tab0").getElementsByClassName("formData");
+      for(let el of formElements) {
+        event.formData.append(el.id, el.id == "typeStrainsOnly" ? el.checked : el.value);
+      }
+    });
+
     var tab1 = document.getElementById("tab1");
     tab1.addEventListener("submit", function(event) {
       new FormData(tab1);
