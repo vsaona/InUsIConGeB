@@ -67,6 +67,9 @@ app.post('/fileUploadAndRender', function(req, res, next) {
     if(err) throw err;
     console.log(fields);
     res.writeHead(200,{'Content-Type':'text/html'});
+    res.write(`<html lang="en">
+    <head>
+      <meta charset="UTF-8">`);
     res.write("<script> ");
     res.write("var contextSources = [");
     console.log(fields["amountOfContexts"]);
@@ -89,8 +92,8 @@ app.post('/fileUploadAndRender', function(req, res, next) {
         res.write('File not found!');
       } else {
         res.write(data);
-        res.end();
       }
+      res.end();
     });
   });
 });
@@ -133,42 +136,63 @@ app.post('/processFile', function(req, res, next) {
       liner.close();
     }
 
-    var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
-    var interestGenes = false;
-    var lastGene = false;
     var contents = "";
-    liner = new readlines(contextSources[j]["fileName"]);
-    
     var line;
+    console.log("contextSources");
+    console.log(contextSources);
     if (contextSources[j]["type"] == "midAccesion") {
-      var interestIndex = -1;
-      console.log(contextSources[j]["midLocus"]);
-      while (line = liner.next()) {
-        line = line.toString("UTF-8");
+      for(var file = 0; file < contextSources[j]["fileName"].length; file++) {
+        var interestGenes = false;
+        var lastGene = false;
         
-        if(line.match(contextSources[j]["midLocus"])) {
-          console.log("---\n\n\nbreaking!\n\n\n---");
-          break;
-        } else if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
-          interestIndex++;
+        var fileName = contextSources[j]["fileName"][file];
+        var found = false;
+        liner = new readlines(fileName);
+        console.log("NAni!");
+        console.log(file);
+        console.log(fileName);
+        fileName = fileName.split("/")[fileName.split("/").length - 1];
+        var interestIndex = -1;
+        console.log(contextSources[j]["midLocus"]);
+
+        while ((line = liner.next()) && !found) {
+          line = line.toString("UTF-8");
+          
+          if(line.match(contextSources[j]["midLocus"])) {
+            console.log("---\n\n\nbreaking!\n\n\n---");
+            found = true;
+          } else if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
+            interestIndex++;
+          }
         }
-      }
-      liner.reset();
-      var minInterest = interestIndex - UPSTREAMCONTEXTAMOUNT;
-      var maxInterest = interestIndex + DOWNSTREAMCONTEXTAMOUNT;
-      interestIndex = -1;
-      while (line = liner.next()) {
-        line = line.toString("UTF-8");
-        if(interestIndex >= minInterest && interestIndex <= maxInterest) {
-          contents = contents + line;
-        } else if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
-          interestIndex++;
+        if(!found) {
+          continue;
         }
+        liner.reset();
+        var minInterest = interestIndex - UPSTREAMCONTEXTAMOUNT;
+        var maxInterest = interestIndex + DOWNSTREAMCONTEXTAMOUNT;
+        interestIndex = -1;
+        while ((line = liner.next()) && interestIndex <= maxInterest) {
+          line = line.toString("UTF-8");
+          if(interestIndex >= minInterest) {
+            contents = contents + line;
+            if(line.match(/\bORIGIN\s+/)) {
+              break;
+            }
+          }
+          if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
+            interestIndex++;
+          }
+        }
+        break;
       }
     } else {
+      var interestGenes = false;
+      var lastGene = false;
+      liner = new readlines(contextSources[j]["fileName"]);
+      var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
       while (line = liner.next()) {
         line = line.toString("UTF-8");
-        
         if(line.includes(contextSources[j]["locusBegin"])) {
           interestGenes = true;
         }
@@ -281,7 +305,6 @@ app.post('/searchHomologous', function(req, res, next) {
     var outFileName = "blast_outputs/results_" + identifier + ".out";
 
     shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8 -max_target_seqs " + fields["contextsQuantity"]);
-
     var liner = new readlines(outFileName);
     var line;
     var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = [];
@@ -294,19 +317,19 @@ app.post('/searchHomologous', function(req, res, next) {
       identities.push(parseFloat(fields[3]));
       accesions.push(fields[4]);
     }
-    
+    for(var i = 0; i < taxids.length; i++) {
+      paths.push([]);
+    }
     var summaryLiner = new readlines("../blast/assembly_summary_refseq.txt");
-    var contextsToDraw = taxids.length;
-    while ((line = summaryLiner.next()) && contextsToDraw) {
+    while ((line = summaryLiner.next())) {
       line = line.toString("UTF-8");
       if(line[0] == "#") {
         continue;
       }
       var fields = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]+)/);
       if(taxids.includes(fields[1])) {
-        console.log(line);
-        contextsToDraw--;
-        paths.push("../blast/" + fields[2].substring(6) + "/" + fields[2].split("/")[fields[2].split("/").length - 1] + "_genomic.gbff");
+        var i = taxids.indexOf(fields[1]);
+        paths[i].push("../blast/" + fields[2].substring(6) + "/" + fields[2].split("/")[fields[2].split("/").length - 1] + "_genomic.gbff");
       }
     }
     console.log(paths);
@@ -316,10 +339,14 @@ app.post('/searchHomologous', function(req, res, next) {
     // This part is identical to the "fileUploadAndRender" function
 
     res.writeHead(200,{'Content-Type':'text/html'});
+    res.write(`<html lang="en">
+    <head>
+      <meta charset="UTF-8">`);
     res.write("<script> ");
     res.write("var contextSources = [");
     for(var j = 0; j < paths.length; j++) {
-      res.write((j? `, `: ``) + `{ "type": "midAccesion", "fileName": "${paths[j]}", "taxid": "${taxids[j]}", "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5"}`);
+      console.log("paths[j]");
+      res.write((j? `, `: ``) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5"}`);
     }
     fs.readFile('./public/render.html', null, function(error,data){
       res.write(" ]; </script>");
@@ -328,8 +355,8 @@ app.post('/searchHomologous', function(req, res, next) {
         res.write('File not found!');
       } else {
         res.write(data);
-        res.end();
       }
+      res.end();
     });
   });
 });

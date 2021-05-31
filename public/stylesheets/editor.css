@@ -27,6 +27,11 @@
 .toolBar {
   animation: appear 1s;
   padding: 10px;
+  display: flex;
+  justify-content: left;
+}
+.toolBar * {
+  margin: 0 10px;
 }
 text {
   cursor: grab;
