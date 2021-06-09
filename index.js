@@ -233,6 +233,9 @@ app.post('/processFile', function(req, res, next) {
           json["complement"] = true;
         }
         var nombre = array[i].match(/\/gene=.+/g);
+        /*if(contextSources[j]["type"] == "midAccesion" && array[i].includes(contextSources[j]["midLocus"])) {
+          json["interest"] = true;
+        }*/
         if(nombre != null) {
           json["name"] = nombre[0].match(/[^(")]\w+?(?=")/g)[0];
         } else {
@@ -244,7 +247,7 @@ app.post('/processFile', function(req, res, next) {
             if(old_locus != null && !json["name"]) {
               json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
             } else {
-              json["name"] = "no";
+              json["name"] = "no-name";
             }
           }
         }
@@ -305,31 +308,44 @@ app.post('/searchHomologous', function(req, res, next) {
     var outFileName = "blast_outputs/results_" + identifier + ".out";
 
     shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8 -max_target_seqs " + fields["contextsQuantity"]);
+    
     var liner = new readlines(outFileName);
     var line;
-    var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = [];
+    var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = []; var taxonGroups = [];
     while (line = liner.next()) {
       line = line.toString("UTF-8");
       console.log(line);
-      var fields = line.match(/(\d+)\t(\d+)\t((?:\d|\.)+)\t(.*)/);
-      taxids.push(fields[1]);
-      coverages.push(parseFloat(fields[2]));
-      identities.push(parseFloat(fields[3]));
-      accesions.push(fields[4]);
+      var lineFields = line.match(/(\d+)\t(\d+)\t((?:\d|\.)+)\t(.*)/);
+      var taxid = lineFields[1];
+      var coverage = parseFloat(lineFields[2]);
+      var identity = parseFloat(lineFields[3]);
+      var taxonomicGroup = shelljs.exec(`echo ${taxid} | taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1`);
+      taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";")[fields["oneOfEach"]];
+      if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"] && !taxonGroups.includes(taxonomicGroup)) {
+        taxids.push(taxid);
+        coverages.push();
+        identities.push();
+        accesions.push(lineFields[4]);
+        taxonGroups.push(taxonomicGroup);
+        console.log(taxonGroups);
+      }
     }
     for(var i = 0; i < taxids.length; i++) {
       paths.push([]);
     }
+    console.log("taxids");
+    console.log(taxids);
     var summaryLiner = new readlines("../blast/assembly_summary_refseq.txt");
     while ((line = summaryLiner.next())) {
       line = line.toString("UTF-8");
       if(line[0] == "#") {
         continue;
       }
-      var fields = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]+)/);
-      if(taxids.includes(fields[1])) {
-        var i = taxids.indexOf(fields[1]);
-        paths[i].push("../blast/" + fields[2].substring(6) + "/" + fields[2].split("/")[fields[2].split("/").length - 1] + "_genomic.gbff");
+      var lineFields = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]+)/);
+      if(taxids.includes(lineFields[1])) {
+        
+        var i = taxids.indexOf(lineFields[1]);
+        paths[i].push("../blast/" + lineFields[2].substring(6) + "/" + lineFields[2].split("/")[lineFields[2].split("/").length - 1] + "_genomic.gbff");
       }
     }
     console.log(paths);

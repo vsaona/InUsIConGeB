@@ -110,14 +110,13 @@
           </div>
           <div class = "search-option">
             <mwc-select outlined label="Sólo uno de cada" id = "oneOfEach" class = "formData">
-              <mwc-list-item value="entry">Entrada</mwc-list-item>
-              <mwc-list-item value="specie">Especie</mwc-list-item> <!-- selected  // This has a bug -->
-              <mwc-list-item value="genre">género</mwc-list-item>
-              <mwc-list-item value="family">familia</mwc-list-item>
-              <mwc-list-item value="order">orden</mwc-list-item>
-              <mwc-list-item value="class">clase</mwc-list-item>
-              <mwc-list-item value="filo">filo</mwc-list-item>
-              <mwc-list-item value="kingdom">reino</mwc-list-item>
+              <mwc-list-item value="0">reino</mwc-list-item>
+              <mwc-list-item value="1">filo</mwc-list-item>
+              <mwc-list-item value="2">clase</mwc-list-item>
+              <mwc-list-item value="3">orden</mwc-list-item>
+              <mwc-list-item value="4">familia</mwc-list-item>
+              <mwc-list-item value="5">género</mwc-list-item>
+              <mwc-list-item value="6">Especie</mwc-list-item> <!-- selected  // This has a bug -->
             </mwc-select>
             <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
               Limitar los resultados para no graficar varios contextos del mismo grupo filogenético
@@ -198,7 +197,7 @@
         </div>
       </div>
     </div>
-    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submitSearchHomologous">
+    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submitSearchHomologous" onClick = "document.getElementById('blastSearch').show();">
   </form>
   <form id = "tab1" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container invisible">
     <div class="main">
@@ -300,9 +299,16 @@
   <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
     Utilizar los contextos indicados para generar el gráfico de contexto genómico.
   </span> </span>
+  <mwc-snackbar id = "blastSearch"
+    timeoutMs = "-1"
+    labelText = "Searching for homologous, please wait a few minutes.">
+  </mwc-snackbar>
+  <mwc-snackbar id = "upload"
+    labelText = "Uploading your data, please wait a few seconds.">
+  </mwc-snackbar>
   <script>
     document.getElementById("tabIndicator0").click();
-    document.getElementById("oneOfEach").value = "specie";
+    document.getElementById("oneOfEach").value = "6";
 
     /* set event listeners for form uploading */
     var tab0 = document.getElementById("tab0");
