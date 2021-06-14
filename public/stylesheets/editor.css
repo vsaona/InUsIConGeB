@@ -7,6 +7,7 @@
   stroke: black;
   stroke-width:5;
   border-radius: 50%;
+  cursor: pointer;
 }
 .canvas {
   flex: 1 1 auto;
@@ -20,9 +21,6 @@
   background: black;
   color: white;
   padding: 20px;
-}
-.invisible {
-  display: none
 }
 .toolBar {
   animation: appear 1s;
@@ -38,4 +36,31 @@ text {
 }
 text:active {
   cursor: grabbing;
+}
+
+.data {
+  display: flex;
+  max-width: none;
+  flex-direction: column;
+  border: solid #6200EE;
+  border-radius: 20px;
+  margin: 20px;
+  padding: 0px;
+}
+.dataEntry {
+  display:flex;
+  flex-direction: row;
+}
+.dataTag {
+  font-weight: bold;
+  flex: 0 1 20%;
+}
+.dataContent {
+  flex-grow: 4;
+}
+.datuum {
+  padding: 10px;
+}
+.invisible {
+  display: none
 }

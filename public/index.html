@@ -293,7 +293,7 @@
       </div>
     </div>
     
-    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submitMyContexts">
+    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submitMyContexts" onClick = "document.getElementById('blastSearch').show();">
   </form>
   <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById(document.getElementById('tab-bar').activeIndex?'submitMyContexts':'submitSearchHomologous').click();"></mwc-button>
   <span class = 'tooltip'><img src = 'images/question.png' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -313,7 +313,6 @@
     /* set event listeners for form uploading */
     var tab0 = document.getElementById("tab0");
     tab0.addEventListener("submit", function(event) {
-      console.log("si");
       new FormData(tab0);
     });
     tab0.addEventListener('formdata', event => {

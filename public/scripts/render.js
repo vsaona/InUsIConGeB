@@ -19,6 +19,7 @@ $.post( "processFile", {"contextSources": JSON.stringify(contextSources)}, funct
     genomas = data.genomas;
     console.log(genomas);
     drawAll(genomas);
+    document.getElementById("Rendering").close();
 });
 
 var dragHandler = d3.drag().on("start", function () {
@@ -53,10 +54,29 @@ g3 = {name: "pseudomonas inverted",
                 {start: 4230, end: 3930, name: "A2", color: "#00FF00", complement: true, interest: false},
                 {start: 3550, end: 3340, name: "A3", color: "#0000FF", complement: false, interest: false}]};
 */
+function updateShownData(data, isGene) {
+    if(isGene) {
+        document.getElementById("geneLocusContent").innerText = data.locus;
+        document.getElementById("geneInferenceContent").innerText = data.definition;
+        document.getElementById("geneNoteContent").innerText = data.note;
+        document.getElementById("geneProductContent").innerText = data.product;
+        document.getElementById("geneTranslationContent").innerText = data.translation;
+        d3.select("#geneData").classed("invisible", false);
+    } else {
+        document.getElementById("genomaDefinitionContent").innerText = data.definition;
+        document.getElementById("genomaAccessionContent").innerText = data.accesion;
+        document.getElementById("genomaFtpPathContent").innerText = data.ftpPath;
+        document.getElementById("genomaSubmitterContent").innerText = data.submitter;
+        document.getElementById("genomaTaxidContent").innerText = data.taxid;
+        d3.select("#genomaData").classed("invisible", false);
+    }
+}
 function activate(type, element, data) {
     d3.select("#arrowToolBar").classed("invisible", true);
     d3.select("#arrowTextToolBar").classed("invisible", true);
     d3.select("#globalToolBar").classed("invisible", true);
+    d3.select("#genomaData").classed("invisible", true);
+    d3.select("#geneData").classed("invisible", true);
     if(type == "arrow") {
         d3.select("#arrowToolBar").classed("invisible", false);
         var arrowColor = document.getElementById("arrowColor");
@@ -65,17 +85,20 @@ function activate(type, element, data) {
         document.getElementById("arrowColor").layout();
         arrowColor.value = data.color;
         d3.select(arrowColor).style("background-color", arrowColor.value);
+        updateShownData(data, true);
     } else if (type == "arrowText") {
         d3.select("#arrowTextToolBar").classed("invisible", false);
         d3.select("#arrowTextToolBar").select("#geneName").attr("value", data.name);
         d3.select("#geneFontSize").attr("value", $(element).css("font-size").slice(0,-2));
         document.getElementById("geneFontSize").layout();
+        updateShownData(data, true);
     } else if (type == "global") {
         d3.select("#globalToolBar").classed("invisible", false);
         d3.select("#globalToolBar").select("#genomaName").attr("value", data.name);
         d3.select("#genomaTextSizeInput").attr("value", $(element).css("font-size").slice(0,-2));
         document.getElementById("genomaTextSizeInput").layout();
         document.getElementById("midLineWidth").layout();
+        updateShownData(data, false);
     } else {
         console.log("You should implement '" + type + "' now!");
     }
@@ -267,18 +290,24 @@ function drawAll(genomas) {
     d3Genomas = d3.select("#canvas").selectAll("g").data(genomas).enter().append("g").each(function(data, index) {
         difference = -1;
         var localMaxEnd = 0;
+        var localMinStart = Number.MAX_VALUE;
         var reverseAll = false;
         for(var j = 0; j < data.genes.length; j++) {
+            if(j < 6) {
+                console.log(data.genes[j]);
+            }
             if(data.genes[j].interest) {
                 difference = data.genes[j].start;
                 reverseAll = data.genes[j].complement;
             }
         }
-        if(difference = -1) {
+        if(difference == -1) {
+            console.log("No interest gene found");
             data.genes[0].interest = true;
             difference = data.genes[0].start;
-            if(data.genes[0].complement)
+            if(data.genes[0].complement) {
                 reverseAll = true;
+            }
         }
         for(var j = 0; j < data.genes.length; j++) {
             data.genes[j].start -= difference;
@@ -295,6 +324,8 @@ function drawAll(genomas) {
                 maxEnd   = data.genes[j].end;
             if(data.genes[j].end > localMaxEnd)
                 localMaxEnd = data.genes[j].end;
+            if(data.genes[j].start < localMinStart)
+                localMinStart = data.genes[j].start;
         }
         if(genomaHeight == 1)
             genomaHeight = (localMaxEnd- minStart)/data.genes.length;
@@ -303,20 +334,18 @@ function drawAll(genomas) {
         d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true).attr("id", "genomaTag_"+index);
         this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1].addEventListener("click", function(){activate("global", this, data);}, false);
         dragHandler(d3.select(this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1]));
-    });
-    // Le annadimos la linea central al genoma
-    d3Genomas.each(function (data,index,c) {
-        d3.select(this).insert("line", ":first-child")
+        d3.select(this).insert("line", ":first-child") // Le annadimos la linea central al genoma
             .attr("id", data.name+"__midLine")
-            .attr("x1", minStart)
-            .attr("x2", maxEnd)
-            .attr("y1", index*genomaHeight)
-            .attr("y2", index*genomaHeight)
+            .attr("x1", localMinStart - 100)
+            .attr("x2", localMaxEnd + 100)
+            .attr("y1", index * genomaHeight)
+            .attr("y2", index * genomaHeight)
             .attr("stroke-width", genomaHeight / 30.0)
             .attr("stroke", "#444444")
             .classed("midLine", true);
         document.getElementById(data.name+"__midLine").addEventListener("click", function(){activate("global", document.getElementById("genomaTag_"+index), data);}, false);
     });
+    
     document.getElementById("midLineWidth").value = Math.round(genomaHeight / 30.0);
     console.log(d3Genomas);
     // We build the scale indicator arrow

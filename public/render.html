@@ -98,9 +98,86 @@
                 onchange = "updateMidLineWidth(this)">
             </mwc-textfield>
         </div>
+        <div id = "genomaData" class = "invisible data">
+            <div id = "genomaDefinition" class = "dataEntry">
+                <span id = "genomaDefinitionTag" class = "dataTag datuum">
+                    Genoma Definition
+                </span>
+                <span id = "genomaDefinitionContent" class = "dataContent datuum">
+                </span>
+            </div>
+            <div id = "genomaAccession" class = "dataEntry">
+                <span id = "genomaAccessionTag" class = "dataTag datuum">
+                    Genoma Accession
+                </span>
+                <span id = "genomaAccessionContent" class = "dataContent datuum">
+                </span>
+            </div>
+            <div id = "genomaFtpPath" class = "dataEntry">
+                <span id = "genomaFtpPathTag" class = "dataTag datuum">
+                    FTP path
+                </span>
+                <span id = "genomaFtpPathContent" class = "dataContent datuum">
+                </span>
+            </div>
+            <div id = "genomaTaxid" class = "dataEntry">
+                <span id = "genomaTaxidTag" class = "dataTag datuum">
+                    Taxonomic ID
+                </span>
+                <span id = "genomaTaxidContent" class = "dataContent datuum">
+                </span>
+            </div>
+            <div id = "genomaSubmitter" class = "dataEntry">
+                <span id = "genomaSubmitterTag" class = "dataTag datuum">
+                    Entry submitter
+                </span>
+                <span id = "genomaSubmitterContent" class = "dataContent datuum">
+                </span>
+            </div>
+        </div>
+        <div id = "geneData" class = "invisible data">
+            <div id = "geneLocus" class = "dataEntry">
+                <span id = "geneLocusTag" class = "dataTag datuum">
+                    Gene Locus tag
+                </span>
+                <span id = "geneLocusContent" class = "dataContent datuum">
+                </span>
+            </div>
+            <div id = "geneInference" class = "dataEntry">
+                <span id = "geneInferenceTag" class = "dataTag datuum">
+                    Gene inference
+                </span>
+                <span id = "geneInferenceContent" class = "dataContent datuum">
+                </span>
+            </div>
+            <div id = "geneProduct" class = "dataEntry">
+                <span id = "genProductTag" class = "dataTag datuum">
+                    Product
+                </span>
+                <span id = "geneProductContent" class = "dataContent datuum">
+                </span>
+            </div>
+            <div id = "geneNote" class = "dataEntry">
+                <span id = "geneNoteTag" class = "dataTag datuum">
+                    Note
+                </span>
+                <span id = "geneNoteContent" class = "dataContent datuum">
+                </span>
+            </div>
+            <div id = "geneTranslation" class = "dataEntry">
+                <span id = "geneTranslationTag" class = "dataTag datuum">
+                    Translation
+                </span>
+                <span id = "geneTranslationContent" class = "dataContent datuum">
+                </span>
+            </div>
+        </div>
         <mwc-snackbar id = "Rendering"
             timeoutMs = "-1"
             labelText = "Analyzing the genomes, please wait.">
         </mwc-snackbar>
+        <script>
+            document.getElementById("Rendering").show();
+        </script>
     </body>
 </html>
