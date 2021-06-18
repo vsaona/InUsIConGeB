@@ -1,6 +1,11 @@
 # Cómo hacer que esto funcione
 
-1. En otra consola, ir a "server/bioinf" y ejecutar "npm start" para inciar el servidor de Node.js
-1. Abre un navegador web (Google Chrome, Safari, Mozilla Firefox, etc.) y accede a localhost:3000
-1. Utilice los botones para seleccionar de su dispositivo uno o más registros de GenBank (archivos en formato .gbff) y pulse el botón "enviar" para ver la imagen resultante. Haga click en cada elemento de esta para acceder a las herramientas de edición correspondientes.
-1. Pulse el botón de descarga para descargar la imagen en formato .svg
+1. En la carpeta raíz, ejecute "npm start" para inciar el servidor de Node.js
+1. Abra un navegador web (Google Chrome, Safari, Mozilla Firefox, etc.) y acceda a localhost:3000
+1. Utilice los campos para identificar los contextos que desee graficar y presione el botón "Draw it!"
+1. Seleccione los elementos del gráfico de los que desea saber más información o que desee editar, las opciones irán surgiendo a medida que seleccione elementos.
+1. Descargue el gráfico a su computador.
+
+### Prerrequisitos
+
+-- Sección en construcción --

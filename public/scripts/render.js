@@ -29,7 +29,7 @@ var dragHandler = d3.drag().on("start", function () {
 }).on("drag", function () {
     d3.select(this)
         .attr("x", d3.event.x + deltaX)
-        .attr("y", d3.event.y + deltaY);
+        .attr("y", d3.event.y + deltaY)
 });            
 
 /*getJSONP('/prueba', function(data){
