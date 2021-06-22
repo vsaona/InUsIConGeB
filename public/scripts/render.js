@@ -13,15 +13,6 @@ var viewBox = [];
 var genomaElement = null;
 var d3Genomas;
 
-$.ajaxSetup({ traditional: true });
-console.log(contextSources);
-$.post( "processFile", {"contextSources": JSON.stringify(contextSources)}, function( data ) {
-    genomas = data.genomas;
-    console.log(genomas);
-    drawAll(genomas);
-    document.getElementById("Rendering").close();
-});
-
 var dragHandler = d3.drag().on("start", function () {
     var current = d3.select(this);
     deltaX = current.attr("x") - d3.event.x;
@@ -57,7 +48,7 @@ g3 = {name: "pseudomonas inverted",
 function updateShownData(data, isGene) {
     if(isGene) {
         document.getElementById("geneLocusContent").innerText = data.locus;
-        document.getElementById("geneInferenceContent").innerText = data.definition;
+        document.getElementById("geneInferenceContent").innerText = data.inference;
         document.getElementById("geneNoteContent").innerText = data.note;
         document.getElementById("geneProductContent").innerText = data.product;
         document.getElementById("geneTranslationContent").innerText = data.translation;
@@ -303,6 +294,7 @@ function drawAll(genomas) {
         }
         if(difference == -1) {
             console.log("No interest gene found");
+            console.log(data);
             data.genes[0].interest = true;
             difference = data.genes[0].start;
             if(data.genes[0].complement) {

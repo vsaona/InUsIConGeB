@@ -79,3 +79,4 @@ typings/
 blast_inputs/*
 blast_outputs/*
 data/*
+subjects/*

@@ -1,10 +1,10 @@
 @keyframes fade-in {
-    0% { opacity: 0 }
+    0% { opacity: 1 }
     100% { opacity: 100 }
 }
 @keyframes build-up {
     0% {
-        opacity: 0;
+        opacity: 1;
         transform: translate(0, -50px);
     }
     100% {
@@ -85,10 +85,10 @@ header {
     border: solid #6200EE;
     border-radius: 20px;
 }
-
+/*
 .genomaSpec, .searchCustomization, .extraInput {
     animation: fade-in .5s ease-in-out 0s;
-}
+}*/
 
 .option-column {
     display: flex;

@@ -6,6 +6,12 @@ function changeTab(activeTabIndex) {
             tabContent.classList.add("invisible");
         }
     }
+    // This is for solving textField positioning bug
+    var textFields = document.getElementsByTagName("mwc-textfield");
+    for(var i = 0; i < textFields.length; i++) {
+        textFields[i].focus();
+        textFields[i].blur();
+    }
 }
 
 var addedInputGenomaisEven = true;
@@ -18,6 +24,7 @@ function addGenoma() {
     addedInputGenomaisEven = !addedInputGenomaisEven;
     document.getElementById("genomaList").appendChild(clone);
     genomas++;
+    clone.getElementsByTagName("mwc-textfield").layout();
 }
 
 function changeGenomaSource(value, id) {

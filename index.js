@@ -10,19 +10,52 @@ import readlines from "n-readlines";
 var colorIndex = 0;
 function generateColorPalette(genes, names, colors) {
   for(var i = 0; i < genes.length; i++) {
-      if(names.includes(genes[i].name)) {
-          genes[i].color = colors[names.indexOf(genes[i].name)];
+    if(names.includes(genes[i].product)) {
+      genes[i].color = colors[names.indexOf(genes[i].product)];
+    } else {
+      names.push(genes[i].product);
+      var color;
+      if(genes[i].interest) {
+        color = "#bd3b32";
       } else {
-          names.push(genes[i].name);
-          //genes[i].color = generateRandomColor();
-          var colors = [];
-          var color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 240, 50, 100);
-          while(colors.includes(color)) {
-            color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 240, 50, 100);
-          }
-          genes[i].color = color;
-          colors.push(color);
+        var colores = [];
+        color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 360, 50, 100);
+        while(colores.includes(color)) {
+          color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 360, 50, 100);
+        }
       }
+      genes[i].color = color;
+      colors.push(color);
+    }
+  }
+  return(genes);
+}
+
+function assignColors(firstContext, genes, names, colors) {
+  for(var i = 0; i < genes.length; i++) {
+    if(names.includes(genes[i].name)) {
+      genes[i].color = colors[names.indexOf(genes[i].name)];
+    } else {
+      names.push(genes[i].name);
+      var fileContent = ">" + genes[i].name + "\n" + genes[i].translation + "\n";
+      var blastQueryFileName = "subjects/" + firstContext[0].fileIdentifier + "-query.fas"; // This makes impossible to parallelize, we should change the file identifier (file name)
+      fs.writeFileSync(blastQueryFileName, fileContent);
+      // Calculate similitude with previous, using blastp
+      var blastSubjectFileName = "subjects/" + firstContext[0].fileIdentifier + "-subject.fas";
+      var identities = shelljs.exec(`blastp -query ${blastQueryFileName} -out ${"outFileNameTest"} -subject ${blastSubjectFileName} -outfmt 6`);
+      console.log("identities.stdout");
+      console.log(identities.stdout); // .slice(0, taxonomicGroup.stdout.length - 1)
+      // If identity > 30% & coberture > 70%, use that color (names.indexOf(name))
+      // else {
+      var colors = [];
+      var color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 240, 50, 100);
+      while(colors.includes(color)) {
+        color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 240, 50, 100);
+      }
+      genes[i].color = color;
+      colors.push(color);
+      // append to "subject" file
+    }
   }
   return(genes);
 }
@@ -147,11 +180,17 @@ app.post('/processFile', function(req, res, next) {
         liner = new readlines(fileName);
         fileName = fileName.split("/")[fileName.split("/").length - 1];
         var interestIndex = -1;
-        console.log("[processFile] contextSources[j][midLocus]");
-        console.log(contextSources[j]["midLocus"]);
+
+        var lineNumber = 0;
+        var linesToJump = 0; // This is because some files have this "//" weird thing
 
         while ((line = liner.next()) && !found) {
+          lineNumber++;
           line = line.toString("UTF-8");
+          if(line.match(/^\/\/$/)) {
+            linesToJump = lineNumber;
+            interestIndex = 0;
+          }
           if(line.match(/\s*ORGANISM\s+(.*)/))
             genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
           if(line.match(/\s*DEFINITION\s+(.*)/))
@@ -172,6 +211,7 @@ app.post('/processFile', function(req, res, next) {
         thisTaxid = contextSources[j]["taxid"];
         thisFtpPath = contextSources[j]["fileName"][file]["ftpPath"];
         liner.reset();
+        for(var temporalCounter = 0; temporalCounter < linesToJump; ++temporalCounter && liner.next());
         var minInterest = interestIndex - UPSTREAMCONTEXTAMOUNT;
         var maxInterest = interestIndex + DOWNSTREAMCONTEXTAMOUNT;
         interestIndex = -1;
@@ -227,6 +267,8 @@ app.post('/processFile', function(req, res, next) {
     }
     genomaDefinition = genomaDefinition ?? genomaName;
     genomaAccession = genomaAccession ?? "";
+    console.log("\n\nContents:");
+    console.log(contents);
     var array = contents.split(/\s*gene\u0020\u0020+/g);//\u0020 -> caracter espacio
     var genes = [];
     for(var i = 0; i < array.length;i++){
@@ -291,7 +333,12 @@ app.post('/processFile', function(req, res, next) {
         genes.push(json);
       }
     }
-    genomas.push({genes:generateColorPalette(genes, names, colors), name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
+    /*if(!genomas.length) {*/
+      genomas.push({genes:generateColorPalette(genes, names, colors), name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
+    /*} else {
+      // This should be called when using a more complex color assignation algorithm
+      genomas.push({genes:assignColors(genomas[0].genes, genes, names, colors), name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
+    }*/
   }
   res.json({genomas: genomas});
 });
@@ -316,10 +363,6 @@ app.post('/searchHomologous', function(req, res, next) {
         line = line.toString("UTF-8");
         if(line.includes(fields["searchFileLocusTag"])) {
           interestGene = true;
-        }
-        if(interestGene) {
-          console.log("[searchHomologous] locus found:");
-          console.log(line);
         }
         if(interestGene && line.match(/\/translation\s*=/)) {
           fastaSequence = line.match(/translation\s*=\s*"(\w+)/)[1];
@@ -346,13 +389,14 @@ app.post('/searchHomologous', function(req, res, next) {
     // Search homologous
     var outFileName = "blast_outputs/results_" + identifier + ".out";
 
-    shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8 -max_target_seqs " + fields["contextsQuantity"]);
+    shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8");
     shelljs.exec("rm blast_inputs/" + identifier + ".fas");
 
     var liner = new readlines(outFileName);
     var line;
     var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = []; var taxonGroups = [];
-    while (line = liner.next()) {
+    var failures = 0;
+    while ((line = liner.next()) && (identities.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {
       line = line.toString("UTF-8");
       console.log("[searchHomologous] Reading blast result line:");
       console.log(line);
@@ -360,14 +404,19 @@ app.post('/searchHomologous', function(req, res, next) {
       var taxid = lineFields[1];
       var coverage = parseFloat(lineFields[2]);
       var identity = parseFloat(lineFields[3]);
-      var taxonomicGroup = shelljs.exec(`echo ${taxid} | taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
-      taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";")[fields["oneOfEach"]];
-      if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"] && !taxonGroups.includes(taxonomicGroup)) {
-        taxids.push(taxid);
-        coverages.push();
-        identities.push();
-        accesions.push(lineFields[4]);
-        taxonGroups.push(taxonomicGroup);
+      if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"]) {
+        var taxonomicGroup = shelljs.exec(`echo ${taxid} | taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
+        var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";");
+        taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";")[fields["oneOfEach"]];
+        if(!taxonGroups.includes(taxonomicGroup) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
+          taxids.push(taxid);
+          coverages.push(coverage);
+          identities.push(identity);
+          accesions.push(lineFields[4]);
+          taxonGroups.push(taxonomicGroup);
+        }
+      } else {
+        failures++;
       }
     }
     shelljs.exec("rm " + outFileName);
@@ -401,8 +450,12 @@ app.post('/searchHomologous', function(req, res, next) {
       <meta charset="UTF-8">`);
     res.write("<script> ");
     res.write("var contextSources = [");
-    for(var j = 0; j < paths.length; j++) {
-      res.write((j? `, `: ``) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}"}`);
+    var writtenGenomas = 0;
+    for(var j = 0; (j < paths.length) && (writtenGenomas < parseInt(fields["contextsQuantity"])); j++) {
+      if(paths[j].length) {
+        res.write((j? `, `: ``) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}"}`);
+        writtenGenomas++;
+      }
     }
     fs.readFile('./public/render.html', null, function(error,data){
       res.write(" ]; </script>");
