@@ -7,57 +7,67 @@ import colorsys from "colorsys";
 import shelljs from "shelljs";
 import readlines from "n-readlines";
 
-var colorIndex = 0;
-function generateColorPalette(genes, names, colors) {
-  for(var i = 0; i < genes.length; i++) {
-    if(names.includes(genes[i].product)) {
-      genes[i].color = colors[names.indexOf(genes[i].product)];
-    } else {
-      names.push(genes[i].product);
-      var color;
-      if(genes[i].interest) {
-        color = "#bd3b32";
-      } else {
-        var colores = [];
-        color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 360, 50, 100);
-        while(colores.includes(color)) {
-          color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 360, 50, 100);
+/* I wish there was a more efficient way to do this, I would like to re-think this.
+ * Probably integrating it with the rest of the analysis would help.
+ */
+function assignColors(genomas) {
+  var DifferentColors = 0;
+  var names = [];
+  var colors = [];
+  console.log("[AssignColors] assigning colors");
+  for(var i = 0; i < genomas.length; i++) {
+    for(var j = 0; j < genomas[i].genes.length; j++) {
+      var gene = genomas[i].genes[j];
+      if(names.includes(gene.name) || names.includes(gene.product)) {
+        for(var k = 0; k < colors.length; k++) {
+          if(colors[k].names.includes(gene.name) || colors[k].names.includes(gene.product)) {
+            colors[k].count++;
+            if(!colors[k].names.includes(gene.name)) {
+              colors[k].names.push(gene.name);
+            } else if(!colors[k].names.includes(gene.product)) {
+              colors[k].names.push(gene.product);
+            }
+          }
         }
       }
-      genes[i].color = color;
-      colors.push(color);
-    }
-  }
-  return(genes);
-}
-
-function assignColors(firstContext, genes, names, colors) {
-  for(var i = 0; i < genes.length; i++) {
-    if(names.includes(genes[i].name)) {
-      genes[i].color = colors[names.indexOf(genes[i].name)];
-    } else {
-      names.push(genes[i].name);
-      var fileContent = ">" + genes[i].name + "\n" + genes[i].translation + "\n";
-      var blastQueryFileName = "subjects/" + firstContext[0].fileIdentifier + "-query.fas"; // This makes impossible to parallelize, we should change the file identifier (file name)
-      fs.writeFileSync(blastQueryFileName, fileContent);
-      // Calculate similitude with previous, using blastp
-      var blastSubjectFileName = "subjects/" + firstContext[0].fileIdentifier + "-subject.fas";
-      var identities = shelljs.exec(`blastp -query ${blastQueryFileName} -out ${"outFileNameTest"} -subject ${blastSubjectFileName} -outfmt 6`);
-      console.log("identities.stdout");
-      console.log(identities.stdout); // .slice(0, taxonomicGroup.stdout.length - 1)
-      // If identity > 30% & coberture > 70%, use that color (names.indexOf(name))
-      // else {
-      var colors = [];
-      var color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 240, 50, 100);
-      while(colors.includes(color)) {
-        color = colorsys.hsv2Hex(colorIndex++ * 0.618033988749895 % 1.0 * 240, 50, 100);
+      else {
+        names.push(gene.name); names.push(gene.product);
+        if(gene.interest) {
+          colors.push({
+            names: [gene.name, gene.product],
+            count: 1,
+            color: "#BD3B32"
+          });
+        } else {
+          colors.push({
+            names: [gene.name, gene.product],
+            count: 1
+          });
+        }
       }
-      genes[i].color = color;
-      colors.push(color);
-      // append to "subject" file
     }
   }
-  return(genes);
+  for(var k = 0; k < colors.length; k++) {
+    if(colors[k].count == 1 && !colors[k].color) {
+      colors[k].names.forEach( name => {
+        names.splice(names.indexOf(name), 1);
+      });
+    } else {
+      colors[k].color = colors[k].color ?? colorsys.hsv2Hex(DifferentColors++ * 0.618033988749895 % 1.0 * 360, 50, 100);
+    }
+  }
+  for(var i = 0; i < genomas.length; i++) {
+    for(var j = 0; j < genomas[i].genes.length; j++) {
+      if(names.includes(genomas[i].genes[j].name) || names.includes(genomas[i].genes[j].product)) {
+        for(var k = 0; k < colors.length; k++) {
+          if(colors[k].names.includes(genomas[i].genes[j].name) || colors[k].names.includes(genomas[i].genes[j].product)) {
+            genomas[i].genes[j].color = colors[k].color;
+          }
+        }
+      }
+    }
+  }
+  return(genomas);
 }
 
 app.use('/favicon.ico', express.static('public/images/favicon.png'));
@@ -333,14 +343,9 @@ app.post('/processFile', function(req, res, next) {
         genes.push(json);
       }
     }
-    /*if(!genomas.length) {*/
-      genomas.push({genes:generateColorPalette(genes, names, colors), name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
-    /*} else {
-      // This should be called when using a more complex color assignation algorithm
-      genomas.push({genes:assignColors(genomas[0].genes, genes, names, colors), name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
-    }*/
+      genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
   }
-  res.json({genomas: genomas});
+  res.json({genomas: assignColors(genomas)});
 });
 
 app.post('/searchHomologous', function(req, res, next) {
@@ -470,6 +475,26 @@ app.post('/searchHomologous', function(req, res, next) {
   });
 });
 
+app.post('/updateDatabases', function(req, res, next) {
+  console.log(req.body);
+  if("password" == req.body.password) {
+    // First, taxonomic database
+    console.log("Updating!");
+    console.log(shelljs.exec("wget https://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz -O ../.taxonkit/taxdump.tar.gz").stdout);
+    console.log(shelljs.exec("gzip --decompress --force ../.taxonkit/taxdump.tar.gz").stdout);
+    // Second, we update the .gbff files
+    console.log(shelljs.exec("wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/assembly_summary_refseq.txt").stdout);
+    console.log(shelljs.exec("wget https://ftp.ncbi.nlm.nih.gov/genomes/genbank/assembly_summary_genbank.txt").stdout);
+    console.log(shelljs.exec("python3 ../blast/download_gbffs.py").stdout);
+    // Last, we update BLAST databases
+    /*
+    for(var i = 0; i < 26; i++) {
+      shelljs.exec(`wget https://ftp.ncbi.nlm.nih.gov/blast/db/refseq_protein.${i}.tar.gz -O ../blast/refseq_protein/refseq_protein.${i}.tar.gz`);
+      shelljs.exec(`gzip --decompress --force ../blast/refseq_protein/refseq_protein.${i}.tar.gz`);
+    }*/
+  }
+  res.end();
+});
 app.listen(3000, function () {
   console.log('Listening on port 3000');
 });
