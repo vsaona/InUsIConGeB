@@ -37,6 +37,13 @@ text {
 text:active {
   cursor: grabbing;
 }
+.hideButton {
+  --mdc-theme-primary: #E94343;
+}
+#downloadButton {
+  margin: 10px;
+}
+
 
 .data {
   display: flex;

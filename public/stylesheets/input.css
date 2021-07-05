@@ -85,10 +85,32 @@ header {
     border: solid #6200EE;
     border-radius: 20px;
 }
-/*
+
 .genomaSpec, .searchCustomization, .extraInput {
     animation: fade-in .5s ease-in-out 0s;
-}*/
+}
+
+footer {
+    background: #555;
+    color: pink;
+    display: flex;
+    flex-direction: row;
+    padding: 50px;
+    margin: 0;
+}
+
+.footer-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin: 0;
+}
+
+a {
+    margin: 0;
+    color: #A2A0FF;
+    text-decoration: underline;
+}
 
 .option-column {
     display: flex;
@@ -98,6 +120,10 @@ header {
 
 .search-option {
     padding: 10px;
+}
+
+mwc-snackbar {
+    margin: 0;
 }
 
 /*
@@ -116,7 +142,7 @@ header {
     background-color: #555;
     color: #fff;
     text-align: center;
-    padding: 5px 0;
+    padding: 10px 5px;
     border-radius: 6px;
   
     /* Position the tooltip text */
@@ -149,6 +175,11 @@ header {
     opacity: 1;
   }
 
+  .tooltipRight {
+    bottom: 125%;
+    left: 50%;
+    margin-left: -200px;
+  }
 /*
  * End of tooltip logic
  */

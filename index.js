@@ -7,6 +7,8 @@ import colorsys from "colorsys";
 import shelljs from "shelljs";
 import readlines from "n-readlines";
 
+const PORT = 3000;
+
 /* I wish there was a more efficient way to do this, I would like to re-think this.
  * Probably integrating it with the rest of the analysis would help.
  */
@@ -73,7 +75,7 @@ function assignColors(genomas) {
 app.use('/favicon.ico', express.static('public/images/favicon.png'));
 
 // create application/json parser
-app.use(express.json());
+app.use(express.json({ limit: 1000000 }));
 app.use(express.urlencoded({
   extended: true
 }));
@@ -277,8 +279,6 @@ app.post('/processFile', function(req, res, next) {
     }
     genomaDefinition = genomaDefinition ?? genomaName;
     genomaAccession = genomaAccession ?? "";
-    console.log("\n\nContents:");
-    console.log(contents);
     var array = contents.split(/\s*gene\u0020\u0020+/g);//\u0020 -> caracter espacio
     var genes = [];
     for(var i = 0; i < array.length;i++){
@@ -294,6 +294,23 @@ app.post('/processFile', function(req, res, next) {
           json["complement"] = false;
         } else {
           json["complement"] = true;
+        }
+        // We extract the data for showing outside the graphic
+        var inference = array[i].match(/\/inference\s*=\s*"((?:.|\n)*?)"/);
+        if(inference != null) {
+          json["inference"] = inference[1].replace("\n", " ").replace(/\s+/g, " ");
+        }
+        var note = array[i].match(/\/note\s*=\s*"((?:.|\n)*?)"/);
+        if(note != null) {
+          json["note"] = note[1].replace("\n", " ").replace(/\s+/g, " ");
+        }
+        var product = array[i].match(/\/product\s*=\s*"((?:.|\n)*?)"/);
+        if(product != null) {
+          json["product"] = product[1].replace("\n", " ").replace(/\s+/g, " ");
+        }
+        var translation = array[i].match(/\/translation\s*=\s*"((?:.|\n)*?)"/);
+        if(translation != null) {
+          json["translation"] = translation[1].replace("\n", " ").replace(/\s+/g, " ");
         }
         var nombre = array[i].match(/\/gene=.+/g);
         if(nombre != null) {
@@ -316,25 +333,19 @@ app.post('/processFile', function(req, res, next) {
             }
           }
         }
-        // We extract the data for showing outside the graphic
-        var inference = array[i].match(/\/inference\s*=\s*"((?:.|\n)*?)"/);
-        if(inference != null) {
-          json["inference"] = inference[1].replace("\n", " ").replace(/\s+/g, " ");
-        }
-        var note = array[i].match(/\/note\s*=\s*"((?:.|\n)*?)"/);
-        if(note != null) {
-          json["note"] = note[1].replace("\n", " ").replace(/\s+/g, " ");
-        }
-        var product = array[i].match(/\/product\s*=\s*"((?:.|\n)*?)"/);
-        if(product != null) {
-          json["product"] = product[1].replace("\n", " ").replace(/\s+/g, " ");
-        }
-        var translation = array[i].match(/\/translation\s*=\s*"((?:.|\n)*?)"/);
-        if(translation != null) {
-          json["translation"] = translation[1].replace("\n", " ").replace(/\s+/g, " ");
+        if(array[i].match(/\s*tRNA\s{3,}/)) {
+          json["name"] = json["product"];
+        } else if (array[i].match(/\s*rRNA\s{3,}/)) {
+          if(json["product"].match(/.* ribosomal RNA/)) {
+            json["name"] = json["product"].replace("ribosomal RNA", "RNA");
+          } else {
+            json["name"] = "rRNA"
+          }
         }
         if(contextSources[j]["type"] == "midAccesion" && array[i].includes(contextSources[j]["midLocus"])) {
           json["interest"] = true;
+          json["identity"] = contextSources[j].identity;
+          json["coverage"] = contextSources[j].coverage;
           console.log("[processFile] Marking this locus as interest gene:");
           console.log(json["locus"]);
         } else {
@@ -393,7 +404,8 @@ app.post('/searchHomologous', function(req, res, next) {
 
     // Search homologous
     var outFileName = "blast_outputs/results_" + identifier + ".out";
-
+    console.log("BLAST command")
+    console.log("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8");
     shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8");
     shelljs.exec("rm blast_inputs/" + identifier + ".fas");
 
@@ -410,10 +422,26 @@ app.post('/searchHomologous', function(req, res, next) {
       var coverage = parseFloat(lineFields[2]);
       var identity = parseFloat(lineFields[3]);
       if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"]) {
-        var taxonomicGroup = shelljs.exec(`echo ${taxid} | taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
-        var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";");
-        taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";")[fields["oneOfEach"]];
-        if(!taxonGroups.includes(taxonomicGroup) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
+        if(parseInt(fields["oneOfEach"]) < 6 || fields["includeOnly"] != "") {
+          var taxonomicGroup = shelljs.exec(`echo ${taxid} | taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
+          var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";");
+          taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";")[fields["oneOfEach"]];
+          if(!taxonGroups.includes(taxonomicGroup) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
+            taxids.push(taxid);
+            coverages.push(coverage);
+            identities.push(identity);
+            accesions.push(lineFields[4]);
+            taxonGroups.push(taxonomicGroup);
+          }
+        } else if(fields["oneOfEach"] == "6") {
+          if(!taxids.includes(taxid)) {
+            taxids.push(taxid);
+            coverages.push(coverage);
+            identities.push(identity);
+            accesions.push(lineFields[4]);
+            taxonGroups.push(taxonomicGroup);
+          }
+        } else {
           taxids.push(taxid);
           coverages.push(coverage);
           identities.push(identity);
@@ -458,7 +486,7 @@ app.post('/searchHomologous', function(req, res, next) {
     var writtenGenomas = 0;
     for(var j = 0; (j < paths.length) && (writtenGenomas < parseInt(fields["contextsQuantity"])); j++) {
       if(paths[j].length) {
-        res.write((j? `, `: ``) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}"}`);
+        res.write((j? `, `: ``) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}", "identity": "${identities[j]}", "coverage": "${coverages[j]}"}`);
         writtenGenomas++;
       }
     }
@@ -495,6 +523,6 @@ app.post('/updateDatabases', function(req, res, next) {
   }
   res.end();
 });
-app.listen(3000, function () {
-  console.log('Listening on port 3000');
+app.listen(PORT, function () {
+  console.log('Listening on port ' + PORT);
 });

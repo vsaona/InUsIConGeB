@@ -53,6 +53,11 @@ function updateShownData(data, isGene) {
         document.getElementById("geneProductContent").innerText = data.product;
         document.getElementById("geneTranslationContent").innerText = data.translation;
         d3.select("#geneData").classed("invisible", false);
+        if(data.identity || data.coverage) {
+            document.getElementById("geneIdentityContent").innerText = data.identity;
+            document.getElementById("geneCoverageContent").innerText = data.coverage;
+            d3.select("#interestGeneData").classed("invisible", false);
+        }
     } else {
         document.getElementById("genomaDefinitionContent").innerText = data.definition;
         document.getElementById("genomaAccessionContent").innerText = data.accesion;
@@ -68,6 +73,7 @@ function activate(type, element, data) {
     d3.select("#globalToolBar").classed("invisible", true);
     d3.select("#genomaData").classed("invisible", true);
     d3.select("#geneData").classed("invisible", true);
+    d3.select("#interestGeneData").classed("invisible", true);
     if(type == "arrow") {
         d3.select("#arrowToolBar").classed("invisible", false);
         var arrowColor = document.getElementById("arrowColor");
@@ -118,10 +124,10 @@ function draw(genoma, y, group){
             gene.color = "#D7D7D7";
             arrow.style("fill", gene.color);
         }
-        if(gene.identity) {
-            arrow.style("fill-opacity", gene.identity);
+        if(gene.opacity) {
+            arrow.style("fill-opacity", gene.opacity);
         } else {
-            gene.identity = 1;
+            gene.opacity = 1;
         }
         this.getElementsByTagName("polygon")[0].addEventListener("click", function(){activate("arrow", this, gene);}, false);
         var textGeneX = (gene.start + gene.end) / 2 - ((gene.end - gene.start) / 3);
@@ -148,9 +154,9 @@ function updateColor(input) {
 function updateStrokeWidth(input) {
     d3.selectAll(".arrow").style("stroke-width", input.value);
 }
-function updateIdentity(input) {
+function updateOpacity(input) {
     d3.select(activeElement).style("fill-opacity", input.value / 100);
-    d3.select(activeElement).data()[0].identity = input.value / 100;
+    d3.select(activeElement).data()[0].opacity = input.value / 100;
 }
 function updateGeneFontSize(input) {
     d3.selectAll(".geneTag").style('font-size', input.value+"px");
@@ -163,6 +169,17 @@ function updateMidLineWidth(input) {
 }
 function updateName(input) {
     d3.select(activeElement).text(input.value);
+}
+function hideContext() {
+    for(var i = 0; i < genomas.length; i++) {
+        //var data = d3.select(activeElement).data()[0];
+        if(genomas[i] == d3.select(activeElement).data()[0]) {
+        //if(genomas[i].name == data.name && genomas[i].accession == data.accession && genomas[i].ftpPath == data.ftpPath && genomas[i].definition == data.definition) {
+            genomas.splice(i, 1);
+        }
+    }
+    document.getElementById("canvas").innerHTML="";
+    drawAll(genomas);
 }
 function updateArrowStyle(input) {
     arrowStyle = input.value;

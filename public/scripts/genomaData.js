@@ -10,7 +10,7 @@ function newGenomaData(id) {
 
   var genomaSourceType = document.createElement("mwc-select");
   genomaSourceType.outlined = true;
-  genomaSourceType.label = "Contexto " + (id + 1);
+  genomaSourceType.label = "Context " + (id + 1);
   genomaSourceType.id = "genomaSourceType" + id;
   genomaSourceType.classList.add("formData");
   genomaSourceType.onchange = (function() {
@@ -19,13 +19,13 @@ function newGenomaData(id) {
 
   var sourceFile = document.createElement("mwc-list-item");
   sourceFile.value = "file";
-  sourceFile.innerText = "Desde archivo";
+  sourceFile.innerText = "From file";
   var sourceLocus = document.createElement("mwc-list-item");
   sourceLocus.value = "locus";
   sourceLocus.innerText = "locus tag";
   var sourceAccesion = document.createElement("mwc-list-item");
   sourceAccesion.value = "accesion";
-  sourceAccesion.innerText = "Número de acceso";
+  sourceAccesion.innerText = "Accession number";
   var sourceFasta = document.createElement("mwc-list-item");
   sourceFasta.value = "fasta";
   sourceFasta.innerText = "secuencia fasta";
@@ -35,7 +35,14 @@ function newGenomaData(id) {
   genomaSourceType.appendChild(sourceAccesion);
   //genomaSourceType.appendChild(sourceFasta);
 
+  var helpGenomaSourceType = document.createElement("span");
+  helpGenomaSourceType.classList.add("tooltip");
+  helpGenomaSourceType.innerHTML = `<img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
+              Where to get the context from. It may be from a GenBank flat file (.gbff), specifying locus tag or accession number, so whe can get it from the database.
+            </span>`;
+
   genomaSource.appendChild(genomaSourceType);
+  genomaSource.appendChild(helpGenomaSourceType);
   genomaSource.appendChild(document.createElement("br"));
 
   var fileSpan = document.createElement("span");
@@ -48,7 +55,7 @@ function newGenomaData(id) {
             <div>
               <input id = "fileSelectButton`+id+`" onChange = "updateFileName(this.value, `+id+`)" type="file" class="form-control-file" name="file`+id+`">
             </div>
-            <mwc-button onclick = "selectFile(`+id+`)" label = "Elegir archivo" outlined></mwc-button>
+            <mwc-button onclick = "selectFile(`+id+`)" label = "Browse file" outlined></mwc-button>
             <div id = "fileName`+id+`">No file selected</div>
   `;
   /*
@@ -79,7 +86,7 @@ function newGenomaData(id) {
   var locusDef = document.createElement("mwc-textfield");
   locusDef.outlined = true;
   locusDef.id = "locus" + id;
-  locusDef.label = "locus tag";
+  locusDef.label = "Locus tag";
   locusDef.classList.add("genomaSpec");
   locusDef.classList.add("locus");
   locusDef.classList.add("invisible");
@@ -89,7 +96,7 @@ function newGenomaData(id) {
   var accesionDef = document.createElement("mwc-textfield");
   accesionDef.outlined = true;
   accesionDef.id = "accesion" + id;
-  accesionDef.label = "número de acceso";
+  accesionDef.label = "Accession number";
   accesionDef.classList.add("genomaSpec");
   accesionDef.classList.add("accesion");
   accesionDef.classList.add("invisible");
@@ -108,16 +115,23 @@ function newGenomaData(id) {
   genomaBoundaries.id = "genomaBoundaries" + id;
   var desde = document.createElement("mwc-textfield");
   desde.outlined = true;
-  desde.label = "Desde";
+  desde.label = "From";
   desde.id = "desde" + id;
   desde.classList.add("formData");
   genomaBoundaries.appendChild(desde);
   var hasta = document.createElement("mwc-textfield");
   hasta.outlined = true;
-  hasta.label = "Hasta";
+  hasta.label = "To";
   hasta.id = "hasta" + id;
   hasta.classList.add("formData");
   genomaBoundaries.appendChild(hasta);
+
+  var helpGenomaBoundaries = document.createElement("span");
+  helpGenomaBoundaries.classList.add("tooltip");
+  helpGenomaBoundaries.innerHTML = `<img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
+    Which adjacent genes you wish to draw. Please specify the first and last locus tag to be included.
+  </span>`;
+  genomaBoundaries.appendChild(helpGenomaBoundaries);
   extraInput.appendChild(genomaBoundaries);
 
   var context = document.createElement("div");
@@ -125,29 +139,36 @@ function newGenomaData(id) {
   context.classList.add("invisible");
   context.id = "genomaContext" + id;
   context.innerHTML =  `
-  <div class = "row mwc-typography">
-              Incluir
-              <mwc-textfield
-                outlined
-                label="genes"
-                
-                min = "0"
-                id = "contextoAntes` + id + `"
-                class = "formData">
-              </mwc-textfield>
-              antes
-            </div>
-            <div class = "row">
-              y
-              <mwc-textfield
-                outlined
-                label="genes"
-                min = "0"
-                id = "contextDespues` + id + `"
-                class = "formData">
-              </mwc-textfield>
-              después
-            </div>
+    <div class = "row mwc-typography">
+      Include
+      <mwc-textfield
+        outlined
+        type = "number"
+        value = "3"
+        min = "0"
+        id = "contextoAntes` + id + `"
+        class = "formData">
+      </mwc-textfield>
+      genes before
+    </div>
+    <div class = "row">
+      and
+      <mwc-textfield
+        outlined
+        type = "number"
+        value = "3"
+        min = "0"
+        id = "contextDespues` + id + `"
+        class = "formData">
+      </mwc-textfield>
+      genes after
+      <span class = 'tooltip'>
+        <img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'>
+        <span class = 'tooltiptext'>
+          Starting from the specified gene, how many more should be drawn upstream and downstream.
+        </span>
+      </span>
+    </div>
   `
   extraInput.appendChild(context);
   genomaData.appendChild(extraInput);

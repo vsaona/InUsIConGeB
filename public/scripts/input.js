@@ -29,10 +29,11 @@ function addGenoma() {
 
 function changeGenomaSource(value, id) {
     if(!value) return;
+    var element;
     if(id != 'SearchSource') {
-        var element = document.getElementById("genomaList").children[id];
+        element = document.getElementById("genomaList").children[id];
     } else {
-        var element = document.getElementById("genomaSearchData");
+        element = document.getElementById("genomaSearchData");
     }
     for(let el of element.children[0].children) {
         if(el.classList.contains("genomaSpec")) {
@@ -49,6 +50,11 @@ function changeGenomaSource(value, id) {
         } else if(value == "locus" && el.classList.contains("genomaContext")) {
             el.classList.remove("invisible");
         }
+    }
+    var textFields = document.getElementsByTagName("mwc-textfield");
+    for(var i = 0; i < textFields.length; i++) {
+        textFields[i].focus();
+        textFields[i].blur();
     }
 }
 
