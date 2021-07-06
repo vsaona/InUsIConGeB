@@ -34,9 +34,12 @@
   
   <form id = "tab0" action="searchHomologous" method="post" enctype="multipart/form-data" class="tabContent container">
     <div class = "main">
+      <div class = "hr">
+        Your query
+      </div>
       <div class = "genomaData" id = "genomaSearchData">
         <div id = "genomaSearchSource">
-          <mwc-select outlined label="Query sequence" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');" class = "formData">
+          <mwc-select outlined label="Query source" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');" class = "formData">
             <mwc-list-item value="file">From .gbff file</mwc-list-item>
             <mwc-list-item value="locus">locus tag</mwc-list-item>
             <!-- <mwc-list-item value="accesion">Número de acceso (como de todas formas se debe especificar el locus tag, esto no debería tener sentido)</mwc-list-item> -->
@@ -73,11 +76,11 @@
             label="Fasta sequence"
             class = "genomaSpec fasta invisible formData"
             rows = "6"
-            cols = "80">
+            cols = "90">
           </mwc-textarea>
         </div>
 
-        <div class = "extraInput">
+        <div id = "querySpecificationExtraInput" class = "extraInput">
           <div class = "genomaBoundaries invisible" id = "genomaBoundariesSearchSource">
             <mwc-textfield
               outlined
@@ -92,6 +95,10 @@
             </span> </span>
           </div>
         </div>
+      </div>
+      <div class = "hr">
+        <hr>
+        Customize your search
       </div>
       <div class = "searchCustomization" id = "searchCustomization">
         <div class = "option-column">
@@ -111,7 +118,8 @@
             </span> </span>
           </div>
           <div class = "search-option">
-            <mwc-select outlined label="One of each" id = "oneOfEach" class = "formData">
+            One of each
+            <mwc-select outlined id = "oneOfEach" class = "formData">
               <mwc-list-item value="0">Kingdom</mwc-list-item>
               <mwc-list-item value="1">Phylum</mwc-list-item>
               <mwc-list-item value="2">Class</mwc-list-item>
@@ -206,9 +214,13 @@
   <form id = "tab1" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container invisible">
     <div class="main">
       <div class = "main" id = "genomaList">
+        <div class = "hr">
+          <hr>
+          Context 1
+        </div>
         <div class = "genomaData" id = "genomaData0">
           <div id = "genomaSource0">
-            <mwc-select outlined label="Context 1" id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);" class = "formData">
+            <mwc-select outlined label="Source" id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);" class = "formData">
               <mwc-list-item value="file">From file</mwc-list-item>
               <mwc-list-item value="locus">locus tag</mwc-list-item>
               <mwc-list-item value="accesion">Accession number</mwc-list-item>
@@ -269,10 +281,9 @@
                   value = "3"
                   id = "contextoAntes0"
                   class = "formData">
-                </mwc-textfield> genes before
+                </mwc-textfield> genes before and
               </div>
               <div class = "row">
-                and
                 <mwc-textfield
                   outlined
                   type = "number"

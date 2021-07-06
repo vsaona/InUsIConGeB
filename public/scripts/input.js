@@ -8,7 +8,7 @@ function changeTab(activeTabIndex) {
     }
     // This is for solving textField positioning bug
     var textFields = document.getElementsByTagName("mwc-textfield");
-    for(var i = 0; i < textFields.length; i++) {
+    for(var i = textFields.length - 1; i > -1; i--) {
         textFields[i].focus();
         textFields[i].blur();
     }
@@ -18,22 +18,35 @@ var addedInputGenomaisEven = true;
 var genomas = 1;
 function addGenoma() {
     var clone = newGenomaData(genomas);
+    var hr = document.createElement("div");
+    hr.classList.add("hr");
+    hr.innerHTML = `<hr>Context ` + (genomas + 1);
     if(addedInputGenomaisEven) {
         clone.classList.add("mdc-theme--secondary-bg");
+        hr.classList.add("mdc-theme--secondary-bg");
     }
     addedInputGenomaisEven = !addedInputGenomaisEven;
+    document.getElementById("genomaList").appendChild(hr);
     document.getElementById("genomaList").appendChild(clone);
     genomas++;
-    clone.getElementsByTagName("mwc-textfield").layout();
+    
+    [...clone.getElementsByTagName("mwc-textfield")].forEach(element => {
+       element.layout(); 
+    });
 }
 
 function changeGenomaSource(value, id) {
     if(!value) return;
     var element;
     if(id != 'SearchSource') {
-        element = document.getElementById("genomaList").children[id];
+        element = document.getElementById("genomaList").getElementsByClassName("genomaData")[id];
     } else {
         element = document.getElementById("genomaSearchData");
+        var extraDataSpace = document.getElementById("querySpecificationExtraInput");
+        extraDataSpace.style.width = "300px";
+        if(value == "fasta") {
+            extraDataSpace.style.width = "0px";
+        }
     }
     for(let el of element.children[0].children) {
         if(el.classList.contains("genomaSpec")) {
@@ -51,7 +64,7 @@ function changeGenomaSource(value, id) {
             el.classList.remove("invisible");
         }
     }
-    var textFields = document.getElementsByTagName("mwc-textfield");
+    var textFields = element.getElementsByTagName("mwc-textfield");
     for(var i = 0; i < textFields.length; i++) {
         textFields[i].focus();
         textFields[i].blur();

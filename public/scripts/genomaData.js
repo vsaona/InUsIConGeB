@@ -10,7 +10,7 @@ function newGenomaData(id) {
 
   var genomaSourceType = document.createElement("mwc-select");
   genomaSourceType.outlined = true;
-  genomaSourceType.label = "Context " + (id + 1);
+  genomaSourceType.label = "Source";
   genomaSourceType.id = "genomaSourceType" + id;
   genomaSourceType.classList.add("formData");
   genomaSourceType.onchange = (function() {
@@ -149,10 +149,9 @@ function newGenomaData(id) {
         id = "contextoAntes` + id + `"
         class = "formData">
       </mwc-textfield>
-      genes before
+      genes before and
     </div>
     <div class = "row">
-      and
       <mwc-textfield
         outlined
         type = "number"

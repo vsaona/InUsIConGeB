@@ -61,14 +61,6 @@ header {
     flex-direction: column;
 }
 
-.genomaData {
-    display: flex;
-    max-width: none;
-    flex-direction: row;
-    padding: 0px;
-    justify-content: space-around;
-    animation: build-up .3  s ease-in-out 0s;
-}
 .form-control-file {
     opacity: 0;
     margin-bottom: -100%;
@@ -77,13 +69,22 @@ header {
     width: 300px;
 }
 
-.searchCustomization {
+.searchCustomization, .genomaData {
     display: flex;
     max-width: none;
     flex-direction: row;
     justify-content: space-around;
-    border: solid #6200EE;
-    border-radius: 20px;
+    animation: build-up .3  s ease-in-out 0s;
+    margin: 0;
+}
+
+.hr {
+    color: #555;
+    font-size: large;
+    margin: 0;
+}
+hr {
+    border: 1px solid #AAA;
 }
 
 .genomaSpec, .searchCustomization, .extraInput {
@@ -120,6 +121,8 @@ a {
 
 .search-option {
     padding: 10px;
+    box-shadow: 1px 1px 2px 2px #EEE;
+    border-radius: 6px;
 }
 
 mwc-snackbar {
