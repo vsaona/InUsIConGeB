@@ -514,18 +514,37 @@ app.post('/updateDatabases', function(req, res, next) {
   if("password" == req.body.password) {
     // First, taxonomic database
     console.log("Updating!");
-    console.log(shelljs.exec("wget https://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz -O ../.taxonkit/taxdump.tar.gz").stdout);
-    console.log(shelljs.exec("gzip --decompress --force ../.taxonkit/taxdump.tar.gz").stdout);
+    if("password" == req.body.tax) {
+      console.log(shelljs.exec("wget https://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz -O ../.taxonkit/taxdump.tar.gz").stdout);
+      console.log(shelljs.exec("gzip --decompress --force ../.taxonkit/taxdump.tar.gz").stdout);
+    }
     // Second, we update the .gbff files
-    console.log(shelljs.exec("wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/assembly_summary_refseq.txt").stdout);
-    console.log(shelljs.exec("wget https://ftp.ncbi.nlm.nih.gov/genomes/genbank/assembly_summary_genbank.txt").stdout);
-    console.log(shelljs.exec("python3 ../blast/download_gbffs.py").stdout);
+    if("password" == req.body.summary) {
+      console.log(shelljs.exec("wget https://ftp.ncbi.nlm.nih.gov/genomes/refseq/assembly_summary_refseq.txt").stdout);
+      console.log(shelljs.exec("wget https://ftp.ncbi.nlm.nih.gov/genomes/genbank/assembly_summary_genbank.txt").stdout);
+    }
+    if("password" == req.body.gbffs) {
+      console.log(shelljs.exec("python3 ../blast/download_gbffs.py").stdout);
+    }
     // Last, we update BLAST databases
-    /*
-    for(var i = 0; i < 26; i++) {
-      shelljs.exec(`wget https://ftp.ncbi.nlm.nih.gov/blast/db/refseq_protein.${i}.tar.gz -O ../blast/refseq_protein/refseq_protein.${i}.tar.gz`);
-      shelljs.exec(`gzip --decompress --force ../blast/refseq_protein/refseq_protein.${i}.tar.gz`);
-    }*/
+    if("password" == req.body.blast) {
+      for(var i = 0; i < 26; i++) {
+        shelljs.exec(`wget https://ftp.ncbi.nlm.nih.gov/blast/db/refseq_protein.${i}.tar.gz -O ../blast/refseq_protein/refseq_protein.${i}.tar.gz`);
+        shelljs.exec(`gzip --decompress --force ../blast/refseq_protein/refseq_protein.${i}.tar.gz`);
+      }
+    }
+  }
+  res.end();
+});
+
+app.post('/freeSpace', function(req, res, next) { // We remove files.
+  console.log(req.body);
+  if("password" == req.body.password) {
+    console.log("Updating!");
+    console.log(shelljs.exec("rm -f data/*").stdout);
+    console.log(shelljs.exec("rm -f blast_outputs/*").stdout);
+    console.log(shelljs.exec("rm -f blast_inputs/*").stdout);
+    console.log(shelljs.exec("rm -r -f ../blasy/ftp.ncbi.nlm.nih.gov/*").stdout);
   }
   res.end();
 });
