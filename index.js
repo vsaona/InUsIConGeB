@@ -529,9 +529,9 @@ app.post('/updateDatabases', function(req, res, next) {
     // Last, we update BLAST databases
     if("password" == req.body.blast) {
       for(var i = 0; i < 26; i++) {
-        var twoDigitIndex = i < 10 ? "0" + i : i
-        shelljs.exec(`wget https://ftp.ncbi.nlm.nih.gov/blast/db/refseq_protein.${i}.tar.gz -O ../blast/refseq_protein/refseq_protein.${i}.tar.gz`);
-        shelljs.exec(`gzip --decompress --force ../blast/refseq_protein/refseq_protein.${i}.tar.gz`);
+        var twoDigitIndex = i < 10 ? "0" + i : i;
+        shelljs.exec(`wget https://ftp.ncbi.nlm.nih.gov/blast/db/refseq_protein.${twoDigitIndex}.tar.gz -O ../blast/refseq_protein/refseq_protein.${twoDigitIndex}.tar.gz`);
+        shelljs.exec(`gzip --decompress --force ../blast/refseq_protein/refseq_protein.${twoDigitIndex}.tar.gz`);
       }
     }
   }
