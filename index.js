@@ -123,7 +123,7 @@ app.post('/fileUploadAndRender', function(req, res, next) {
     for(var j = 0; j < fields["amountOfContexts"]; j++) {
       if(fields["genomaSourceType" + j] == "file") {
         var oldpath = files["file" + j].path;
-        var newpath = './data/' + files["file" + j].name;
+        var newpath = './data/' + files["file" + j].name + Date.now();
         fs.renameSync(oldpath, newpath);
         res.write((j? `, `: ``) + `{ "type": "file", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);    // Todo lo que se necesita saber del formulario
       } else if(fields["genomaSourceType" + j] == "locus") {
@@ -281,6 +281,12 @@ app.post('/processFile', function(req, res, next) {
     genomaAccession = genomaAccession ?? "";
     var array = contents.split(/\s*gene\u0020\u0020+/g);//\u0020 -> caracter espacio
     var genes = [];
+    /*console.log("\n\n\nContents:");
+    console.log(contents);
+    console.log("Contents end\n\n\n");*/
+    if(contents.match(/$\s+^/)) {
+      res.json({"Error": `Error con ${genomaName}: No se han encontrado los locus tag especificados.`})
+    }
     for(var i = 0; i < array.length;i++){
       var json = {};
       json["color"] = "#D7D7D7";

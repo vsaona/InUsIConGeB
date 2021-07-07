@@ -340,9 +340,6 @@ function drawAll(genomas) {
             genomaHeight = (localMaxEnd- minStart)/data.genes.length;
         fontSize = Math.round(genomaHeight/6);
         draw(data, index * genomaHeight, d3.select(this));
-        d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", localMaxEnd + 20).classed("genomaTag", true).attr("id", "genomaTag_"+index);
-        this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1].addEventListener("click", function(){activate("global", this, data);}, false);
-        dragHandler(d3.select(this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1]));
         d3.select(this).insert("line", ":first-child") // Le annadimos la linea central al genoma
             .attr("id", data.name+"__midLine")
             .attr("x1", localMinStart - 100)
@@ -350,11 +347,28 @@ function drawAll(genomas) {
             .attr("y1", index * genomaHeight)
             .attr("y2", index * genomaHeight)
             .attr("stroke-width", genomaHeight / 30.0)
-            .attr("stroke", "#444444")
+            .attr("stroke", "#888")
             .classed("midLine", true);
         document.getElementById(data.name+"__midLine").addEventListener("click", function(){activate("global", document.getElementById("genomaTag_"+index), data);}, false);
     });
-    
+    d3Genomas.each(function(data, index) {
+        d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", maxEnd + 200).classed("genomaTag", true).attr("id", "genomaTag_"+index);
+        this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1].addEventListener("click", function(){activate("global", this, data);}, false);
+        dragHandler(d3.select(this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1]));
+        d3.select(this).insert("line", ":first-child") // Le annadimos la linea central al genoma
+            .attr("id", data.name+"__phantomMidLine")
+            .attr("x1", minStart - 25)
+            .attr("x2", maxEnd + 25)
+            .attr("y1", index * genomaHeight)
+            .attr("y2", index * genomaHeight)
+            .attr("stroke-width", genomaHeight / 30.0)
+            .attr("stroke", "#CCC")
+            .attr("stroke-dasharray", "100, 100")
+            .classed("midLine", true)
+            .classed("phantomMidLine", true);
+        document.getElementById(data.name+"__phantomMidLine").addEventListener("click", function(){activate("global", document.getElementById("genomaTag_"+index), data);}, false);
+    });
+        
     document.getElementById("midLineWidth").value = Math.round(genomaHeight / 30.0);
     console.log(d3Genomas);
     // We build the scale indicator arrow
@@ -363,7 +377,7 @@ function drawAll(genomas) {
     draw(scaleData, genomas.length * genomaHeight, scaleGroup);
     // Setting viewbox
     var begin = minStart - 100;
-    var width = maxEnd + 10 - begin  + 15*fontSize;
+    var width = maxEnd + 10 - begin + 20 * fontSize;
     viewBox = [begin, (-(genomaHeight)), width, (genomaHeight*(genomas.length + 1.5))];
     document.getElementById("canvas").setAttribute("viewBox", ""+viewBox[0]+" "+viewBox[1]+" "+viewBox[2]+" "+viewBox[3]);
     return(true);

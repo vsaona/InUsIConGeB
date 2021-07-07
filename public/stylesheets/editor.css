@@ -9,9 +9,17 @@
   border-radius: 50%;
   cursor: pointer;
 }
+.genomaTag {
+  font-weight: bold;
+}
+text {
+  cursor: grab;
+}
+text:active {
+  cursor: grabbing;
+}
 .canvas {
   flex: 1 1 auto;
-
 }
 .container {
   display: flex;
@@ -30,12 +38,6 @@
 }
 .toolBar * {
   margin: 0 10px;
-}
-text {
-  cursor: grab;
-}
-text:active {
-  cursor: grabbing;
 }
 .hideButton {
   --mdc-theme-primary: #E94343;
