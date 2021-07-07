@@ -7,7 +7,7 @@ import colorsys from "colorsys";
 import shelljs from "shelljs";
 import readlines from "n-readlines";
 
-const PORT = 3000;
+const PORT = 3030;
 
 /* I wish there was a more efficient way to do this, I would like to re-think this.
  * Probably integrating it with the rest of the analysis would help.
