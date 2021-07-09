@@ -72,7 +72,7 @@ function assignColors(genomas) {
   return(genomas);
 }
 
-download_gbff(fileName) {
+function download_gbff(fileName) {
   try {
     if (!fs.existsSync(fileName)) {
       console.log("[ProcessFile] Downloading " + fileName);
@@ -81,10 +81,11 @@ download_gbff(fileName) {
       console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz`).stdout);
       console.log(shelljs.exec(`gzip --decompress --force ${fileName}.gz`).stdout);
       process.chdir('../InUsIConGeB');
+      return(true);
     }
   } catch(err) {
     console.error(err);
-    continue;
+    return(false);
   }
 }
 
@@ -187,6 +188,7 @@ app.post('/processFile', function(req, res, next) {
              thisSubmitter = summaryData[2];
              thisFtpPath = summaryData[3];
             contextSources[j]["fileName"] = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
+            download_gbff(contextSources[j]["fileName"]);
             break;
           }
         }
@@ -206,7 +208,9 @@ app.post('/processFile', function(req, res, next) {
         var fileName = contextSources[j]["fileName"][file]["path"];
         var found = false;
         
-        download_gbff(fileName);
+        if(!download_gbff(fileName)) {
+          continue;
+        }
         
         liner = new readlines(fileName);
         fileName = fileName.split("/")[fileName.split("/").length - 1];
@@ -269,7 +273,6 @@ app.post('/processFile', function(req, res, next) {
     } else {
       var interestGenes = false;
       var lastGene = false;
-      download_gbff(contextSources[j]["fileName"]);
       liner = new readlines(contextSources[j]["fileName"]);
       var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
       genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
