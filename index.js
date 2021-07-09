@@ -189,6 +189,19 @@ app.post('/processFile', function(req, res, next) {
         
         var fileName = contextSources[j]["fileName"][file]["path"];
         var found = false;
+        
+        // TODO: Download file
+        try {
+          if (!fs.existsSync(fileName)) {
+            console.log("[ProcessFile] Downloading " + fileName);
+            console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz -O ${fileName}.gz`).stdout);
+            console.log(shelljs.exec(`gzip --decompress --force ${fileName}.gz`).stdout);
+          }
+        } catch(err) {
+          console.error(err);
+          continue;
+        }
+        
         liner = new readlines(fileName);
         fileName = fileName.split("/")[fileName.split("/").length - 1];
         var interestIndex = -1;
@@ -376,7 +389,6 @@ app.post('/searchHomologous', function(req, res, next) {
     var fastaSequence;
     if(fields["genomaSearchSourceType"] == "file") {
       filePath = files["fileSearchSource"].path;
-      
       // We extract the fasta sequence
       var liner = new readlines(filePath);
       var interestGene = false;
@@ -490,10 +502,12 @@ app.post('/searchHomologous', function(req, res, next) {
     res.write("<script> ");
     res.write("var contextSources = [");
     var writtenGenomas = 0;
+    var isFirst = true;
     for(var j = 0; (j < paths.length) && (writtenGenomas < parseInt(fields["contextsQuantity"])); j++) {
       if(paths[j].length) {
-        res.write((j? `, `: ``) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}", "identity": "${identities[j]}", "coverage": "${coverages[j]}"}`);
+        res.write((isFirst? ``: `, `) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}", "identity": "${identities[j]}", "coverage": "${coverages[j]}"}`);
         writtenGenomas++;
+        isFirst = false;
       }
     }
     fs.readFile('./public/render.html', null, function(error,data){
