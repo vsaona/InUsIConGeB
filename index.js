@@ -72,6 +72,22 @@ function assignColors(genomas) {
   return(genomas);
 }
 
+download_gbff(fileName) {
+  try {
+    if (!fs.existsSync(fileName)) {
+      console.log("[ProcessFile] Downloading " + fileName);
+      console.log(`wget -r -l 0 https://${fileName.substring(9)}.gz -O ${fileName}.gz`);
+      process.chdir('../blast');
+      console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz`).stdout);
+      console.log(shelljs.exec(`gzip --decompress --force ${fileName}.gz`).stdout);
+      process.chdir('../InUsIConGeB');
+    }
+  } catch(err) {
+    console.error(err);
+    continue;
+  }
+}
+
 app.use('/favicon.ico', express.static('public/images/favicon.png'));
 
 // create application/json parser
@@ -190,20 +206,7 @@ app.post('/processFile', function(req, res, next) {
         var fileName = contextSources[j]["fileName"][file]["path"];
         var found = false;
         
-        // TODO: Download file
-        try {
-          if (!fs.existsSync(fileName)) {
-            console.log("[ProcessFile] Downloading " + fileName);
-            console.log(`wget -r -l 0 https://${fileName.substring(9)}.gz -O ${fileName}.gz`);
-            process.chdir('../blast');
-            console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz`).stdout);
-            console.log(shelljs.exec(`gzip --decompress --force ${fileName}.gz`).stdout);
-            process.chdir('../InUsIConGeB');
-          }
-        } catch(err) {
-          console.error(err);
-          continue;
-        }
+        download_gbff(fileName);
         
         liner = new readlines(fileName);
         fileName = fileName.split("/")[fileName.split("/").length - 1];
@@ -266,6 +269,7 @@ app.post('/processFile', function(req, res, next) {
     } else {
       var interestGenes = false;
       var lastGene = false;
+      download_gbff(contextSources[j]["fileName"]);
       liner = new readlines(contextSources[j]["fileName"]);
       var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
       genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
