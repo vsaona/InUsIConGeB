@@ -194,8 +194,11 @@ app.post('/processFile', function(req, res, next) {
         try {
           if (!fs.existsSync(fileName)) {
             console.log("[ProcessFile] Downloading " + fileName);
-            console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz -O ${fileName}.gz`).stdout);
+            console.log(`wget -r -l 0 https://${fileName.substring(9)}.gz -O ${fileName}.gz`);
+            process.chdir('../blast');
+            console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz`).stdout);
             console.log(shelljs.exec(`gzip --decompress --force ${fileName}.gz`).stdout);
+            process.chdir('../InUsIConGeB');
           }
         } catch(err) {
           console.error(err);
