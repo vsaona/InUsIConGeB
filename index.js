@@ -80,12 +80,13 @@ function download_gbff(fileName) {
       process.chdir('../blast');
       console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz`).stdout);
       console.log(shelljs.exec(`gzip --decompress --force ${fileName}.gz`).stdout);
-      process.chdir('../InUsIConGeB');
-      return(true);
     }
+    return(true);
   } catch(err) {
     console.error(err);
     return(false);
+  } finally {
+    process.chdir('../InUsIConGeB');
   }
 }
 
@@ -180,19 +181,18 @@ app.post('/processFile', function(req, res, next) {
         liner = new readlines("../blast/assembly_summary_genbank.txt");
       }
       var line;
-        while (line = liner.next()) {
-          line = line.toString("UTF-8");
-          if(line.match(contextSources[j]["accesion"])) {
-             var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
-             thisTaxid = summaryData[1];
-             thisSubmitter = summaryData[2];
-             thisFtpPath = summaryData[3];
-            contextSources[j]["fileName"] = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
-            download_gbff(contextSources[j]["fileName"]);
-            break;
-          }
+      while (line = liner.next()) {
+        line = line.toString("UTF-8");
+        if(line.match(contextSources[j]["accesion"])) {
+            var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
+            thisTaxid = summaryData[1];
+            thisSubmitter = summaryData[2];
+            thisFtpPath = summaryData[3];
+          contextSources[j]["fileName"] = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
+          download_gbff(contextSources[j]["fileName"]);
+          break;
         }
-      //}
+      }
       liner.close();
     }
 
