@@ -41,8 +41,8 @@
         <div id = "genomaSearchSource">
           <mwc-select outlined label="Query source" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');" class = "formData">
             <mwc-list-item value="file">From .gbff file</mwc-list-item>
-            <mwc-list-item value="locus">locus tag</mwc-list-item>
-            <!-- <mwc-list-item value="accesion">Número de acceso (como de todas formas se debe especificar el locus tag, esto no debería tener sentido)</mwc-list-item> -->
+            <!-- <mwc-list-item value="locus">locus tag</mwc-list-item> -->
+            <mwc-list-item value="accesion">Accession number</mwc-list-item>
             <mwc-list-item value="fasta">fasta sequence</mwc-list-item>
           </mwc-select>
           <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -151,36 +151,19 @@
               Coverage says how much of the query sequence appears in the subject to draw.
             </span> </span>
           </div>
-          <div class = "search-option">
-            Minimum identity:
-            <mwc-textfield
-              outlined
-              id = "minIdentity"
-              iconTrailing = "%"
-              type = "number"
-              min = "0"
-              max = "100"
-              value = "30"
-              class = "formData">
-            </mwc-textfield>
-            <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Limit results for not showing some that are way too different from the query.<br>
-              Identity says how similar is one sequence to the query.
-            </span> </span>
-          </div>
         </div>
         <div class = "option-column">
           <div class = "search-option" >
             <mwc-select outlined label="Database" id = "databaseToSearch" naturalMenuWidth="true" class = "formData">
-              <mwc-list-item value="nr">Non-redundant protein sequences</mwc-list-item>
-              <mwc-list-item value="refseq_select">RefSeq Select proteins</mwc-list-item>
-              <mwc-list-item value="refseq_protein">Reference proteins</mwc-list-item>
-              <mwc-list-item value="landmark">Model Organisms</mwc-list-item>
-              <mwc-list-item value="swissprot">UniProtKB/Swiss-Prot</mwc-list-item>
-              <mwc-list-item value="pataa">Patented protein sequences</mwc-list-item>
-              <mwc-list-item value="pdb">Protein Data Bank proteins</mwc-list-item>
-              <mwc-list-item value="env_nr">Metagenomic proteins</mwc-list-item>
-              <mwc-list-item value="tsa_nr">Transcriptome Shotgun Assembly proteins</mwc-list-item>
+              <!-- <mwc-list-item value="nr">Non-redundant protein sequences</mwc-list-item> -->
+              <!-- <mwc-list-item value="refseq_select">RefSeq Select proteins</mwc-list-item> -->
+              <mwc-list-item value="refseq_protein">Reference proteins (RefSeq)</mwc-list-item>
+              <!-- <mwc-list-item value="landmark">Model Organisms</mwc-list-item> -->
+              <!-- <mwc-list-item value="swissprot">UniProtKB/Swiss-Prot</mwc-list-item> -->
+              <!-- <mwc-list-item value="pataa">Patented protein sequences</mwc-list-item> -->
+              <!-- <mwc-list-item value="pdb">Protein Data Bank proteins</mwc-list-item> -->
+              <!-- <mwc-list-item value="env_nr">Metagenomic proteins</mwc-list-item> -->
+              <!-- <mwc-list-item value="tsa_nr">Transcriptome Shotgun Assembly proteins</mwc-list-item> -->
             </mwc-select>
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
               Look for homologous into which database.
@@ -198,6 +181,23 @@
             </span> </span>
           </div>
           <div class = "search-option">
+            Minimum identity:
+            <mwc-textfield
+              outlined
+              id = "minIdentity"
+              iconTrailing = "%"
+              type = "number"
+              min = "0"
+              max = "100"
+              value = "30"
+              class = "formData">
+            </mwc-textfield>
+            <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
+              Limit results for not showing some that are way too different from the query.<br>
+              Identity says how similar is one sequence to the query.
+            </span> </span>
+          </div>
+          <!-- <div class = "search-option">
             <mwc-formfield label="Type strains only">
               <mwc-checkbox checked id = "typeStrainsOnly" class = "formData" >
               </mwc-checkbox>
@@ -205,7 +205,7 @@
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
               Type strains are the ones used to determine genetic composition of a sepcie. Check this if you want to draw only type strains.
             </span> </span>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -222,7 +222,7 @@
           <div id = "genomaSource0">
             <mwc-select outlined label="Source" id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);" class = "formData">
               <mwc-list-item value="file">From file</mwc-list-item>
-              <mwc-list-item value="locus">locus tag</mwc-list-item>
+              <!-- <mwc-list-item value="locus">locus tag</mwc-list-item> -->
               <mwc-list-item value="accesion">Accession number</mwc-list-item>
             </mwc-select>
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -347,6 +347,7 @@
   <script>
     document.getElementById("tabIndicator0").click();
     document.getElementById("oneOfEach").value = "6";
+    document.getElementById("databaseToSearch").value = "refseq_protein";
 
     /* set event listeners for form uploading */
     var tab0 = document.getElementById("tab0");

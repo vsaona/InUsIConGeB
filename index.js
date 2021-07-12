@@ -189,7 +189,9 @@ app.post('/processFile', function(req, res, next) {
             thisSubmitter = summaryData[2];
             thisFtpPath = summaryData[3];
           contextSources[j]["fileName"] = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
-          download_gbff(contextSources[j]["fileName"]);
+          if(!download_gbff(contextSources[j]["fileName"])) {
+            res.json({"Error": `Error con ${contextSources[j]["fileName"]}: No se ha logrado descargar el archivo.`});
+          }
           break;
         }
       }
@@ -308,7 +310,7 @@ app.post('/processFile', function(req, res, next) {
     console.log(contents);
     console.log("Contents end\n\n\n");*/
     if(contents.match(/$\s+^/)) {
-      res.json({"Error": `Error con ${genomaName}: No se han encontrado los locus tag especificados.`})
+      res.json({"Error": `Error con ${genomaName}: No se han encontrado los locus tag especificados.`});
     }
     for(var i = 0; i < array.length;i++){
       var json = {};
@@ -392,13 +394,34 @@ app.post('/searchHomologous', function(req, res, next) {
   var form = new formidable.IncomingForm();
   var filePath;
   var identifier = Date.now() + Math.random();
+  var error;
   form.uploadDir = "./data"
   form.parse(req, function (err, fields, files){
     console.log("[searchHomologous] form fields:");
     console.log(fields);
     var fastaSequence;
-    if(fields["genomaSearchSourceType"] == "file") {
-      filePath = files["fileSearchSource"].path;
+    if(fields["genomaSearchSourceType"] == "accesion") {
+      liner = new readlines("../blast/assembly_summary_refseq.txt");
+      if(fields["accesionSearchSource"].includes("GCA")) {
+        liner = new readlines("../blast/assembly_summary_genbank.txt");
+      }
+      var line;
+      while (line = liner.next()) {
+        line = line.toString("UTF-8");
+        if(line.match(fields["accesionSearchSource"])) {
+          var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
+          var thisFtpPath = summaryData[3];
+          filePath = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
+          if(!download_gbff(filePath)) {
+            error = `There's been an error downloading ${thisFtpPath}, so you will probably see one context less. Please try again later.`// `Ha habido un error al descargar desde ${thisFtpPath}. Esto puede hacer que no se vea uno de los contextos encontrados. Por favor inténtelo de nuevo más tarde`
+          }
+          break;
+        }
+      }
+      liner.close();
+    }
+    if(fields["genomaSearchSourceType"] == "file" || fields["genomaSearchSourceType"] == "accesion") {
+      filePath = filePath ?? files["fileSearchSource"].path;
       // We extract the fasta sequence
       var liner = new readlines(filePath);
       var interestGene = false;
@@ -423,8 +446,6 @@ app.post('/searchHomologous', function(req, res, next) {
       // End of fasta extracting
     } else if(fields["genomaSearchSourceType"] == "fasta") {
       fastaSequence = fields["fastaSearchSource"];
-    } else if(fields["genomaSearchSourceType"] == "accesion") {
-      console.log("[searchHomologous] To be implemented: Get the file path, get the file and do the staff from above");
     }
     
     var query = "blast_inputs/" + identifier + ".fas";
@@ -515,7 +536,7 @@ app.post('/searchHomologous', function(req, res, next) {
     var isFirst = true;
     for(var j = 0; (j < paths.length) && (writtenGenomas < parseInt(fields["contextsQuantity"])); j++) {
       if(paths[j].length) {
-        res.write((isFirst? ``: `, `) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}", "identity": "${identities[j]}", "coverage": "${coverages[j]}"}`);
+        res.write((isFirst? ``: `, `) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}", "identity": "${identities[j]}", "coverage": "${coverages[j]}"${error ? ", error: " + error : ""}}`);
         writtenGenomas++;
         isFirst = false;
       }
