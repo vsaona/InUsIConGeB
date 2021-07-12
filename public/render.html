@@ -20,13 +20,26 @@
                 Sorry, looks like your web browser doesn't support this technology. We suggest using Mozilla Firefox
             </svg>
         </div>
-        <mwc-button
-            raised
-            id = "downloadButton"
-            onClick = "var e = document.createElement('script'); e.setAttribute('src', '../svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e);"
-            label = "Download"
-            icon = "⇩">
-        </mwc-button>
+        <div id = "imageToolBar" class = "toolBar">
+            <mwc-button
+                raised
+                id = "downloadButton"
+                onClick = "var e = document.createElement('script'); e.setAttribute('src', '../svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e);"
+                label = "Download"
+                icon = "⇩">
+            </mwc-button>
+            <mwc-formfield>
+                <img src = 'images/zoom_in_black_24dp.svg' style = 'width: 20px;'>
+                <mwc-slider
+                    step="10"
+                    pin
+                    min="50"
+                    max="500"
+                    value="100"
+                    onchange = "zoom(this.value)">
+                </mwc-slider>
+            </mwc-formfield>
+        </div>
         
         <div id = "arrowToolBar" class = "invisible toolBar">
             <!--Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">-->
@@ -44,7 +57,7 @@
                 label = "Stroke width"
                 type = "number"
                 value = "0"
-		min = "0"
+		        min = "0"
                 onchange = "updateStrokeWidth(this)">
             </mwc-textfield>
             <mwc-textfield
@@ -226,6 +239,7 @@
                     document.getElementById("Rendering").close();
                 }
             });
+            document.getElementById("arrowStyleSelector").value = "arrow";
         </script>
         
     </body>

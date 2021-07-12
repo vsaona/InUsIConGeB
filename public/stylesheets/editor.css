@@ -5,7 +5,7 @@
 .arrow {
   fill: #D7D7D7;
   stroke: black;
-  stroke-width:5;
+  stroke-width: 0;
   border-radius: 50%;
   cursor: pointer;
 }
@@ -18,17 +18,13 @@ text {
 text:active {
   cursor: grabbing;
 }
-.canvas {
-  flex: 1 1 auto;
-}
 .container {
-  display: flex;
+  display: block;
   max-width: none;
 }
-#toolBar {
-  background: black;
-  color: white;
-  padding: 20px;
+.canvas {
+  width: 100%;
+  height: auto;
 }
 .toolBar {
   animation: appear 1s;
@@ -36,6 +32,15 @@ text:active {
   display: flex;
   flex-flow: row wrap;
   justify-content: left;
+}
+#imageToolBar {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  display: inline-block;
+  background: #FFFA;
+  border-radius: 20px;
 }
 .toolBar * {
   margin: 0 10px;

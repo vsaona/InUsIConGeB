@@ -270,7 +270,6 @@ function setInterestGene() {
     // We move the genoma
     redraw(genoma, index*genomaHeight, genomaElement);
     // And now we move the texts
-    console.log("alo?");
 }
 
 function redraw(genoma, y, el) {
@@ -381,4 +380,10 @@ function drawAll(genomas) {
     viewBox = [begin, (-(genomaHeight)), width, (genomaHeight*(genomas.length + 1.5))];
     document.getElementById("canvas").setAttribute("viewBox", ""+viewBox[0]+" "+viewBox[1]+" "+viewBox[2]+" "+viewBox[3]);
     return(true);
+}
+
+function zoom(value) {
+    var canvas = document.getElementById("canvas");
+    canvas.style.width = "auto";
+    canvas.style.height = `${value}%`;
 }
