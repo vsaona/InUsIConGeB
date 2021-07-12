@@ -34,6 +34,7 @@ text:active {
   animation: appear 1s;
   padding: 10px;
   display: flex;
+  flex-flow: row wrap;
   justify-content: left;
 }
 .toolBar * {
