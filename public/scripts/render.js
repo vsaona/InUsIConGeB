@@ -121,7 +121,7 @@ function draw(genoma, y, group){
         if(gene.color) {
             arrow.style("fill", gene.color);
         } else {
-            gene.color = "#D7D7D7";
+            gene.color = "#A7A7A7";
             arrow.style("fill", gene.color);
         }
         if(gene.opacity) {

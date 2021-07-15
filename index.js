@@ -93,7 +93,7 @@ function download_gbff(fileName) {
 app.use('/favicon.ico', express.static('public/images/favicon.png'));
 
 // create application/json parser
-app.use(express.json({ limit: 1000000 }));
+app.use(express.json({ limit: 10000000 }));
 app.use(express.urlencoded({
   extended: true
 }));
@@ -314,7 +314,7 @@ app.post('/processFile', function(req, res, next) {
     }
     for(var i = 0; i < array.length;i++){
       var json = {};
-      json["color"] = "#D7D7D7";
+      json["color"] = "#A7A7A7";
       var fields = array[i].match(/.+/g);
       if (fields != null){
         var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g);
@@ -454,8 +454,8 @@ app.post('/searchHomologous', function(req, res, next) {
     // Search homologous
     var outFileName = "blast_outputs/results_" + identifier + ".out";
     console.log("BLAST command")
-    console.log("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8");
-    shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 8");
+    console.log( "../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
+    shelljs.exec("../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
     shelljs.exec("rm blast_inputs/" + identifier + ".fas");
 
     var liner = new readlines(outFileName);
