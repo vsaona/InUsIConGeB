@@ -455,7 +455,8 @@ app.post('/searchHomologous', function(req, res, next) {
     var outFileName = "blast_outputs/results_" + identifier + ".out";
     console.log("BLAST command")
     console.log( "../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
-    shelljs.exec("../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
+    shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
+    // shelljs.exec("../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
     shelljs.exec("rm blast_inputs/" + identifier + ".fas");
 
     var liner = new readlines(outFileName);

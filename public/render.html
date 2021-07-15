@@ -20,7 +20,7 @@
                 Sorry, looks like your web browser doesn't support this technology. We suggest using Mozilla Firefox
             </svg>
         </div>
-        <div id = "imageToolBar" class = "toolBar">
+        <div id = "imageToolBar" class = "toolBar invisible">
             <mwc-button
                 raised
                 id = "downloadButton"
@@ -237,6 +237,7 @@
                 } else {
                     drawAll(genomas);
                     document.getElementById("Rendering").close();
+                    document.getElementById("imageToolBar").classList.remove("invisible");
                 }
             });
             document.getElementById("arrowStyleSelector").value = "arrow";
