@@ -21,7 +21,7 @@ function assignColors(genomas) {
     for(var j = 0; j < genomas[i].genes.length; j++) {
       var gene = genomas[i].genes[j];
       var geneName = gene.name.toLowerCase();
-      var geneProduct = gene.product.toLowerCase();
+      var geneProduct = gene.product? gene.product.toLowerCase() : null;
       if(names.includes(geneName) || names.includes(geneProduct)) {
         for(var k = 0; k < colors.length; k++) {
           if(colors[k].names.includes(geneName) || colors[k].names.includes(geneProduct)) {
@@ -432,7 +432,7 @@ app.post('/searchHomologous', function(req, res, next) {
         res.writeHead(400,{'Content-Type':'text/html'});
         res.write(`<html lang="en">
         <body>
-        <h1> Error <h1> <p> The specified assembly accession number is not part of RefSeq assemblies. </p>
+        <h1> Error <h1> <p> The specified assembly accession number is not part of GenBank assemblies. </p>
         </body>`);
         res.end();
         return;

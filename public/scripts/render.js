@@ -74,6 +74,13 @@ function activate(type, element, data) {
     d3.select("#genomaData").classed("invisible", true);
     d3.select("#geneData").classed("invisible", true);
     d3.select("#interestGeneData").classed("invisible", true);
+    /* Show animation */
+    d3.select("#goToBarIndicator").classed("invisible", false);
+    var el = document.getElementById('goToBarIndicator');
+    el.style.animation = 'none';
+    el.offsetHeight; /* trigger reflow */
+    el.style.animation = null;
+
     if(type == "arrow") {
         d3.select("#arrowToolBar").classed("invisible", false);
         var arrowColor = document.getElementById("arrowColor");
