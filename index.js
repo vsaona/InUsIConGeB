@@ -20,29 +20,31 @@ function assignColors(genomas) {
   for(var i = 0; i < genomas.length; i++) {
     for(var j = 0; j < genomas[i].genes.length; j++) {
       var gene = genomas[i].genes[j];
-      if(names.includes(gene.name) || names.includes(gene.product)) {
+      var geneName = gene.name.toLowerCase();
+      var geneProduct = gene.product.toLowerCase();
+      if(names.includes(geneName) || names.includes(geneProduct)) {
         for(var k = 0; k < colors.length; k++) {
-          if(colors[k].names.includes(gene.name) || colors[k].names.includes(gene.product)) {
+          if(colors[k].names.includes(geneName) || colors[k].names.includes(geneProduct)) {
             colors[k].count++;
-            if(!colors[k].names.includes(gene.name)) {
-              colors[k].names.push(gene.name);
-            } else if(!colors[k].names.includes(gene.product)) {
-              colors[k].names.push(gene.product);
+            if(!colors[k].names.includes(geneName)) {
+              colors[k].names.push(geneName);
+            } else if(!colors[k].names.includes(geneProduct)) {
+              colors[k].names.push(geneProduct);
             }
           }
         }
       }
       else {
-        names.push(gene.name); names.push(gene.product);
+        names.push(geneName); names.push(geneProduct);
         if(gene.interest) {
           colors.push({
-            names: [gene.name, gene.product],
+            names: [geneName, geneProduct],
             count: 1,
             color: "#BD3B32"
           });
         } else {
           colors.push({
-            names: [gene.name, gene.product],
+            names: [geneName, geneProduct],
             count: 1
           });
         }
@@ -93,7 +95,7 @@ function download_gbff(fileName) {
 app.use('/favicon.ico', express.static('public/images/favicon.png'));
 
 // create application/json parser
-app.use(express.json({ limit: 10000000 }));
+app.use(express.json({ limit: "1000mb" }));
 app.use(express.urlencoded({
   extended: true
 }));
@@ -169,8 +171,7 @@ app.post('/processFile', function(req, res, next) {
   var DOWNSTREAMCONTEXTAMOUNT = 5;
   contextSources = JSON.parse(req.body.contextSources);
   var genomas = [];
-  var names = [];
-  var colors =[];
+  var thereIsAnError = "";
   for(var j = 0; j < contextSources.length; j++) {
     var thisFtpPath; var thisTaxid; var thisSubmitter;
     var liner;
@@ -203,6 +204,9 @@ app.post('/processFile', function(req, res, next) {
     console.log("[processFile] contextSources");
     console.log(contextSources);
     if (contextSources[j]["type"] == "midAccesion") {
+      if(!contextSources[j]["fileName"].length && contextSources[j].error) {
+        thereIsAnError = thereIsAnError + ";" + contextSources[j].error;
+      }
       for(var file = 0; file < contextSources[j]["fileName"].length; file++) {
         var interestGenes = false;
         var lastGene = false;
@@ -310,7 +314,8 @@ app.post('/processFile', function(req, res, next) {
     console.log(contents);
     console.log("Contents end\n\n\n");*/
     if(contents.match(/$\s+^/)) {
-      res.json({"Error": `Error con ${genomaName}: No se han encontrado los locus tag especificados.`});
+      thereIsAnError = thereIsAnError + " ; " + `Error con ${genomaName}: No se han encontrado los locus tag especificados.`;
+      continue;
     }
     for(var i = 0; i < array.length;i++){
       var json = {};
@@ -387,6 +392,9 @@ app.post('/processFile', function(req, res, next) {
     }
       genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
   }
+  if(thereIsAnError) {
+    res.json({genomas: assignColors(genomas), error: thereIsAnError});
+  }
   res.json({genomas: assignColors(genomas)});
 });
 
@@ -418,7 +426,17 @@ app.post('/searchHomologous', function(req, res, next) {
           break;
         }
       }
-      liner.close();
+      try {
+        liner.close();
+      } catch {
+        res.writeHead(400,{'Content-Type':'text/html'});
+        res.write(`<html lang="en">
+        <body>
+        <h1> Error <h1> <p> The specified assembly accession number is not part of RefSeq assemblies. </p>
+        </body>`);
+        res.end();
+        return;
+      }
     }
     if(fields["genomaSearchSourceType"] == "file" || fields["genomaSearchSourceType"] == "accesion") {
       filePath = filePath ?? files["fileSearchSource"].path;
@@ -463,6 +481,7 @@ app.post('/searchHomologous', function(req, res, next) {
     var line;
     var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = []; var taxonGroups = [];
     var failures = 0;
+    fields["includeOnly"] = fields["includeOnly"].toLowerCase();
     while ((line = liner.next()) && (identities.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {
       line = line.toString("UTF-8");
       console.log("[searchHomologous] Reading blast result line:");
@@ -474,8 +493,8 @@ app.post('/searchHomologous', function(req, res, next) {
       if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"]) {
         if(parseInt(fields["oneOfEach"]) < 6 || fields["includeOnly"] != "") {
           var taxonomicGroup = shelljs.exec(`echo ${taxid} | taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
-          var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";");
-          taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).split("\t")[1].split(";")[fields["oneOfEach"]];
+          var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";");
+          taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";")[fields["oneOfEach"]];
           if(!taxonGroups.includes(taxonomicGroup) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
             taxids.push(taxid);
             coverages.push(coverage);
