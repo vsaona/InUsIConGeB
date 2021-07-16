@@ -4,7 +4,7 @@ Array.prototype.first = function(){return this[0];};
 var genomaHeight = 1;
 var fontSize = 24;
 var activeElement = null;
-var arrowStyle = "clearlyNotATriangle";
+var arrowStyle = "arrow";
 var difference = -1;
 var minStart = 0;
 var maxEnd = 0;
@@ -12,6 +12,7 @@ var genomas;
 var viewBox = [];
 var genomaElement = null;
 var d3Genomas;
+var itIsTheFirstTimeTheySelect = true;
 
 var dragHandler = d3.drag().on("start", function () {
     var current = d3.select(this);
@@ -58,6 +59,10 @@ function updateShownData(data, isGene) {
             document.getElementById("geneCoverageContent").innerText = data.coverage;
             d3.select("#interestGeneData").classed("invisible", false);
         }
+        if(itIsTheFirstTimeTheySelect) {
+            document.getElementById("geneLocusContent").scrollIntoView({ behavior: 'smooth', block: 'nearest'});
+            itIsTheFirstTimeTheySelect = false;
+        }
     } else {
         document.getElementById("genomaDefinitionContent").innerText = data.definition;
         document.getElementById("genomaAccessionContent").innerText = data.accesion;
@@ -65,6 +70,10 @@ function updateShownData(data, isGene) {
         document.getElementById("genomaSubmitterContent").innerText = data.submitter;
         document.getElementById("genomaTaxidContent").innerText = data.taxid;
         d3.select("#genomaData").classed("invisible", false);
+        if(itIsTheFirstTimeTheySelect) {
+            document.getElementById("genomaDefinitionContent").scrollIntoView();
+            itIsTheFirstTimeTheySelect = false;
+        }
     }
 }
 function activate(type, element, data) {
@@ -88,6 +97,7 @@ function activate(type, element, data) {
         document.getElementById("arrowStrokeWidthMwcTextField").layout();
         document.getElementById("arrowOpacity").layout();
         document.getElementById("arrowColor").layout();
+        setTimeout(function() { document.getElementById("arrowStyleSelector").value = arrowStyle; }, 200);
         arrowColor.value = data.color;
         d3.select(arrowColor).style("background-color", arrowColor.value);
         updateShownData(data, true);
