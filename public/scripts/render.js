@@ -78,8 +78,9 @@ function activate(type, element, data) {
     d3.select("#goToBarIndicator").classed("invisible", false);
     var el = document.getElementById('goToBarIndicator');
     el.style.animation = 'none';
-    el.offsetHeight; /* trigger reflow */
-    el.style.animation = null;
+    setTimeout(function() {
+        el.style.animation = '';
+    }, 10);
 
     if(type == "arrow") {
         d3.select("#arrowToolBar").classed("invisible", false);

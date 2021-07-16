@@ -231,7 +231,7 @@
                 alert("We couldn't find any genomes matching your criteria");
             }
             $.post( "processFile", {"contextSources": JSON.stringify(contextSources)}, function( data ) {
-                if(data.Error) {
+                if(data.error) {
                     alert("Error: " + data.error);
                 }
                 genomas = data.genomas;

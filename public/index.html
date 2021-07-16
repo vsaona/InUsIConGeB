@@ -91,7 +91,7 @@
               <!-- autocompletar -->
             </mwc-textfield>
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Locus tag of the interest gene out of specified genoma.
+              Locus tag of the interest gene out of specified genome.
             </span> </span>
           </div>
         </div>
@@ -117,21 +117,27 @@
               How many contexts do you wish to draw.
             </span> </span>
           </div>
-          <div class = "search-option">
-            One of each
-            <mwc-select outlined id = "oneOfEach" class = "formData">
-              <mwc-list-item value="0">Kingdom</mwc-list-item>
-              <mwc-list-item value="1">Phylum</mwc-list-item>
-              <mwc-list-item value="2">Class</mwc-list-item>
-              <mwc-list-item value="3">Order</mwc-list-item>
-              <mwc-list-item value="4">Family</mwc-list-item>
-              <mwc-list-item value="5">Genre</mwc-list-item>
-              <mwc-list-item value="6">Specie</mwc-list-item>
-              <mwc-list-item value="7">Entry</mwc-list-item> <!-- selected  // This has a bug -->
-            </mwc-select>
-            <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Not to draw many contexts from the same specified taxonomic group.
-            </span> </span>
+          <div class = "search-option" style = "display: flex;">
+            <span>
+              <mwc-checkbox id = "useOneOfEach" class = "formData" onChange = "document.getElementById('oneOfEach').disabled = !this.checked;">
+              </mwc-checkbox>
+            </span>
+            <span>
+              One of each
+              <mwc-select disabled outlined id = "oneOfEach" class = "formData">
+                <mwc-list-item value="0">Kingdom</mwc-list-item>
+                <mwc-list-item value="1">Phylum</mwc-list-item>
+                <mwc-list-item value="2">Class</mwc-list-item>
+                <mwc-list-item value="3">Order</mwc-list-item>
+                <mwc-list-item value="4">Family</mwc-list-item>
+                <mwc-list-item value="5">Genre</mwc-list-item>
+                <mwc-list-item value="6">Species</mwc-list-item>
+                <!-- <mwc-list-item value="7">Entry</mwc-list-item> -->
+              </mwc-select>
+              <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
+                Not to draw many contexts from the same specified taxonomic group.
+              </span> </span>
+          </span>
           </div>
           <div class = "search-option">
             Minimum coverage:
@@ -223,10 +229,10 @@
             <mwc-select outlined label="Source" id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);" class = "formData">
               <mwc-list-item value="file">From file</mwc-list-item>
               <!-- <mwc-list-item value="locus">locus tag</mwc-list-item> -->
-              <mwc-list-item value="accesion">Accession number</mwc-list-item>
+              <mwc-list-item value="accesion">Assembly accession</mwc-list-item>
             </mwc-select>
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Where to get the context from. It may be from a GenBank flat file (.gbff), specifying locus tag or accession number, so whe can get it from the database.
+              Where to get the context from. It may be from a GenBank flat file (.gbff) or specifying locus tag and accession number, so whe can get it from the database.
             </span> </span>
             <br>
             <span
@@ -357,7 +363,7 @@
     tab0.addEventListener('formdata', event => {
       var formElements = document.getElementById("tab0").getElementsByClassName("formData");
       for(let el of formElements) {
-        event.formData.append(el.id, el.id == "typeStrainsOnly" ? el.checked : el.value);
+        event.formData.append(el.id, el.tagName == "MWC-CHECKBOX" ? el.checked : el.value);
       }
     });
 

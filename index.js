@@ -20,31 +20,29 @@ function assignColors(genomas) {
   for(var i = 0; i < genomas.length; i++) {
     for(var j = 0; j < genomas[i].genes.length; j++) {
       var gene = genomas[i].genes[j];
-      var geneName = gene.name.toLowerCase();
-      var geneProduct = gene.product? gene.product.toLowerCase() : null;
-      if(names.includes(geneName) || names.includes(geneProduct)) {
+      if(names.includes(gene.name) || names.includes(gene.product)) {
         for(var k = 0; k < colors.length; k++) {
-          if(colors[k].names.includes(geneName) || colors[k].names.includes(geneProduct)) {
+          if(colors[k].names.includes(gene.name) || colors[k].names.includes(gene.product)) {
             colors[k].count++;
-            if(!colors[k].names.includes(geneName)) {
-              colors[k].names.push(geneName);
-            } else if(!colors[k].names.includes(geneProduct)) {
-              colors[k].names.push(geneProduct);
+            if(!colors[k].names.includes(gene.name)) {
+              colors[k].names.push(gene.name);
+            } else if(!colors[k].names.includes(gene.product)) {
+              colors[k].names.push(gene.product);
             }
           }
         }
       }
       else {
-        names.push(geneName); names.push(geneProduct);
+        names.push(gene.name); names.push(gene.product);
         if(gene.interest) {
           colors.push({
-            names: [geneName, geneProduct],
+            names: [gene.name, gene.product],
             count: 1,
             color: "#BD3B32"
           });
         } else {
           colors.push({
-            names: [geneName, geneProduct],
+            names: [gene.name, gene.product],
             count: 1
           });
         }
@@ -166,344 +164,364 @@ app.post('/fileUploadAndRender', function(req, res, next) {
 });
 
 app.post('/processFile', function(req, res, next) {
-  var contextSources;
-  var UPSTREAMCONTEXTAMOUNT = 5;
-  var DOWNSTREAMCONTEXTAMOUNT = 5;
-  contextSources = JSON.parse(req.body.contextSources);
-  var genomas = [];
-  var thereIsAnError = "";
-  for(var j = 0; j < contextSources.length; j++) {
-    var thisFtpPath; var thisTaxid; var thisSubmitter;
-    var liner;
-    var genomaName; var genomaDefinition = null ; var genomaAccession = null;
-    if(contextSources[j]["type"] == "accesion") { // || contextSources[j]["type"] == "midAccesion") {
-      liner = new readlines("../blast/assembly_summary_refseq.txt");
-      if(contextSources[j]["accesion"].includes("GCA")) {
-        liner = new readlines("../blast/assembly_summary_genbank.txt");
+  try {
+    var contextSources;
+    var UPSTREAMCONTEXTAMOUNT = 5;
+    var DOWNSTREAMCONTEXTAMOUNT = 5;
+    contextSources = JSON.parse(req.body.contextSources);
+    var genomas = [];
+    var thereIsAnError = "";
+    for(var j = 0; j < contextSources.length; j++) {
+      var thisFtpPath; var thisTaxid; var thisSubmitter;
+      var liner;
+      var genomaName; var genomaDefinition = null ; var genomaAccession = null;
+      if(contextSources[j]["type"] == "accesion") { // || contextSources[j]["type"] == "midAccesion") {
+        liner = new readlines("../blast/assembly_summary_refseq.txt");
+        if(contextSources[j]["accesion"].includes("GCA")) {
+          liner = new readlines("../blast/assembly_summary_genbank.txt");
+        }
+        var line;
+        while (line = liner.next()) {
+          line = line.toString("UTF-8");
+          if(line.match(contextSources[j]["accesion"])) {
+              var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
+              thisTaxid = summaryData[1];
+              thisSubmitter = summaryData[2];
+              thisFtpPath = summaryData[3];
+            contextSources[j]["fileName"] = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
+            if(!download_gbff(contextSources[j]["fileName"])) {
+              res.json({"Error": `Error con ${contextSources[j]["fileName"]}: No se ha logrado descargar el archivo.`});
+            }
+            break;
+          }
+        }
+        liner.close();
       }
+
+      var contents = "";
       var line;
-      while (line = liner.next()) {
-        line = line.toString("UTF-8");
-        if(line.match(contextSources[j]["accesion"])) {
-            var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
-            thisTaxid = summaryData[1];
-            thisSubmitter = summaryData[2];
-            thisFtpPath = summaryData[3];
-          contextSources[j]["fileName"] = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
-          if(!download_gbff(contextSources[j]["fileName"])) {
-            res.json({"Error": `Error con ${contextSources[j]["fileName"]}: No se ha logrado descargar el archivo.`});
+      console.log("[processFile] contextSources");
+      console.log(contextSources);
+      if (contextSources[j]["type"] == "midAccesion") {
+        if(!contextSources[j]["fileName"].length && contextSources[j].error) {
+          thereIsAnError = thereIsAnError + ";" + contextSources[j].error;
+        }
+        for(var file = 0; file < contextSources[j]["fileName"].length; file++) {
+          var interestGenes = false;
+          var lastGene = false;
+          
+          var fileName = contextSources[j]["fileName"][file]["path"];
+          var found = false;
+          
+          if(!download_gbff(fileName)) {
+            continue;
+          }
+          
+          liner = new readlines(fileName);
+          fileName = fileName.split("/")[fileName.split("/").length - 1];
+          var interestIndex = -1;
+
+          var lineNumber = 0;
+          var linesToJump = 0; // This is because some files have this "//" weird thing
+
+          while ((line = liner.next()) && !found) {
+            lineNumber++;
+            line = line.toString("UTF-8");
+            if(line.match(/^\/\/$/)) {
+              linesToJump = lineNumber;
+              interestIndex = 0;
+            }
+            if(line.match(/\s*ORGANISM\s+(.*)/))
+              genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
+            if(line.match(/\s*DEFINITION\s+(.*)/))
+              genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
+            if(line.match(/\s*ACCESSION\s+(.*)/))
+              genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
+            if(line.match(contextSources[j]["midLocus"])) {
+              console.log("---\n\n\n[processFile] Interest locus tag found. Breaking cycle!\n\n\n---");
+              found = true;
+            } else if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
+              interestIndex++;
+            }
+          }
+          if(!found) {
+            continue;
+          }
+          thisSubmitter = contextSources[j]["fileName"][file]["submitter"];
+          thisTaxid = contextSources[j]["taxid"];
+          thisFtpPath = contextSources[j]["fileName"][file]["ftpPath"];
+          liner.reset();
+          for(var temporalCounter = 0; temporalCounter < linesToJump; ++temporalCounter && liner.next());
+          var minInterest = interestIndex - UPSTREAMCONTEXTAMOUNT;
+          var maxInterest = interestIndex + DOWNSTREAMCONTEXTAMOUNT;
+          interestIndex = -1;
+          genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
+          while ((line = liner.next()) && interestIndex <= maxInterest) {
+            line = line.toString("UTF-8");
+            if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
+              interestIndex++;
+              if(interestIndex > maxInterest) {
+                break;
+              }
+            }
+            if(line.match(/\s*ORGANISM\s+(.*)/))
+              genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
+            if(interestIndex >= minInterest) {
+              contents = contents + line;
+              if(line.match(/\bORIGIN\s+/)) {
+                break;
+              }
+            }
           }
           break;
         }
-      }
-      liner.close();
-    }
-
-    var contents = "";
-    var line;
-    console.log("[processFile] contextSources");
-    console.log(contextSources);
-    if (contextSources[j]["type"] == "midAccesion") {
-      if(!contextSources[j]["fileName"].length && contextSources[j].error) {
-        thereIsAnError = thereIsAnError + ";" + contextSources[j].error;
-      }
-      for(var file = 0; file < contextSources[j]["fileName"].length; file++) {
+      } else {
         var interestGenes = false;
         var lastGene = false;
-        
-        var fileName = contextSources[j]["fileName"][file]["path"];
-        var found = false;
-        
-        if(!download_gbff(fileName)) {
-          continue;
-        }
-        
-        liner = new readlines(fileName);
-        fileName = fileName.split("/")[fileName.split("/").length - 1];
-        var interestIndex = -1;
-
-        var lineNumber = 0;
-        var linesToJump = 0; // This is because some files have this "//" weird thing
-
-        while ((line = liner.next()) && !found) {
-          lineNumber++;
+        liner = new readlines(contextSources[j]["fileName"]);
+        var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
+        genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
+        while (line = liner.next()) {
           line = line.toString("UTF-8");
-          if(line.match(/^\/\/$/)) {
-            linesToJump = lineNumber;
-            interestIndex = 0;
-          }
+          // Extracting key data from the genoma
           if(line.match(/\s*ORGANISM\s+(.*)/))
             genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
           if(line.match(/\s*DEFINITION\s+(.*)/))
             genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
           if(line.match(/\s*ACCESSION\s+(.*)/))
             genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
-          if(line.match(contextSources[j]["midLocus"])) {
-            console.log("---\n\n\n[processFile] Interest locus tag found. Breaking cycle!\n\n\n---");
-            found = true;
-          } else if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
-            interestIndex++;
+          // Extracting genes data
+          if(line.includes(contextSources[j]["locusBegin"])) {
+            interestGenes = true;
           }
-        }
-        if(!found) {
-          continue;
-        }
-        thisSubmitter = contextSources[j]["fileName"][file]["submitter"];
-        thisTaxid = contextSources[j]["taxid"];
-        thisFtpPath = contextSources[j]["fileName"][file]["ftpPath"];
-        liner.reset();
-        for(var temporalCounter = 0; temporalCounter < linesToJump; ++temporalCounter && liner.next());
-        var minInterest = interestIndex - UPSTREAMCONTEXTAMOUNT;
-        var maxInterest = interestIndex + DOWNSTREAMCONTEXTAMOUNT;
-        interestIndex = -1;
-        genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
-        while ((line = liner.next()) && interestIndex <= maxInterest) {
-          line = line.toString("UTF-8");
-          if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
-            interestIndex++;
-            if(interestIndex > maxInterest) {
-              break;
-            }
+          if(interestGenes && line.includes(contextSources[j]["locusEnd"])) {
+            lastGene = true;
           }
-          if(line.match(/\s*ORGANISM\s+(.*)/))
-            genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
-          if(interestIndex >= minInterest) {
-            contents = contents + line;
-            if(line.match(/\bORIGIN\s+/)) {
-              break;
-            }
+          if(lastGene && line.includes("gene\u0020\u0020")) {
+            break;
           }
-        }
-        break;
-      }
-    } else {
-      var interestGenes = false;
-      var lastGene = false;
-      liner = new readlines(contextSources[j]["fileName"]);
-      var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
-      genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
-      while (line = liner.next()) {
-        line = line.toString("UTF-8");
-        // Extracting key data from the genoma
-        if(line.match(/\s*ORGANISM\s+(.*)/))
-          genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
-        if(line.match(/\s*DEFINITION\s+(.*)/))
-          genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
-        if(line.match(/\s*ACCESSION\s+(.*)/))
-          genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
-        // Extracting genes data
-        if(line.includes(contextSources[j]["locusBegin"])) {
-          interestGenes = true;
-        }
-        if(interestGenes && line.includes(contextSources[j]["locusEnd"])) {
-          lastGene = true;
-        }
-        if(lastGene && line.includes("gene\u0020\u0020")) {
-          break;
-        }
-        if(interestGenes) {
-          contents = contents + line + "\n";
+          if(interestGenes) {
+            contents = contents + line + "\n";
+          }
         }
       }
-    }
-    genomaDefinition = genomaDefinition ?? genomaName;
-    genomaAccession = genomaAccession ?? "";
-    var array = contents.split(/\s*gene\u0020\u0020+/g);//\u0020 -> caracter espacio
-    var genes = [];
-    /*console.log("\n\n\nContents:");
-    console.log(contents);
-    console.log("Contents end\n\n\n");*/
-    if(contents.match(/$\s+^/)) {
-      thereIsAnError = thereIsAnError + " ; " + `Error con ${genomaName}: No se han encontrado los locus tag especificados.`;
-      continue;
-    }
-    for(var i = 0; i < array.length;i++){
-      var json = {};
-      json["color"] = "#A7A7A7";
-      var fields = array[i].match(/.+/g);
-      if (fields != null){
-        var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g);
-        json["start"] = length[0].match(/\d+/g)[0];
-        json["end"] = length[0].match(/\d+/g)[1];
-        var complement = array[i].match("complement(" + length[0] + ")");
-        if(complement == null){
-          json["complement"] = false;
-        } else {
-          json["complement"] = true;
-        }
-        // We extract the data for showing outside the graphic
-        var inference = array[i].match(/\/inference\s*=\s*"((?:.|\n)*?)"/);
-        if(inference != null) {
-          json["inference"] = inference[1].replace("\n", " ").replace(/\s+/g, " ");
-        }
-        var note = array[i].match(/\/note\s*=\s*"((?:.|\n)*?)"/);
-        if(note != null) {
-          json["note"] = note[1].replace("\n", " ").replace(/\s+/g, " ");
-        }
-        var product = array[i].match(/\/product\s*=\s*"((?:.|\n)*?)"/);
-        if(product != null) {
-          json["product"] = product[1].replace("\n", " ").replace(/\s+/g, " ");
-        }
-        var translation = array[i].match(/\/translation\s*=\s*"((?:.|\n)*?)"/);
-        if(translation != null) {
-          json["translation"] = translation[1].replace("\n", " ").replace(/\s+/g, " ");
-        }
-        var nombre = array[i].match(/\/gene=.+/g);
-        if(nombre != null) {
-          json["name"] = nombre[0].match(/[^(")]\w+?(?=")/g)[0];
-          var locus = array[i].match(/\/locus_tag=.+/g);
-          if(locus != null) {
-            json["locus"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
-          }
-        } else {
-          var locus = array[i].match(/\/locus_tag=.+/g);
-          if(locus != null && !json["name"]) {
-            json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
-            json["locus"] = json["name"];
+      genomaDefinition = genomaDefinition ?? genomaName;
+      genomaAccession = genomaAccession ?? "";
+      var array = contents.split(/\s*gene\u0020\u0020+/g);//\u0020 -> caracter espacio
+      var genes = [];
+      /*console.log("\n\n\nContents:");
+      console.log(contents);
+      console.log("Contents end\n\n\n");*/
+      if(contents.match(/$\s+^/)) {
+        thereIsAnError = thereIsAnError + " ; " + `Error con ${genomaName}: No se han encontrado los locus tag especificados.`;
+        continue;
+      }
+      for(var i = 0; i < array.length;i++){
+        var json = {};
+        json["color"] = "#A7A7A7";
+        var fields = array[i].match(/.+/g);
+        if (fields != null){
+          var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g);
+          json["start"] = length[0].match(/\d+/g)[0];
+          json["end"] = length[0].match(/\d+/g)[1];
+          var complement = array[i].match("complement(" + length[0] + ")");
+          if(complement == null){
+            json["complement"] = false;
           } else {
-            var old_locus = array[i].match(/\/old_locus_tag=.+/g);
-            if(old_locus != null && !json["name"]) {
-              json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
+            json["complement"] = true;
+          }
+          // We extract the data for showing outside the graphic
+          var inference = array[i].match(/\/inference\s*=\s*"((?:.|\n)*?)"/);
+          if(inference != null) {
+            json["inference"] = inference[1].replace("\n", " ").replace(/\s+/g, " ");
+          }
+          var note = array[i].match(/\/note\s*=\s*"((?:.|\n)*?)"/);
+          if(note != null) {
+            json["note"] = note[1].replace("\n", " ").replace(/\s+/g, " ");
+          }
+          var product = array[i].match(/\/product\s*=\s*"((?:.|\n)*?)"/);
+          if(product != null) {
+            json["product"] = product[1].replace("\n", " ").replace(/\s+/g, " ");
+          }
+          var translation = array[i].match(/\/translation\s*=\s*"((?:.|\n)*?)"/);
+          if(translation != null) {
+            json["translation"] = translation[1].replace("\n", " ").replace(/\s+/g, " ");
+          }
+          var nombre = array[i].match(/\/gene=.+/g);
+          if(nombre != null) {
+            json["name"] = nombre[0].match(/[^(")]\w+?(?=")/g)[0];
+            var locus = array[i].match(/\/locus_tag=.+/g);
+            if(locus != null) {
+              json["locus"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
+            }
+          } else {
+            var locus = array[i].match(/\/locus_tag=.+/g);
+            if(locus != null && !json["name"]) {
+              json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
+              json["locus"] = json["name"];
             } else {
-              json["name"] = "no-name";
+              var old_locus = array[i].match(/\/old_locus_tag=.+/g);
+              if(old_locus != null && !json["name"]) {
+                json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
+              } else {
+                json["name"] = "no-name";
+              }
             }
           }
-        }
-        if(array[i].match(/\s*tRNA\s{3,}/)) {
-          json["name"] = json["product"];
-        } else if (array[i].match(/\s*rRNA\s{3,}/)) {
-          if(json["product"].match(/.* ribosomal RNA/)) {
-            json["name"] = json["product"].replace("ribosomal RNA", "RNA");
-          } else {
-            json["name"] = "rRNA"
+          if(array[i].match(/\s*tRNA\s{3,}/)) {
+            json["name"] = json["product"];
+          } else if (array[i].match(/\s*rRNA\s{3,}/)) {
+            if(json["product"].match(/.* ribosomal RNA/)) {
+              json["name"] = json["product"].replace("ribosomal RNA", "RNA");
+            } else {
+              json["name"] = "rRNA"
+            }
           }
+          if(contextSources[j]["type"] == "midAccesion" && array[i].includes(contextSources[j]["midLocus"])) {
+            json["interest"] = true;
+            json["identity"] = contextSources[j].identity;
+            json["coverage"] = contextSources[j].coverage;
+            console.log("[processFile] Marking this locus as interest gene:");
+            console.log(json["locus"]);
+          } else {
+            json["interest"] = false;
+          }
+          genes.push(json);
         }
-        if(contextSources[j]["type"] == "midAccesion" && array[i].includes(contextSources[j]["midLocus"])) {
-          json["interest"] = true;
-          json["identity"] = contextSources[j].identity;
-          json["coverage"] = contextSources[j].coverage;
-          console.log("[processFile] Marking this locus as interest gene:");
-          console.log(json["locus"]);
-        } else {
-          json["interest"] = false;
-        }
-        genes.push(json);
       }
+        genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
     }
-      genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
+    if(thereIsAnError) {
+      res.json({genomas: assignColors(genomas), error: thereIsAnError});
+    }
+    res.json({genomas: assignColors(genomas)});
+  } catch (ex) {
+    res.json({error: "Ha habido un error desconocido. Favor contactar a los desarrolladores."});
   }
-  if(thereIsAnError) {
-    res.json({genomas: assignColors(genomas), error: thereIsAnError});
-  }
-  res.json({genomas: assignColors(genomas)});
 });
 
 app.post('/searchHomologous', function(req, res, next) {
-  var form = new formidable.IncomingForm();
-  var filePath;
-  var identifier = Date.now() + Math.random();
-  var error;
-  form.uploadDir = "./data"
-  form.parse(req, function (err, fields, files){
-    console.log("[searchHomologous] form fields:");
-    console.log(fields);
-    var fastaSequence;
-    if(fields["genomaSearchSourceType"] == "accesion") {
-      liner = new readlines("../blast/assembly_summary_refseq.txt");
-      if(fields["accesionSearchSource"].includes("GCA")) {
-        liner = new readlines("../blast/assembly_summary_genbank.txt");
-      }
-      var line;
-      while (line = liner.next()) {
-        line = line.toString("UTF-8");
-        if(line.match(fields["accesionSearchSource"])) {
-          var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
-          var thisFtpPath = summaryData[3];
-          filePath = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
-          if(!download_gbff(filePath)) {
-            error = `There's been an error downloading ${thisFtpPath}, so you will probably see one context less. Please try again later.`// `Ha habido un error al descargar desde ${thisFtpPath}. Esto puede hacer que no se vea uno de los contextos encontrados. Por favor inténtelo de nuevo más tarde`
-          }
-          break;
+  try {
+    var form = new formidable.IncomingForm();
+    var filePath;
+    var identifier = Date.now() + Math.random();
+    var error;
+    form.uploadDir = "./data"
+    form.parse(req, function (err, fields, files){
+      console.log("[searchHomologous] form fields:");
+      console.log(fields);
+      var fastaSequence;
+      if(fields["genomaSearchSourceType"] == "accesion") {
+        liner = new readlines("../blast/assembly_summary_refseq.txt");
+        if(fields["accesionSearchSource"].includes("GCA")) {
+          liner = new readlines("../blast/assembly_summary_genbank.txt");
         }
-      }
-      try {
-        liner.close();
-      } catch {
-        res.writeHead(400,{'Content-Type':'text/html'});
-        res.write(`<html lang="en">
-        <body>
-        <h1> Error <h1> <p> The specified assembly accession number is not part of GenBank assemblies. </p>
-        </body>`);
-        res.end();
-        return;
-      }
-    }
-    if(fields["genomaSearchSourceType"] == "file" || fields["genomaSearchSourceType"] == "accesion") {
-      filePath = filePath ?? files["fileSearchSource"].path;
-      // We extract the fasta sequence
-      var liner = new readlines(filePath);
-      var interestGene = false;
-      var line;
-      while (line = liner.next()) {
-        line = line.toString("UTF-8");
-        if(line.includes(fields["searchFileLocusTag"])) {
-          interestGene = true;
-        }
-        if(interestGene && line.match(/\/translation\s*=/)) {
-          fastaSequence = line.match(/translation\s*=\s*"(\w+)/)[1];
-          while (line = liner.next()) {
-            line = line.toString("UTF-8");
-            fastaSequence = fastaSequence + line.match(/\s*(\w+)"?/)[1];
-            if(line.includes('"')) {
-              break;
+        var line;
+        while (line = liner.next()) {
+          line = line.toString("UTF-8");
+          if(line.match(fields["accesionSearchSource"])) {
+            var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
+            var thisFtpPath = summaryData[3];
+            filePath = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
+            if(!download_gbff(filePath)) {
+              error = `There's been an error downloading ${thisFtpPath}, so you will probably see one context less. Please try again later.`// `Ha habido un error al descargar desde ${thisFtpPath}. Esto puede hacer que no se vea uno de los contextos encontrados. Por favor inténtelo de nuevo más tarde`
             }
+            break;
           }
-          break;
+        }
+        try {
+          liner.close();
+        } catch {
+          res.writeHead(400,{'Content-Type':'text/html'});
+          res.write(`<html lang="en">
+          <body>
+          <h1> Error </h1> <p> The specified assembly accession number is not part of GenBank assemblies. </p>
+          </body>`);
+          res.end();
+          return;
         }
       }
-      // End of fasta extracting
-    } else if(fields["genomaSearchSourceType"] == "fasta") {
-      fastaSequence = fields["fastaSearchSource"];
-    }
-    
-    var query = "blast_inputs/" + identifier + ".fas";
-    fs.writeFileSync(query, ">" + identifier + "\n" + fastaSequence);
-
-    // Search homologous
-    var outFileName = "blast_outputs/results_" + identifier + ".out";
-    console.log("BLAST command")
-    console.log( "../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
-    shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
-    // shelljs.exec("../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
-    shelljs.exec("rm blast_inputs/" + identifier + ".fas");
-
-    var liner = new readlines(outFileName);
-    var line;
-    var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = []; var taxonGroups = [];
-    var failures = 0;
-    fields["includeOnly"] = fields["includeOnly"].toLowerCase();
-    while ((line = liner.next()) && (identities.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {
-      line = line.toString("UTF-8");
-      console.log("[searchHomologous] Reading blast result line:");
-      console.log(line);
-      var lineFields = line.match(/(\d+)\t(\d+)\t((?:\d|\.)+)\t(.*)/);
-      var taxid = lineFields[1];
-      var coverage = parseFloat(lineFields[2]);
-      var identity = parseFloat(lineFields[3]);
-      if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"]) {
-        if(parseInt(fields["oneOfEach"]) < 6 || fields["includeOnly"] != "") {
-          var taxonomicGroup = shelljs.exec(`echo ${taxid} | taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
-          var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";");
-          taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";")[fields["oneOfEach"]];
-          if(!taxonGroups.includes(taxonomicGroup) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
-            taxids.push(taxid);
-            coverages.push(coverage);
-            identities.push(identity);
-            accesions.push(lineFields[4]);
-            taxonGroups.push(taxonomicGroup);
+      if(fields["genomaSearchSourceType"] == "file" || fields["genomaSearchSourceType"] == "accesion") {
+        filePath = filePath ?? files["fileSearchSource"].path;
+        // We extract the fasta sequence
+        var liner = new readlines(filePath);
+        var interestGene = false;
+        var line;
+        while (line = liner.next()) {
+          line = line.toString("UTF-8");
+          if(line.includes(fields["searchFileLocusTag"])) {
+            interestGene = true;
           }
-        } else if(fields["oneOfEach"] == "6") {
-          if(!taxids.includes(taxid)) {
+          if(interestGene && line.match(/\/translation\s*=/)) {
+            fastaSequence = line.match(/translation\s*=\s*"(\w+)/)[1];
+            while (line = liner.next()) {
+              line = line.toString("UTF-8");
+              fastaSequence = fastaSequence + line.match(/\s*(\w+)"?/)[1];
+              if(line.includes('"')) {
+                break;
+              }
+            }
+            break;
+          }
+        }
+        // End of fasta extracting
+      } else if(fields["genomaSearchSourceType"] == "fasta") {
+        fastaSequence = "";
+        var fastaLines = fields["fastaSearchSource"].split(/\n\r?/);
+        for(var fastaLineIndex = 0; fastaLineIndex < fastaLines.length; fastaLineIndex++) {
+          if(!fastaLines[fastaLineIndex].match(/$\>/)) {
+            fastaSequence = fastaSequence + fastaLines[fastaLineIndex];
+          }
+        }
+      }
+      
+      var query = "blast_inputs/" + identifier + ".fas";
+      fs.writeFileSync(query, ">" + identifier + "\n" + fastaSequence);
+
+      // Search homologous
+      var outFileName = "blast_outputs/results_" + identifier + ".out";
+      console.log("BLAST command")
+      console.log( "../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
+      shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
+      // shelljs.exec("../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
+      shelljs.exec("rm blast_inputs/" + identifier + ".fas");
+
+      var liner = new readlines(outFileName);
+      var line;
+      var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = []; var taxonGroups = [];
+      var failures = 0;
+      fields["includeOnly"] = fields["includeOnly"].toLowerCase();
+      fields["useOneOfEach"] = fields["useOneOfEach"] === "true";
+
+      while ((line = liner.next()) && (identities.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {
+        line = line.toString("UTF-8");
+        console.log("[searchHomologous] Reading blast result line:");
+        console.log(line);
+        var lineFields = line.match(/(\d+)\t(\d+)\t((?:\d|\.)+)\t(.*)/);
+        var taxid = lineFields[1];
+        var coverage = parseFloat(lineFields[2]);
+        var identity = parseFloat(lineFields[3]);
+        if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"]) {
+          if((fields["useOneOfEach"] && fields["oneOfEach"] < "6") || fields["includeOnly"] != "") {
+            var taxonomicGroup = shelljs.exec(`echo ${taxid} | taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
+            var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";");
+            taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";")[fields["oneOfEach"]];
+            if((!fields["useOneOfEach"] || !taxonGroups.includes(taxonomicGroup)) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
+              taxids.push(taxid);
+              coverages.push(coverage);
+              identities.push(identity);
+              accesions.push(lineFields[4]);
+              taxonGroups.push(taxonomicGroup);
+            }
+          } else if(fields["useOneOfEach"] && fields["oneOfEach"] == "6") {
+            if(!taxids.includes(taxid)) {
+              taxids.push(taxid);
+              coverages.push(coverage);
+              identities.push(identity);
+              accesions.push(lineFields[4]);
+              taxonGroups.push(taxonomicGroup);
+            }
+          } else {
             taxids.push(taxid);
             coverages.push(coverage);
             identities.push(identity);
@@ -511,67 +529,70 @@ app.post('/searchHomologous', function(req, res, next) {
             taxonGroups.push(taxonomicGroup);
           }
         } else {
-          taxids.push(taxid);
-          coverages.push(coverage);
-          identities.push(identity);
-          accesions.push(lineFields[4]);
-          taxonGroups.push(taxonomicGroup);
+          failures++;
         }
-      } else {
-        failures++;
       }
-    }
-    shelljs.exec("rm " + outFileName);
-    for(var i = 0; i < taxids.length; i++) {
-      paths.push([]);
-    }
-    console.log("[searchHomologous] unique taxids:");
-    console.log(taxids);
-    var summaryLiner = new readlines("../blast/assembly_summary_refseq.txt");
-    while ((line = summaryLiner.next())) {
-      line = line.toString("UTF-8");
-      if(line[0] == "#") {
-        continue;
+      shelljs.exec("rm " + outFileName);
+      for(var i = 0; i < taxids.length; i++) {
+        paths.push([]);
       }
-      var lineFields = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
-      if(taxids.includes(lineFields[1])) {
-        var i = taxids.indexOf(lineFields[1]);
-        paths[i].push({submitter: lineFields[2], ftpPath: lineFields[3], path: "../blast/" + lineFields[3].substring(6) + "/" + lineFields[3].split("/")[lineFields[3].split("/").length - 1] + "_genomic.gbff"});
+      console.log("[searchHomologous] unique taxids:");
+      console.log(taxids);
+      var summaryLiner = new readlines("../blast/assembly_summary_refseq.txt");
+      while ((line = summaryLiner.next())) {
+        line = line.toString("UTF-8");
+        if(line[0] == "#") {
+          continue;
+        }
+        var lineFields = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
+        if(taxids.includes(lineFields[1])) {
+          var i = taxids.indexOf(lineFields[1]);
+          paths[i].push({submitter: lineFields[2], ftpPath: lineFields[3], path: "../blast/" + lineFields[3].substring(6) + "/" + lineFields[3].split("/")[lineFields[3].split("/").length - 1] + "_genomic.gbff"});
+        }
       }
-    }
-    console.log("[searchHomologous] File paths:");
-    console.log(paths);
-   
-    // We need to get the specific locus of interest
+      console.log("[searchHomologous] File paths:");
+      console.log(paths);
+    
+      // We need to get the specific locus of interest
 
-    // This part is identical to the "fileUploadAndRender" function
+      // This part is identical to the "fileUploadAndRender" function
 
-    res.writeHead(200,{'Content-Type':'text/html'});
-    res.write(`<html lang="en">
-    <head>
-      <meta charset="UTF-8">`);
-    res.write("<script> ");
-    res.write("var contextSources = [");
-    var writtenGenomas = 0;
-    var isFirst = true;
-    for(var j = 0; (j < paths.length) && (writtenGenomas < parseInt(fields["contextsQuantity"])); j++) {
-      if(paths[j].length) {
-        res.write((isFirst? ``: `, `) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}", "identity": "${identities[j]}", "coverage": "${coverages[j]}"${error ? ", error: " + error : ""}}`);
-        writtenGenomas++;
-        isFirst = false;
+      res.writeHead(200,{'Content-Type':'text/html'});
+      res.write(`<html lang="en">
+      <head>
+        <meta charset="UTF-8">`);
+      res.write("<script> ");
+      res.write("var contextSources = [");
+      var writtenGenomas = 0;
+      var isFirst = true;
+      for(var j = 0; (j < paths.length) && (writtenGenomas < parseInt(fields["contextsQuantity"])); j++) {
+        if(paths[j].length) {
+          res.write((isFirst? ``: `, `) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}", "identity": "${identities[j]}", "coverage": "${coverages[j]}"${error ? ", error: " + error : ""}}`);
+          writtenGenomas++;
+          isFirst = false;
+        }
       }
-    }
-    fs.readFile('./public/render.html', null, function(error,data){
-      res.write(" ]; </script>");
-      if(error){
-        //res.writeHead(404);
-        res.write('File not found!');
-      } else {
-        res.write(data);
-      }
-      res.end();
+      fs.readFile('./public/render.html', null, function(error,data){
+        res.write(" ]; </script>");
+        if(error){
+          //res.writeHead(404);
+          res.write('File not found!');
+        } else {
+          res.write(data);
+        }
+        res.end();
+      });
     });
-  });
+  } catch (ex) {
+    res.writeHead(400,{'Content-Type':'text/html'});
+    res.write(`<html lang="en">
+      <body>
+        <h1> Error </h1> <p> ha habido un error desconocido. Por favor contactar a los desarrolladores. </p>
+      </body>`
+    );
+    res.end();
+    return;
+  }
 });
 
 app.post('/updateDatabases', function(req, res, next) {
