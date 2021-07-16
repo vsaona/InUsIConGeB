@@ -21,7 +21,7 @@ var dragHandler = d3.drag().on("start", function () {
 }).on("drag", function () {
     d3.select(this)
         .attr("x", d3.event.x + deltaX)
-        .attr("y", d3.event.y + deltaY)
+        .attr("y", d3.event.y + deltaY);
 });            
 
 /*getJSONP('/prueba', function(data){
@@ -132,8 +132,11 @@ function draw(genoma, y, group){
         }
         if (arrowStyle == "triangle") {
             arrow.attr("points", start+","+(y - genomaHeight/4)+" "+start+","+(y + genomaHeight/4)+" "+end+","+y);
+        } else if (arrowStyle == "tag") {
+            middle = (start + end * 3) / 4;
+            arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+end+","+y+" "+middle+","+(y - genomaHeight/6));
         } else {
-            middle = (start + end * 3) / 4
+            middle = (start + end * 3) / 4;
             arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
         }
         if(gene.color) {
@@ -302,6 +305,9 @@ function redraw(genoma, y, el) {
         }
         if (arrowStyle == "triangle") {
             arrow.attr("points", start+","+(y - genomaHeight/4)+" "+start+","+(y + genomaHeight/4)+" "+end+","+y);
+        } else if (arrowStyle == "tag") {
+            middle = (start + end * 3) / 4;
+            arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+end+","+y+" "+middle+","+(y - genomaHeight/6));
         } else {
             middle = (start + end * 3) / 4
             arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));

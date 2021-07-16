@@ -297,7 +297,7 @@ app.post('/processFile', function(req, res, next) {
           if(interestGenes && line.includes(contextSources[j]["locusEnd"])) {
             lastGene = true;
           }
-          if(lastGene && line.includes("gene\u0020\u0020")) {
+          if(lastGene && line.includes("\u0020\u0020\u0020\u0020\u0020gene\u0020\u0020")) {
             break;
           }
           if(interestGenes) {
@@ -307,7 +307,7 @@ app.post('/processFile', function(req, res, next) {
       }
       genomaDefinition = genomaDefinition ?? genomaName;
       genomaAccession = genomaAccession ?? "";
-      var array = contents.split(/\s*gene\u0020\u0020+/g);//\u0020 -> caracter espacio
+      var array = contents.split(/\s{5}gene\u0020{10}/g);//\u0020 -> caracter espacio
       var genes = [];
       /*console.log("\n\n\nContents:");
       console.log(contents);
@@ -321,6 +321,8 @@ app.post('/processFile', function(req, res, next) {
         json["color"] = "#A7A7A7";
         var fields = array[i].match(/.+/g);
         if (fields != null){
+          console.log("array: " + i);
+          console.log(array[i]);
           var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g);
           json["start"] = length[0].match(/\d+/g)[0];
           json["end"] = length[0].match(/\d+/g)[1];
@@ -331,19 +333,19 @@ app.post('/processFile', function(req, res, next) {
             json["complement"] = true;
           }
           // We extract the data for showing outside the graphic
-          var inference = array[i].match(/\/inference\s*=\s*"((?:.|\n)*?)"/);
+          var inference = array[i].match(/\/inference=\s*"((?:.|\n)*?)"/);
           if(inference != null) {
             json["inference"] = inference[1].replace("\n", " ").replace(/\s+/g, " ");
           }
-          var note = array[i].match(/\/note\s*=\s*"((?:.|\n)*?)"/);
+          var note = array[i].match(/\/note=\s*"((?:.|\n)*?)"/);
           if(note != null) {
             json["note"] = note[1].replace("\n", " ").replace(/\s+/g, " ");
           }
-          var product = array[i].match(/\/product\s*=\s*"((?:.|\n)*?)"/);
+          var product = array[i].match(/\/product=\s*"((?:.|\n)*?)"/);
           if(product != null) {
             json["product"] = product[1].replace("\n", " ").replace(/\s+/g, " ");
           }
-          var translation = array[i].match(/\/translation\s*=\s*"((?:.|\n)*?)"/);
+          var translation = array[i].match(/\/translation=\s*"((?:.|\n)*?)"/);
           if(translation != null) {
             json["translation"] = translation[1].replace("\n", " ").replace(/\s+/g, " ");
           }
@@ -396,6 +398,7 @@ app.post('/processFile', function(req, res, next) {
     }
     res.json({genomas: assignColors(genomas)});
   } catch (ex) {
+    console.error(ex);
     res.json({error: "Ha habido un error desconocido. Favor contactar a los desarrolladores."});
   }
 });
@@ -411,6 +414,9 @@ app.post('/searchHomologous', function(req, res, next) {
       console.log("[searchHomologous] form fields:");
       console.log(fields);
       var fastaSequence;
+      var thisFtpPath;
+      var thisSubmitter;
+      var thisTaxid;
       if(fields["genomaSearchSourceType"] == "accesion") {
         liner = new readlines("../blast/assembly_summary_refseq.txt");
         if(fields["accesionSearchSource"].includes("GCA")) {
@@ -421,7 +427,9 @@ app.post('/searchHomologous', function(req, res, next) {
           line = line.toString("UTF-8");
           if(line.match(fields["accesionSearchSource"])) {
             var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
-            var thisFtpPath = summaryData[3];
+            thisFtpPath = summaryData[3];
+            thisSubmitter = summaryData[2];
+            thisTaxid = summaryData[1];
             filePath = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
             if(!download_gbff(filePath)) {
               error = `There's been an error downloading ${thisFtpPath}, so you will probably see one context less. Please try again later.`// `Ha habido un error al descargar desde ${thisFtpPath}. Esto puede hacer que no se vea uno de los contextos encontrados. Por favor inténtelo de nuevo más tarde`
@@ -441,6 +449,7 @@ app.post('/searchHomologous', function(req, res, next) {
           return;
         }
       }
+      var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = []; var taxonGroups = [];
       if(fields["genomaSearchSourceType"] == "file" || fields["genomaSearchSourceType"] == "accesion") {
         filePath = filePath ?? files["fileSearchSource"].path;
         // We extract the fasta sequence
@@ -452,8 +461,8 @@ app.post('/searchHomologous', function(req, res, next) {
           if(line.includes(fields["searchFileLocusTag"])) {
             interestGene = true;
           }
-          if(interestGene && line.match(/\/translation\s*=/)) {
-            fastaSequence = line.match(/translation\s*=\s*"(\w+)/)[1];
+          if(interestGene && line.match(/\/translation=/)) {
+            fastaSequence = line.match(/translation=\s*"(\w+)/)[1];
             while (line = liner.next()) {
               line = line.toString("UTF-8");
               fastaSequence = fastaSequence + line.match(/\s*(\w+)"?/)[1];
@@ -463,7 +472,17 @@ app.post('/searchHomologous', function(req, res, next) {
             }
             break;
           }
+        }        
+        if(fields["genomaSearchSourceType"] == "file") {
+          paths.push([{path: filePath.replace("\\", "/"), submitter: "you"}]);
+          taxids.push(0);
+        } else {
+          paths.push([{path: filePath.replace("\\", "/"), ftpPath: thisFtpPath, submitter: thisSubmitter}]);
+          taxids.push(thisTaxid);
         }
+        coverages.push(100);
+        identities.push(100);
+        accesions.push(fields["searchFileLocusTag"]);
         // End of fasta extracting
       } else if(fields["genomaSearchSourceType"] == "fasta") {
         fastaSequence = "";
@@ -488,7 +507,6 @@ app.post('/searchHomologous', function(req, res, next) {
 
       var liner = new readlines(outFileName);
       var line;
-      var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = []; var taxonGroups = [];
       var failures = 0;
       fields["includeOnly"] = fields["includeOnly"].toLowerCase();
       fields["useOneOfEach"] = fields["useOneOfEach"] === "true";
