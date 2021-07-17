@@ -231,29 +231,15 @@
         <script>
             document.getElementById("Rendering").show();
 
-            $.ajaxSetup({ traditional: true });
-            console.log(contextSources);
-            if(!contextSources.length) {
+            if(!genomas.length) {
                 document.getElementById("Rendering").close();
-                alert("We couldn't find any genomes matching your criteria");
+                alert("We are sorry, but we have nothing to show you.\nPlease go read the documentation or contact the developers.");
                 document.getElementById("goBackInCaseOfErrorDiv").classList.remove("invisible");
+            } else {
+                drawAll(genomas);
+                document.getElementById("Rendering").close();
+                document.getElementById("imageToolBar").classList.remove("invisible");
             }
-            $.post( "processFile", {"contextSources": JSON.stringify(contextSources)}, function( data ) {
-                if(data.error) {
-                    alert("Error: " + data.error);
-                    document.getElementById("goBackInCaseOfErrorDiv").classList.remove("invisible");
-                }
-                genomas = data.genomas;
-                if(contextSources.length && !genomas.length) {
-                    document.getElementById("Rendering").close();
-                    alert("We are sorry, but we have nothing to show you.\nPlease go read the documentation or contact the developers.");
-                    document.getElementById("goBackInCaseOfErrorDiv").classList.remove("invisible");
-                } else {
-                    drawAll(genomas);
-                    document.getElementById("Rendering").close();
-                    document.getElementById("imageToolBar").classList.remove("invisible");
-                }
-            });
         </script>
         
     </body>
