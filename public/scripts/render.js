@@ -21,7 +21,9 @@ var dragHandler = d3.drag().on("start", function () {
 }).on("drag", function () {
     d3.select(this)
         .attr("x", d3.event.x + deltaX)
-        .attr("y", d3.event.y + deltaY);
+        .attr("y", d3.event.y + deltaY)
+        .attr("transform", "rotate(-15,"+(d3.event.x + deltaX)+","+(d3.event.y + deltaY)+")")
+    ;
 });            
 
 /*getJSONP('/prueba', function(data){
@@ -263,6 +265,7 @@ function setInterestGene() {
 
     var reverseAll = d3.select(activeElement).data()[0].complement;
     var localMaxEnd = 0;
+    var localMinStart = 0;
     var difference = d3.select(activeElement).data()[0].start;
 
     for(var j = 0; j < genoma.genes.length; j++) {
@@ -274,23 +277,38 @@ function setInterestGene() {
             genoma.genes[j].end = temp;
             genoma.genes[j].complement = !genoma.genes[j].complement;
         }
-        if(genoma.genes[j].start < minStart)
-            minStart = genoma.genes[j].start;
-        if(genoma.genes[j].end > maxEnd)
-            maxEnd   = genoma.genes[j].end;
-        if(genoma.genes[j].end > localMaxEnd)
+        if(genoma.genes[j].start < localMinStart) {
+            localMinStart = genoma.genes[j].start;
+            if(genoma.genes[j].start < minStart) {
+                minStart = genoma.genes[j].start;
+            }
+        }
+        if(genoma.genes[j].end > localMaxEnd) {
             localMaxEnd = genoma.genes[j].end;
+            if(genoma.genes[j].end > maxEnd) {
+                maxEnd   = genoma.genes[j].end;
+            }
+        }
     }
     // Resetting viewbox
-    var begin = minStart - 10;
-    var width = maxEnd + 10 - begin  + 15*fontSize;
+    var begin = minStart - 100;
+    var width = maxEnd + 10 - begin + 20 * fontSize;
     viewBox = [begin, viewBox[1], width, viewBox[3]];
     document.getElementById("canvas").setAttribute("viewBox", ""+viewBox[0]+" "+viewBox[1]+" "+viewBox[2]+" "+viewBox[3]);
     // We move the genoma tag
-    d3.select(genomaElement).select(".genomaTag").attr("x", localMaxEnd + 20);
+    d3.selectAll(".genomaTag").attr("x", maxEnd + 200);
     // We move the genoma
     redraw(genoma, index*genomaHeight, genomaElement);
-    // And now we move the texts
+    // And now we move the line
+    console.log("localMinStart");
+    console.log(localMinStart);
+    d3.select(genomaElement).select(`.realMidLine`).attr("x1", localMinStart - 100)
+        .attr("x2", localMaxEnd + 100);
+    d3.select("#canvas").selectAll(".phantomMidLine").each(function(_, index) {
+        d3.select(this).attr("x1", minStart - 25)
+            .attr("x2", maxEnd + 25);
+    });
+    
 }
 
 function redraw(genoma, y, el) {
@@ -312,7 +330,10 @@ function redraw(genoma, y, el) {
             middle = (start + end * 3) / 4
             arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
         }
-        d3.select(this).select("text").attr("x", (start + end) / 2 - (end-start)/3);
+        var textTag = d3.select(this).select("text");
+        var textTagY = textTag.attr("y");
+        textTag.attr("x", (start + end) / 2 - (end-start)/3)
+            .attr("transform", "rotate(-15,"+((start + end) / 2 - (end-start)/3)+"," + textTagY + ")");
     });
     return(0);
 }
@@ -324,17 +345,12 @@ function drawAll(genomas) {
         var localMinStart = Number.MAX_VALUE;
         var reverseAll = false;
         for(var j = 0; j < data.genes.length; j++) {
-            if(j < 6) {
-                console.log(data.genes[j]);
-            }
             if(data.genes[j].interest) {
                 difference = data.genes[j].start;
                 reverseAll = data.genes[j].complement;
             }
         }
         if(difference == -1) {
-            console.log("No interest gene found");
-            console.log(data);
             data.genes[0].interest = true;
             difference = data.genes[0].start;
             if(data.genes[0].complement) {
@@ -371,7 +387,7 @@ function drawAll(genomas) {
             .attr("y2", index * genomaHeight)
             .attr("stroke-width", genomaHeight / 30.0)
             .attr("stroke", "#888")
-            .classed("midLine", true);
+            .classed("midLine", true).classed("realMidLine", true);
         document.getElementById(data.name+"__midLine").addEventListener("click", function(){activate("global", document.getElementById("genomaTag_"+index), data);}, false);
     });
     d3Genomas.each(function(data, index) {
