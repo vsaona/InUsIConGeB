@@ -197,11 +197,12 @@ function hideContext() {
     for(var i = 0; i < genomas.length; i++) {
         //var data = d3.select(activeElement).data()[0];
         if(genomas[i] == d3.select(activeElement).data()[0]) {
-        //if(genomas[i].name == data.name && genomas[i].accession == data.accession && genomas[i].ftpPath == data.ftpPath && genomas[i].definition == data.definition) {
             genomas.splice(i, 1);
         }
     }
     document.getElementById("canvas").innerHTML="";
+    minStart = 0;
+    maxEnd = 0;
     drawAll(genomas);
 }
 function updateArrowStyle(input) {
