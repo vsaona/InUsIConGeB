@@ -284,24 +284,36 @@ app.post('/processFile', function(req, res, next) {
         genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
         while (line = liner.next()) {
           line = line.toString("UTF-8");
+
           // Extracting key data from the genoma
           if(line.match(/\s*ORGANISM\s+(.*)/))
             genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
-          if(line.match(/\s*DEFINITION\s+(.*)/))
+          else if(line.match(/\s*DEFINITION\s+(.*)/))
             genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
-          if(line.match(/\s*ACCESSION\s+(.*)/))
+          else if(line.match(/\s*ACCESSION\s+(.*)/))
             genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
+
           // Extracting genes data
-          if(line.includes(contextSources[j]["locusBegin"])) {
-            interestGenes = true;
-          }
-          if(interestGenes && line.includes(contextSources[j]["locusEnd"])) {
-            lastGene = true;
-          }
-          if(lastGene && line.includes("\u0020\u0020\u0020gene\u0020\u0020")) {
-            break;
-          }
-          if(interestGenes) {
+          else if(!interestGenes) {
+            if(contextSources[j]["locusBegin"] && line.includes(contextSources[j]["locusBegin"])) {
+              interestGenes = true;
+              console.log("BEGIN LINE :: " + line);
+            } else if(!contextSources[j]["locusBegin"] && line.match(/..\s{3}gene\s{12}/)) {
+              interestGenes = true;
+              console.log("BEGIN LINE :: " + line);
+            }
+          } else {
+            if(interestGenes && contextSources[j]["locusEnd"] && line.includes(contextSources[j]["locusEnd"])) {
+              lastGene = true;
+            }
+            if(lastGene && line.includes("\u0020\u0020\u0020gene\u0020\u0020")) {
+              console.log("LAST LINE :: " + line);
+              break;
+            }
+            if(line.match(/^ORIGIN\b/) || line.match(/^\/\//)) {
+              console.log("LAST LINE :: " + line);
+              break;
+            }
             contents = contents + line + "\n";
           }
         }

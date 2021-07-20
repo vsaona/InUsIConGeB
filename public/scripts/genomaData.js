@@ -26,14 +26,10 @@ function newGenomaData(id) {
   var sourceAccesion = document.createElement("mwc-list-item");
   sourceAccesion.value = "accesion";
   sourceAccesion.innerText = "Accession number";
-  var sourceFasta = document.createElement("mwc-list-item");
-  sourceFasta.value = "fasta";
-  sourceFasta.innerText = "secuencia fasta";
 
   genomaSourceType.appendChild(sourceFile);
-  genomaSourceType.appendChild(sourceLocus);
+  //genomaSourceType.appendChild(sourceLocus);
   genomaSourceType.appendChild(sourceAccesion);
-  //genomaSourceType.appendChild(sourceFasta);
 
   var helpGenomaSourceType = document.createElement("span");
   helpGenomaSourceType.classList.add("tooltip");
