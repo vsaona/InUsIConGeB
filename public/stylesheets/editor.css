@@ -56,6 +56,14 @@ text:active {
 #downloadButton {
   margin: 10px;
 }
+#arrowColorStandardInput {
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+  width: 1px;
+  height: 1px;
+  opacity: 1%;
+}
 
 .data {
   display: flex;

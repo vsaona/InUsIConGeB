@@ -297,21 +297,17 @@ app.post('/processFile', function(req, res, next) {
           else if(!interestGenes) {
             if(contextSources[j]["locusBegin"] && line.includes(contextSources[j]["locusBegin"])) {
               interestGenes = true;
-              console.log("BEGIN LINE :: " + line);
             } else if(!contextSources[j]["locusBegin"] && line.match(/..\s{3}gene\s{12}/)) {
               interestGenes = true;
-              console.log("BEGIN LINE :: " + line);
             }
           } else {
             if(interestGenes && contextSources[j]["locusEnd"] && line.includes(contextSources[j]["locusEnd"])) {
               lastGene = true;
             }
             if(lastGene && line.includes("\u0020\u0020\u0020gene\u0020\u0020")) {
-              console.log("LAST LINE :: " + line);
               break;
             }
             if(line.match(/^ORIGIN\b/) || line.match(/^\/\//)) {
-              console.log("LAST LINE :: " + line);
               break;
             }
             contents = contents + line + "\n";

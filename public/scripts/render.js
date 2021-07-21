@@ -19,10 +19,13 @@ var dragHandler = d3.drag().on("start", function () {
     deltaX = current.attr("x") - d3.event.x;
     deltaY = current.attr("y") - d3.event.y;
 }).on("drag", function () {
+    var newX = d3.event.x + deltaX;
+    var newY = d3.event.y + deltaY;
+    var rotationDegree = d3.select(this).classed("genomaTag") ? "0" : "-15";
     d3.select(this)
-        .attr("x", d3.event.x + deltaX)
-        .attr("y", d3.event.y + deltaY)
-        .attr("transform", "rotate(-15,"+(d3.event.x + deltaX)+","+(d3.event.y + deltaY)+")")
+        .attr("x", newX)
+        .attr("y", newY)
+        .attr("transform", `rotate(${rotationDegree}, ${newX}, ${newY})`)
     ;
 });            
 
@@ -170,9 +173,18 @@ function draw(genoma, y, group){
     return(true);
 }
 
+function updateColorField(picker) {
+    document.getElementById('arrowColor').value = picker.toHEXString();
+    d3.select("#arrowColor").style("background-color", picker.toHEXString());
+    d3.select(activeElement).style('fill', picker.toHEXString());
+    d3.select(activeElement).data()[0].color = picker.toHEXString();
+}
 function updateColor(input) {
-    d3.select(activeElement).style('fill', input.value);
-    d3.select(activeElement).data()[0].color = input.value;
+    if(input.value.match(/^#[0-9A-Fa-f]{3}(?:[0-9A-Fa-f]{3})?$/)) {
+        d3.select("#arrowColor").style("background-color", input.value);
+        d3.select(activeElement).style('fill', input.value);
+        d3.select(activeElement).data()[0].color = input.value;
+    }
 }
 function updateStrokeWidth(input) {
     d3.selectAll(".arrow").style("stroke-width", input.value);

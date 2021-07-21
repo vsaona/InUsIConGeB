@@ -42,21 +42,21 @@
                     min="50"
                     max="500"
                     value="100"
-                    onchange = "zoom(this.value)">
+                    oninput = "zoom(this.value)">
                 </mwc-slider>
             </mwc-formfield>
             <img id = 'goToBarIndicator' src = 'images/arrow_downward_black_24dp.svg' style = 'width: 40px;' class = "invisible disappear">
         </div>
         
         <div id = "arrowToolBar" class = "invisible toolBar">
-            <!--Color: <input class = "jscolor {hash:true}" value = "#FFFFFF" id = "arrowColor" onchange = "updateColor(this)">-->
+            
             <mwc-textfield
                 id = "arrowColor"
                 outlined
                 label = "Color"
                 value = "#FFFFFF"
-                class = "jscolor {hash:true}"
-                onchange = "updateColor(this)">
+                data-jscolor = "{position:'top', previewElement:'none', onInput: 'updateColorField(this)'}"
+                oninput = "updateColor(this)">
             </mwc-textfield>
             <mwc-textfield
                 id = "arrowStrokeWidthMwcTextField"
@@ -65,7 +65,7 @@
                 type = "number"
                 value = "0"
 		        min = "0"
-                onchange = "updateStrokeWidth(this)">
+                oninput = "updateStrokeWidth(this)">
             </mwc-textfield>
             <mwc-textfield
                 id = "arrowOpacity"
@@ -75,7 +75,7 @@
                 value = "100"
                 max = "100"
                 min = "0"
-                onchange = "updateOpacity(this)">
+                oninput = "updateOpacity(this)">
             </mwc-textfield>
             <mwc-select outlined label="Arrow style"id = "arrowStyleSelector" onchange = "updateArrowStyle(this)">
                 <mwc-list-item value="arrow">Arrows</mwc-list-item>
@@ -92,14 +92,14 @@
                 label = "Font size"
                 value = "24"
                 type = "number"
-                onchange = "updateGeneFontSize(this)">
+                oninput = "updateGeneFontSize(this)">
             </mwc-textfield>
             <mwc-textfield
                 id = "geneName"
                 outlined
                 label = "Gene name"
                 value = ""
-                onchange = "updateName(this)">
+                oninput = "updateName(this)">
             </mwc-textfield>
         </div>
         <div id = "globalToolBar" class = "invisible toolBar">
@@ -109,14 +109,14 @@
                 label = "Font size"
                 value = "24"
                 type = "number"
-                onchange = "updateGenomaFontSize(this)">
+                oninput = "updateGenomaFontSize(this)">
             </mwc-textfield>
             <mwc-textfield
                 id = "genomaName"
                 outlined
                 label = "Context name"
                 value = ""
-                onchange = "updateName(this)">
+                oninput = "updateName(this)">
             </mwc-textfield>
             <mwc-textfield
                 id = "midLineWidth"
@@ -124,7 +124,7 @@
                 label = "Midline Width"
                 type = "number"
                 value = ""
-                onchange = "updateMidLineWidth(this)">
+                oninput = "updateMidLineWidth(this)">
             </mwc-textfield>
             <mwc-button
                 id = "genomaHideButton"

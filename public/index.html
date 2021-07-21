@@ -118,26 +118,23 @@
             </span> </span>
           </div>
           <div class = "search-option" style = "display: flex;">
-            <span>
+            <mwc-formfield label="One of each">
               <mwc-checkbox id = "useOneOfEach" class = "formData" onChange = "document.getElementById('oneOfEach').disabled = !this.checked;">
               </mwc-checkbox>
-            </span>
-            <span>
-              One of each
-              <mwc-select disabled outlined id = "oneOfEach" class = "formData">
-                <mwc-list-item value="0">Kingdom</mwc-list-item>
-                <mwc-list-item value="1">Phylum</mwc-list-item>
-                <mwc-list-item value="2">Class</mwc-list-item>
-                <mwc-list-item value="3">Order</mwc-list-item>
-                <mwc-list-item value="4">Family</mwc-list-item>
-                <mwc-list-item value="5">Genre</mwc-list-item>
-                <mwc-list-item value="6">Species</mwc-list-item>
-                <!-- <mwc-list-item value="7">Entry</mwc-list-item> -->
-              </mwc-select>
-              <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-                Not to draw many contexts from the same specified taxonomic group.
-              </span> </span>
-          </span>
+            </mwc-formfield>
+            <mwc-select disabled outlined id = "oneOfEach" class = "formData">
+              <mwc-list-item value="0">Kingdom</mwc-list-item>
+              <mwc-list-item value="1">Phylum</mwc-list-item>
+              <mwc-list-item value="2">Class</mwc-list-item>
+              <mwc-list-item value="3">Order</mwc-list-item>
+              <mwc-list-item value="4">Family</mwc-list-item>
+              <mwc-list-item value="5">Genre</mwc-list-item>
+              <mwc-list-item value="6">Species</mwc-list-item>
+              <!-- <mwc-list-item value="7">Entry</mwc-list-item> -->
+            </mwc-select>
+            <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
+              Not to draw many contexts from the same specified taxonomic group.
+            </span> </span>
           </div>
           <div class = "search-option">
             Minimum coverage:
