@@ -3,52 +3,132 @@
 <head>
   <title>User manual - Genomic context diagram editor</title>
   <meta charset="utf-8">
+  <script src="../mwc_bundle/mwc-material-bundle.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../stylesheets/user_manual.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
 </head>
 <body>
 
-  <header>
-    <h2>Genomic context diagram editor</h2>
-  </header>
-
-  <section>
-    <nav>
+  <mwc-drawer hasHeader>
+    <span slot="title">Index</span>
+    <div>
       <ul>
-        <li><a href="#">Introduction</a></li>
-        <li><a href="#">BLAST</a></li>
-        <li><a href="#">My contexts</a></li>
-        <li><a href="#">Diagram edit</a></li>
+        <li><a href="#Introduction">Introduction</a></li>
+        <li><a href="#BLAST">BLAST</a></li>
+        <li><a href="#MyContexts">My contexts</a></li>
+        <li><a href="#DiagramEdit">Diagram edit</a></li>
       </ul>
-    </nav>
+    </div>
+    <div slot="appContent">
+      <mwc-top-app-bar>
+          <div slot="title">Genomic context diagram editor</div>
+      </mwc-top-app-bar>
+      <article>
+        <h1 id = "Introduction">Introduction</h1>
+        <p>
+          This app allows you to generate a genomic context diagram. You can use any genome assembly from GenBank and even use your own .gbff files.
+        </p>
+        <p>
+          We'll only store the data we need for drawing, and we will delete it afterwards.
+        </p>
+        <img src = "images/tutorial1.png" style = "height: 70vh">
+        <p>
+          You may do a BLAST search for homologous genes, and we'll draw the results in their respective contexts.
+        </p>
+        <p>
+          See all about the genes, edit your drawing colors, shapes, and show the information you want to show.
+        </p>
+        <p>
+          Click on the genes, their tags or the assembly's tags to see more about them and edit them.
+        </p>
+        <img src = "images/tutorial3.png" style = "height: 70vh">
   
-    <article>
-      <h1>Introduction</h1>
-      <p>London is the capital city of England. It is the most populous city in the  United Kingdom, with a metropolitan area of over 13 million inhabitants.</p>
-      <p>Standing on the River Thames, London has been a major settlement for two millennia, its history going back to its founding by the Romans, who named it Londinium.</p>
-    </article>
-
-    <article>
-      <h1>BLAST</h1>
-      <p>London is the capital city of England. It is the most populous city in the  United Kingdom, with a metropolitan area of over 13 million inhabitants.</p>
-      <p>Standing on the River Thames, London has been a major settlement for two millennia, its history going back to its founding by the Romans, who named it Londinium.</p>
-    </article>
-
-    <article>
-      <h1>My contexts</h1>
-      <p>London is the capital city of England. It is the most populous city in the  United Kingdom, with a metropolitan area of over 13 million inhabitants.</p>
-      <p>Standing on the River Thames, London has been a major settlement for two millennia, its history going back to its founding by the Romans, who named it Londinium.</p>
-    </article>
-
-    <article>
-      <h1 id = "Diagram edit">Diagram edit</h1>
-      <p>London is the capital city of England. It is the most populous city in the  United Kingdom, with a metropolitan area of over 13 million inhabitants.</p>
-      <p>Standing on the River Thames, London has been a major settlement for two millennia, its history going back to its founding by the Romans, who named it Londinium.</p>
-    </article>
+        <h1 id = "BLAST">BLAST</h1>
+        <p>
+          BLAST finds regions of similarity between biological sequences.
+          The program compares nucleotide or protein sequences to sequence databases and calculates the statistical significance.
+          We are using <a href = "https://blast.ncbi.nlm.nih.gov/Blast.cgi"> NCBI's implementation of protein BLAST </a>
+        </p>
+        <h2> Specifying your query </h2>
+        <p>
+          To run a BLAST search, you need to specify a protein sequence to search. This is your query. There are many ways you can do this:
+        </p>
+        <ul>
+          <li>
+            <b>FASTA sequence:</b> You may directly write down the protein FASTA sequence of your interest. For example, "MKFTRVCDRR DVPEGEALKV ESGGTSVAIFNV DGELFATQDRC THGDWSLSDGG YLEGDVVECSL HMGKFCVRTGK VKSPPPCEALKI FPIRIEDNDVLV DFEAGYLAP"
+          </li>
+          <li>
+            <b>.gbff file:</b> You may upload a GenBank flat file, containing a whole assembly. You must specify, by locus tag, which specific sequence you wish to use for the search. In this case, the uploaded .gbff will be drawn together with the search results.
+          </li>
+          <li>
+            <b>Assembly accession:</b> Similar to uploading the file, but with this option you only specify the assembly accession number, so we get the data from GenBank. An assembly accession should always begin with "GCF" or "GCA". For example, "GCF_000013645.1"
+          </li>
+        </ul>
+        <h2> Search customization </h2>
+        <p>
+          There are many options to customize your search and filter your results.
+        </p>
+        <p>
+          In first place, you can choose how many contexts you wish to be drawn. If you specify, for example "best 15 matches", out of BLAST results, the 15 with best expect value will be drawn.
+          <br> If used together with "one of each" or "include only", using high numbers may slow down the process.
+        </p>
+        <p>
+          You may specify the database to use for the search. This means the program will show you the best matches from all the genes in that particular database.
+        </p>
+        <p>
+          "One of each" limits the results to not have two (nor more) of the specified taxonomic group. That is, if you say "One of each class", and the best match is from a Paraburkholderia xenovorans assembly (Betaproteobacteria class), and the second best match is from a Pseudoxanthomonas spadix assembly (Betaproteobacteria class), it will show only the Xenovorans' gene context.
+        </p>
+        <p>
+          "Include only" limits the results to a certain taxonomic group. That is, if you say "Include only Xanthomonadales", and the best match is from a Paraburkholderia xenovorans (Burkholderiales) assembly, it won't be shown.
+        </p>
+        <p>
+          Both "Minimum identity" and "Minimum coverage" limit the results. If these number are too high, it is possible to have less results drawn that the number specified in "Best X matches".
+        </p>
+        <p>
+          Once you set all these options, you may click the "Draw it!" button. It may take a few minutes or even a few hours to process your request, but after that you will see the diagram and <a href = "#DiagramEdit">you'll be able to edit it.</a>
+        </p>
+  
+        <h1 id = "MyContexts">My contexts</h1>
+        <p>Use "Draw my contexts" if you know exactly what you want to draw.</p>
+        
+        <h1 id = "DiagramEdit">Diagram edit</h1>
+        <p>You may click on the different elements of the diagram to see more information about them or edit them.</p>
+        <p>Click on the gene tag to change the text or font size.</p>
+        <p>Click on the gene itself (the arrow) to change the color, shape, border width or put that gene in the center of the image.</p>
+        <p>Click on the assembly tag to change the text or font size. You'll also see general data aboout the assembly.</p>
+        <img src = "images/tutorial3.png" style = "height: 70vh">
+        <p>When you're ready with your diagram, click on the "Download" button to download the diagram as a .svg image file.</p>
+      </article>
+    </div>
+</mwc-drawer>
+  
+    
   </section>
 
   <footer>
-    <p>Footer</p>
+    <div class = "footer-column">
+      <div class = "footer-link">
+        <a href = "/user_manual.html">
+          User manual
+        </a>
+      </div>
+      <div class = "footer-link">
+        Developed by Durán,R. & Saona, V. on 2021
+        <a>
+          Cite us
+        </a>
+      </div>
+      <div class = "footer-link">
+        <a>
+          Read about how was this built
+        </a>
+      </div>
+      <div class = "footer-link">
+        Any questions, please write to vicente.saona@sansano.usm.cl
+      </div>
+    </div>
   </footer>
 
 </body>

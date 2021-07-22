@@ -105,7 +105,7 @@ function activate(type, element, data) {
 
 function draw(genoma, y, group){
     group.selectAll("g").data(genoma.genes).enter().append("g").classed("jscolor", true).each(function(gene, index) {
-        var arrow = d3.select(this).attr("id", genoma.name+"__"+gene.name).append("polygon").classed("arrow", true).attr("id", genoma.name+"__"+gene.name+"__"+"arrow");
+        var arrow = d3.select(this).attr("id", "group__"+y+"__"+index).append("polygon").classed("arrow", true).attr("id", "arrow__"+y+"__"+index);
         if(gene.complement) {
             start = gene.end;
             end = gene.start;
@@ -364,11 +364,11 @@ function drawAll(genomas) {
                 localMinStart = data.genes[j].start;
         }
         if(genomaHeight == 1)
-            genomaHeight = (localMaxEnd- minStart)/data.genes.length;
+            genomaHeight = Math.round((localMaxEnd- minStart)/data.genes.length);
         fontSize = Math.round(genomaHeight/6);
         draw(data, index * genomaHeight, d3.select(this));
         d3.select(this).insert("line", ":first-child") // Le annadimos la linea central al genoma
-            .attr("id", data.name+"__midLine")
+            .attr("id", "midLine__"+index)
             .attr("x1", localMinStart - 100)
             .attr("x2", localMaxEnd + 100)
             .attr("y1", index * genomaHeight)
@@ -376,14 +376,14 @@ function drawAll(genomas) {
             .attr("stroke-width", genomaHeight / 30.0)
             .attr("stroke", "#888")
             .classed("midLine", true).classed("realMidLine", true);
-        document.getElementById(data.name+"__midLine").addEventListener("click", function(){activate("global", document.getElementById("genomaTag_"+index), data);}, false);
+        document.getElementById("midLine__"+index).addEventListener("click", function(){activate("global", document.getElementById("genomaTag_"+index), data);}, false);
     });
     d3Genomas.each(function(data, index) {
         d3.select(this).append("text").text(data.name).attr("y", index * genomaHeight).style("font-size", fontSize+"px").attr("x", maxEnd + 200).classed("genomaTag", true).attr("id", "genomaTag_"+index);
         this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1].addEventListener("click", function(){activate("global", this, data);}, false);
         dragHandler(d3.select(this.getElementsByTagName("text")[this.getElementsByTagName("text").length - 1]));
         d3.select(this).insert("line", ":first-child") // Le annadimos la linea central al genoma
-            .attr("id", data.name+"__phantomMidLine")
+            .attr("id", "phantomMidLine__"+index)
             .attr("x1", minStart - 25)
             .attr("x2", maxEnd + 25)
             .attr("y1", index * genomaHeight)
@@ -393,14 +393,14 @@ function drawAll(genomas) {
             .attr("stroke-dasharray", "100, 100")
             .classed("midLine", true)
             .classed("phantomMidLine", true);
-        document.getElementById(data.name+"__phantomMidLine").addEventListener("click", function(){activate("global", document.getElementById("genomaTag_"+index), data);}, false);
+        document.getElementById("phantomMidLine__"+index).addEventListener("click", function(){activate("global", document.getElementById("genomaTag_"+index), data);}, false);
     });
         
     document.getElementById("midLineWidth").value = Math.round(genomaHeight / 30.0);
     console.log(d3Genomas);
     // We build the scale indicator arrow
     scaleGroup = d3.select("#canvas").append("g");
-    scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)"}], name: " "}
+    scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)"}], name: ""}
     draw(scaleData, genomas.length * genomaHeight, scaleGroup);
     // Setting viewbox
     var begin = minStart - 100;
