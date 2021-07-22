@@ -29,28 +29,6 @@ var dragHandler = d3.drag().on("start", function () {
     ;
 });            
 
-/*getJSONP('/prueba', function(data){
-    console.log(data);
-    drawAll([{name: "prueba", genes: data.genomas}])
-    
-});*/ 
-
-/*g1 = {name: "pseudococco",
-        genes: [{start: 5790, end: 6020, name: "A1", color: "#FF0000", complement: false, interest: true},
-                {start: 6440, end: 6650, name: "A2", color: "#00FF00", complement: false, interest: false},
-                {start: 7230, end: 7530, name: "A3", color: "#0000FF", complement: true, interest: false}]};
-
-g2 = {name: "pseudomonas furukawaii KF707",
-        genes: [{start: 2790, end: 3120, name: "A1", color: "#FF0000", complement: false, interest: true},
-                {start: 3340, end: 3550, name: "A2", color: "#00FF00", complement: false, interest: false},
-                {start: 3930, end: 4230, name: "A3", color: "#0000FF", complement: true, interest: false},
-                {start: 4500, end: 4600, name: "A4", color: "#FF00FF", complement: true, interest: false}]};
-g3 = {name: "pseudomonas inverted",
-        genes: [{start: 4900, end: 4850, name: "A4", color: "#FF00FF", complement: false, interest: false},
-                {start: 4600, end: 4500, name: "A1", color: "#FF0000", complement: true, interest: true},
-                {start: 4230, end: 3930, name: "A2", color: "#00FF00", complement: true, interest: false},
-                {start: 3550, end: 3340, name: "A3", color: "#0000FF", complement: false, interest: false}]};
-*/
 function updateShownData(data, isGene) {
     if(isGene) {
         document.getElementById("geneLocusContent").innerText = data.locus;
@@ -256,10 +234,6 @@ function setInterestGene() {
                     if(genomas[i].genes[j].interest)
                         return(0);
                 }
-                if(genomas[i].genes[j].interest && genomas[i].genes[j].end < 0) {
-                    // Now we handle the reversed issue
-                    // I should implement this
-                }
             }
         }
     }
@@ -279,7 +253,7 @@ function setInterestGene() {
     var reverseAll = d3.select(activeElement).data()[0].complement;
     var localMaxEnd = 0;
     var localMinStart = 0;
-    var difference = d3.select(activeElement).data()[0].start;
+    var difference = reverseAll ? d3.select(activeElement).data()[0].end : d3.select(activeElement).data()[0].start;
 
     for(var j = 0; j < genoma.genes.length; j++) {
         genoma.genes[j].start -= difference;
@@ -366,8 +340,9 @@ function drawAll(genomas) {
         if(difference == -1) {
             data.genes[0].interest = true;
             difference = data.genes[0].start;
-            if(data.genes[0].complement) {
-                reverseAll = true;
+            reverseAll = data.genes[0].complement;
+            if(reverseAll) {
+                difference = data.genes[data.genes.length - 1].end;
             }
         }
         for(var j = 0; j < data.genes.length; j++) {

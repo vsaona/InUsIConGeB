@@ -361,12 +361,15 @@ app.post('/processFile', function(req, res, next) {
           var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g);
           json["start"] = length[0].match(/\d+/g)[0];
           json["end"] = length[0].match(/\d+/g)[1];
-          var complement = array[i].match("complement(" + length[0] + ")");
-          if(complement == null){
+          json["complement"] = array[i].includes("complement(" + length[0] + ")");
+          console.log(json["complement"]);
+          /*if(complement == null){
             json["complement"] = false;
           } else {
             json["complement"] = true;
-          }
+            console.log("does enter here on");
+            console.log(json["start"]);
+          }*/
           // We extract the data for showing outside the graphic
           var inference = array[i].match(/\/inference=\s*"((?:.|\n)*?)"/);
           if(inference != null) {
