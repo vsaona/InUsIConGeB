@@ -125,6 +125,37 @@ a {
     border-radius: 6px;
 }
 
+.submitInput {
+    opacity: 0%;
+    display: contents;
+    width: 1px;
+    margin: 0px;
+    padding: 0px;
+    border: 0px;
+}
+
+mwc-dialog {
+    --mdc-dialog-min-width: 240px;
+    --mdc-dialog-max-width: 80vw;
+}
+
+.tutorialContainer {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    
+}
+.tutorialText {
+    margin: auto;
+    flex: 0 1 40vw;
+}
+.tutorialImage {
+    flex: 0 1 40vw;
+}
+.tutorialImage img {
+    height: 60vh;
+}
+
 mwc-snackbar {
     margin: 0;
 }

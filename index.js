@@ -7,6 +7,7 @@ import colorsys from "colorsys";
 import shelljs from "shelljs";
 import readlines from "n-readlines";
 import child_process from "child_process";
+import cookieParser from "cookie-parser";
 
 const PORT = 3030;
 
@@ -95,11 +96,10 @@ app.use('/favicon.ico', express.static('public/images/favicon.png'));
 
 // create application/json parser
 app.use(express.json({ limit: "1000mb" }));
+app.use(cookieParser());
 app.use(express.urlencoded({
   extended: true
 }));
-
-app.use(express.static(path.join(process.cwd(), 'public')));
 
 app.all("/*", function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -109,18 +109,46 @@ app.all("/*", function(req, res, next) {
 });
 
 app.get("/", function(req, res, next) {
-  console.log("index");
-  fs.readFile('./public/index.html', null, function(error,data){
-    if(error){
-      res.writeHead(404);
-      res.write('File not found!');
+  if(req.cookies.drawnDiagram == undefined) {
+    if(req.cookies.knowsTutorial == undefined) {
+      fs.readFile('./public/index.html', null, function(error,data){
+        if(error){
+          res.writeHead(404);
+          res.write('File not found!');
+        } else {
+          res.cookie('knowsTutorial', "yes", { maxAge: 90000000000 });
+          
+          res.writeHead(200,{'Content-Type':'text/html'});
+          res.write(`<html lang="en">
+                      <head>
+                      <meta charset="UTF-8"></meta>
+                      <script>var tutorial = true;</script>`);
+          res.write(data);
+          
+          res.end();
+        }
+      });
     } else {
-      res.writeHead(200,{'Content-Type':'text/html'});
-      res.write(data);
-      res.end();
+      fs.readFile('./public/index.html', null, function(error,data){
+        if(error){
+          res.writeHead(404);
+          res.write('File not found!');
+        } else {
+          res.writeHead(200,{'Content-Type':'text/html'});
+          res.write(`<html lang="en">
+                      <head>
+                      <meta charset="UTF-8"></meta>`);
+          res.write(data);
+          
+          res.end();
+        }
+      });
     }
-  });
+  } else {
+  }
 });
+
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 // Esta es la funcion original, responde correctamente a las vistas de Node.
 app.post('/fileUploadAndRender', function(req, res, next) {

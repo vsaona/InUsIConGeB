@@ -1,7 +1,6 @@
 
   <title>InusiCongeb</title>
-  <link rel="alternate" hreflang="en" href="index.html"/> <!-- TODO: Poner direcciones completas -->
-  <link rel="alternate" hreflang="es" href="es-index.html"/>
+
   <meta name="viewport" content="width=device-width, user-scalable=no">
   <script src="../mwc_bundle/mwc-material-bundle.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
@@ -18,7 +17,7 @@
 <body>
 <header>
   <div id = "Explicacion" class = "mdc-typography">
-    Welcome! This tool can help you draw high-quality genomic context graphics.<br>
+    This tool can help you draw high-quality genomic context graphics.<br>
     Please, choose the contexts you want to draw. You can do this with "Draw my contexts" if you know exactly what you want to draw,
     or you may do a BLAST search with "Search homologous".
   </div>
@@ -27,6 +26,66 @@
     </mwc-button>
   </div>
 </header>
+
+<mwc-dialog id = "tutorial1" class = "container" heading = "Welcome!">
+  <div id = "tutorialContainer1" class = "tutorialContainer">
+    <div class = "tutorialText">
+      <p>
+        This app allows you to generate a genomic context diagram. You can use any genome assembly from GenBank and even use your own .gbff files.
+      </p>
+      <p>
+        <br>
+        We'll only store the data we need for drawing, and we will delete it afterwards.
+      </p>
+    </div>
+    <div class = "tutorialImage">
+      <img src = "images/tutorial1.png">
+    </div>
+  </div>
+  <mwc-button dialogAction = "next" slot = "primaryAction" raised>
+    Next
+  </mwc-button>
+</mwc-dialog>
+<mwc-dialog id = "tutorial2" class = "container" heading = "From BLAST to color">
+  <div id = "tutorialContainer2" class = "tutorialContainer">
+    <div class = "tutorialText">
+      <p>
+        You may do a BLAST search for homologous genes, and we'll draw the results in their respective contexts.
+      </p>
+    </div>
+    <div class = "tutorialImage">
+      <img src = "images/tutorial2.png">
+    </div>
+  </div>
+  <mwc-button dialogAction = "back" slot = "secondaryAction">
+    Back
+  </mwc-button>
+  <mwc-button dialogAction = "next" slot = "primaryAction" raised>
+    Next
+  </mwc-button>
+</mwc-dialog>
+<mwc-dialog id = "tutorial3" class = "container" heading = "Customize your diagram">
+  <div id = "tutorialContainer3" class = "tutorialContainer">
+    <div class = "tutorialText">
+      <p>
+        See all about the genes, edit your drawing colors, shapes, and show the information you want to show.
+      </p>
+      <p>
+        Click on the genes, their tags or the assembly's tags to see more about them and edit them.
+      </p>
+    </div>
+    <div class = "tutorialImage">
+      <img src = "images/tutorial3.png">
+    </div>
+  </div>
+  <mwc-button dialogAction = "back" slot = "secondaryAction" onClick = "goToWindow(3, 2)">
+    Back
+  </mwc-button>
+  <mwc-button dialogAction = "close" slot = "primaryAction" raised>
+    Got it!
+  </mwc-button>
+</mwc-dialog>
+
   <mwc-tab-bar onclick = "changeTab(this.activeIndex)" id = "tab-bar" activeIndex = "0">
     <mwc-tab label = "Search homologous" id = "tabIndicator0" > </mwc-tab>
     <mwc-tab label = "Draw my contexts" id = "tabIndicator1"> </mwc-tab>
@@ -212,7 +271,7 @@
         </div>
       </div>
     </div>
-    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submitSearchHomologous" onClick = "document.getElementById('blastSearch').show();">
+    <input type="submit" class="submitInput" style = "opacity: 0;" id = "submitSearchHomologous" onClick = "document.getElementById('blastSearch').show();">
   </form>
   <form id = "tab1" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container invisible">
     <div class="main">
@@ -311,7 +370,7 @@
       </div>
     </div>
     
-    <input type="submit" class="btn btn-primary" style = "opacity: 0;" id = "submitMyContexts" onClick = "document.getElementById('blastSearch').show();">
+    <input type="submit" class = "submitInput" style = "opacity: 0;" id = "submitMyContexts" onClick = "document.getElementById('blastSearch').show();">
   </form>
   <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById(document.getElementById('tab-bar').activeIndex?'submitMyContexts':'submitSearchHomologous').click();"></mwc-button>
   <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -389,6 +448,28 @@
     });
     document.getElementById("blastSearch").close();
     window.onunload = function(){};
+
+    document.getElementById("tutorial1").addEventListener('closing', (event) => {
+      if(event.detail.action == "next") {
+        document.getElementById("tutorial2").show();
+      }
+    });
+    document.getElementById("tutorial2").addEventListener('closing', (event) => {
+      if(event.detail.action == "back") {
+        document.getElementById("tutorial1").show();
+      }
+      if(event.detail.action == "next") {
+        document.getElementById("tutorial3").show();
+      }
+    });
+    document.getElementById("tutorial3").addEventListener('closing', (event) => {
+      if(event.detail.action == "back") {
+        document.getElementById("tutorial2").show();
+      }
+    });
+    if(tutorial) {
+      document.getElementById("tutorial1").show();
+    }
   </script>
 </body>
 </html>

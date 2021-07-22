@@ -25,7 +25,7 @@ function newGenomaData(id) {
   sourceLocus.innerText = "locus tag";
   var sourceAccesion = document.createElement("mwc-list-item");
   sourceAccesion.value = "accesion";
-  sourceAccesion.innerText = "Accession number";
+  sourceAccesion.innerText = "Assembly accession";
 
   genomaSourceType.appendChild(sourceFile);
   //genomaSourceType.appendChild(sourceLocus);

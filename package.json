@@ -30,6 +30,7 @@
     "@webcomponents/webcomponentsjs": "^2.5.0",
     "body-parser": "^1.19.0",
     "colorsys": "^1.0.22",
+    "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",
