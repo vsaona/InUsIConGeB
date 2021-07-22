@@ -100,7 +100,7 @@ function activate(type, element, data) {
         d3.select("#arrowToolBar").classed("invisible", false);
         var arrowColor = document.getElementById("arrowColor");
         document.getElementById("arrowStrokeWidthMwcTextField").layout();
-        document.getElementById("arrowOpacity").layout();
+        //document.getElementById("arrowOpacity").layout();
         document.getElementById("arrowColor").layout();
         setTimeout(function() { document.getElementById("arrowStyleSelector").value = arrowStyle; }, 200);
         arrowColor.value = data.color;

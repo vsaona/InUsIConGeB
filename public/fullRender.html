@@ -42,14 +42,13 @@
                     min="50"
                     max="500"
                     value="100"
-                    oninput = "zoom(this.value)">
+                    onchange = "zoom(this.value)">
                 </mwc-slider>
             </mwc-formfield>
             <img id = 'goToBarIndicator' src = 'images/arrow_downward_black_24dp.svg' style = 'width: 40px;' class = "invisible disappear">
         </div>
         
         <div id = "arrowToolBar" class = "invisible toolBar">
-            
             <mwc-textfield
                 id = "arrowColor"
                 outlined
@@ -67,7 +66,7 @@
 		        min = "0"
                 oninput = "updateStrokeWidth(this)">
             </mwc-textfield>
-            <mwc-textfield
+            <!--<mwc-textfield
                 id = "arrowOpacity"
                 outlined
                 label = "Fill opacity"
@@ -76,7 +75,7 @@
                 max = "100"
                 min = "0"
                 oninput = "updateOpacity(this)">
-            </mwc-textfield>
+            </mwc-textfield>-->
             <mwc-select outlined label="Arrow style"id = "arrowStyleSelector" onchange = "updateArrowStyle(this)">
                 <mwc-list-item value="arrow">Arrows</mwc-list-item>
                 <mwc-list-item value="triangle">Triangles</mwc-list-item>

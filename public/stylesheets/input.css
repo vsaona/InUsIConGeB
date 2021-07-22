@@ -137,6 +137,7 @@ a {
 mwc-dialog {
     --mdc-dialog-min-width: 240px;
     --mdc-dialog-max-width: 80vw;
+    --mdc-dialog-content-ink-color: #000;
 }
 
 .tutorialContainer {
@@ -153,7 +154,7 @@ mwc-dialog {
     flex: 0 1 40vw;
 }
 .tutorialImage img {
-    height: 60vh;
+    height: 40vh;
 }
 
 mwc-snackbar {
