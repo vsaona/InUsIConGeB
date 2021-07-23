@@ -204,7 +204,7 @@ app.post('/processFile', function(req, res, next) {
       var thisFtpPath; var thisTaxid; var thisSubmitter;
       var liner;
       var genomaName; var genomaDefinition = null ; var genomaAccession = null;
-      if(contextSources[j]["type"] == "accesion") { // || contextSources[j]["type"] == "midAccesion") {
+      if(contextSources[j]["type"] == "accesion") {
         liner = new readlines("../blast/assembly_summary_refseq.txt");
         if(contextSources[j]["accesion"].includes("GCA")) {
           liner = new readlines("../blast/assembly_summary_genbank.txt");
@@ -231,104 +231,37 @@ app.post('/processFile', function(req, res, next) {
       var line;
       console.log("[processFile] contextSources");
       console.log(contextSources);
-      if (contextSources[j]["type"] == "midAccesion") {
-        if(!contextSources[j]["fileName"].length && contextSources[j].error) {
-          thereIsAnError = thereIsAnError + ";" + contextSources[j].error;
-        }
-        for(var file = 0; file < contextSources[j]["fileName"].length; file++) {
-          var interestGenes = false;
-          var lastGene = false;
-          
-          var fileName = contextSources[j]["fileName"][file]["path"];
-          var found = false;
-          
-          if(!download_gbff(fileName)) {
-            continue;
-          }
-          
-          liner = new readlines(fileName);
-          fileName = fileName.split("/")[fileName.split("/").length - 1];
-          var interestIndex = -1;
+    
+      var interestGenes = false;
+      var lastGene = false;
+      liner = new readlines(contextSources[j]["fileName"]);
+      var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
+      genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
+      var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/);
+      if(isRegionSpecified) {
+        contextSources[j]["locusBegin"] = parseInt(contextSources[j]["locusBegin"]);
+        contextSources[j]["locusEnd"] = parseInt(contextSources[j]["locusEnd"]);
+      }
+      while (line = liner.next()) {
+        line = line.toString("UTF-8");
 
-          var lineNumber = 0;
-          var linesToJump = 0; // This is because some files have this "//" weird thing
+        // Extracting key data from the genoma
+        if(line.match(/\s*ORGANISM\s+(.*)/))
+          genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
+        else if(line.match(/\s*DEFINITION\s+(.*)/))
+          genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
+        else if(line.match(/\s*ACCESSION\s+(.*)/))
+          genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
 
-          while ((line = liner.next()) && !found) {
-            lineNumber++;
-            line = line.toString("UTF-8");
-            if(line.match(/^\/\/$/)) {
-              linesToJump = lineNumber;
-              interestIndex = 0;
-            }
-            if(line.match(/\s*ORGANISM\s+(.*)/))
-              genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
-            if(line.match(/\s*DEFINITION\s+(.*)/))
-              genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
-            if(line.match(/\s*ACCESSION\s+(.*)/))
-              genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
-            if(line.match(contextSources[j]["midLocus"])) {
-              console.log("---\n\n\n[processFile] Interest locus tag found. Breaking cycle!\n\n\n---");
-              found = true;
-            } else if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
-              interestIndex++;
-            }
-          }
-          if(!found) {
-            continue;
-          }
-          thisSubmitter = contextSources[j]["fileName"][file]["submitter"];
-          thisTaxid = contextSources[j]["taxid"];
-          thisFtpPath = contextSources[j]["fileName"][file]["ftpPath"];
-          liner.reset();
-          for(var temporalCounter = 0; temporalCounter < linesToJump; ++temporalCounter && liner.next());
-          var minInterest = interestIndex - UPSTREAMCONTEXTAMOUNT;
-          var maxInterest = interestIndex + DOWNSTREAMCONTEXTAMOUNT;
-          interestIndex = -1;
-          genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
-          while ((line = liner.next()) && interestIndex <= maxInterest) {
-            line = line.toString("UTF-8");
-            if(line.match(/\s*gene\s+\w*\(*<?\d+\.\.>?\d+/)) {
-              interestIndex++;
-              if(interestIndex > maxInterest) {
-                break;
-              }
-            }
-            if(line.match(/\s*ORGANISM\s+(.*)/))
-              genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
-            if(interestIndex >= minInterest) {
-              contents = contents + line;
-              if(line.match(/\bORIGIN\s+/)) {
-                break;
-              }
-            }
-          }
-          break;
-        }
-      } else {
-        var interestGenes = false;
-        var lastGene = false;
-        liner = new readlines(contextSources[j]["fileName"]);
-        var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
-        genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
-        while (line = liner.next()) {
-          line = line.toString("UTF-8");
-
-          // Extracting key data from the genoma
-          if(line.match(/\s*ORGANISM\s+(.*)/))
-            genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
-          else if(line.match(/\s*DEFINITION\s+(.*)/))
-            genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
-          else if(line.match(/\s*ACCESSION\s+(.*)/))
-            genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
-
-          // Extracting genes data
+        // Extracting genes data
+        if(!isRegionSpecified) {
           contents = contents + line + "\n";
           if(!interestGenes) {
             if(contextSources[j]["locusBegin"] && line.includes(contextSources[j]["locusBegin"])) {
               interestGenes = true;
             } else if(!contextSources[j]["locusBegin"] && line.match(/^..\s{3}\w+\s{2}/)) {
               if(!line.match(/^..\s{3}source\s{10}/)) {
-                contents = line;
+                contents = line + "\n";
                 interestGenes = true;
               }
             } else if(line.match(/^..\s{3}\w+\s{2}.*\d+\.\./)){
@@ -342,6 +275,28 @@ app.post('/processFile', function(req, res, next) {
             }
             if(line.match(/^..[^\s]/) || line.match(/^\/\//)) {
               break;
+            }
+          }
+        } else {
+          var featureDefinition = line.match(/^..\s{3}\w+\s{2}.*?(\d+)\.\.(?:\d+\s,\s\d+\.\.)?(\d+)/);
+          if(featureDefinition) {
+            console.log("featureDefinition");
+            console.log(featureDefinition);
+          }
+          if(!interestGenes) {
+            if(featureDefinition) {
+              if(parseInt(featureDefinition[1]) >= contextSources[j]["locusBegin"]) {
+                console.log("Begin!");
+                interestGenes = true;
+                contents = line + "\n";
+              }
+            }
+          } else {
+            if(featureDefinition && parseInt(featureDefinition[2]) > contextSources[j]["locusEnd"]) {
+              interestGenes = false;
+              break;
+            } else {
+              contents = contents + line + "\n";
             }
           }
         }
@@ -409,8 +364,8 @@ app.post('/processFile', function(req, res, next) {
           var locus = array[i].match(/\/locus_tag=.+/g);
           if(locus != null) {
             try {
-            json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0].split("_")[1];
-            json["locus"] = json["name"];
+              json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0].split("_")[1];
+              json["locus"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
             } catch(ex){}
           }
           var nombre = array[i].match(/\/gene=.+/g);
@@ -427,15 +382,7 @@ app.post('/processFile', function(req, res, next) {
               json["name"] = "rRNA"
             }
           }
-          if(contextSources[j]["type"] == "midAccesion" && array[i].includes(contextSources[j]["midLocus"])) {
-            json["interest"] = true;
-            json["identity"] = contextSources[j].identity;
-            json["coverage"] = contextSources[j].coverage;
-            console.log("[processFile] Marking this locus as interest gene:");
-            console.log(json["locus"]);
-          } else {
-            json["interest"] = false;
-          }
+          json["interest"] = false;
           lastJson = json;
         }
       }

@@ -353,20 +353,32 @@ function searchAndDraw(fields, files)
         thereIsAnError = thereIsAnError + " ; " + `Error con ${genomaName}: No se han encontrado los locus tag especificados.`;
         continue;
       }
+      var lastJson = null;
       for(var i = 0; i < array.length;i++){
         var json = {};
-        json["color"] = "#A7A7A7";
         var fields = array[i].match(/.+/g);
         if (fields != null){
-          var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g);
-          json["start"] = length[0].match(/\d+/g)[0];
-          json["end"] = length[0].match(/\d+/g)[1];
-          var complement = array[i].match("complement(" + length[0] + ")");
-          if(complement == null){
-            json["complement"] = false;
-          } else {
-            json["complement"] = true;
+          if(array[i].match(/..\s{10,}\/pseudo/)) {
+            continue;
           }
+          var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g)[0];
+          var start = length.match(/\d+/g)[0];
+          var end = length.match(/\d+/g)[1];
+          if(array[i].match(/^.*join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)) {
+            length = array[i].match(/(?<=^.*)join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)[0];
+            start = length.match(/\d+/g)[0];
+            end = length.match(/\d+/g)[3];
+          }
+          if(lastJson && start === lastJson.start && end === lastJson.end) {
+            json = {...json, ...lastJson};
+          } else {
+            json["start"] = start;
+            json["end"] = end;
+            if(lastJson) {
+              genes.push(lastJson);
+            }
+          }
+          json["complement"] = array[i].includes("complement(" + length + ")");
           // We extract the data for showing outside the graphic
           var inference = array[i].match(/\/inference=\s*"((?:.|\n)*?)"/);
           if(inference != null) {
@@ -384,26 +396,20 @@ function searchAndDraw(fields, files)
           if(translation != null) {
             json["translation"] = translation[1].replace("\n", " ").replace(/\s+/g, " ");
           }
+          var old_locus = array[i].match(/\/old_locus_tag=.+/g);
+          if(old_locus != null) {
+            json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
+          }
+          var locus = array[i].match(/\/locus_tag=.+/g);
+          if(locus != null) {
+            try {
+              json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0].split("_")[1];
+              json["locus"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
+            } catch(ex){}
+          }
           var nombre = array[i].match(/\/gene=.+/g);
           if(nombre != null) {
-            json["name"] = nombre[0].match(/[^(")]\w+?(?=")/g)[0];
-            var locus = array[i].match(/\/locus_tag=.+/g);
-            if(locus != null) {
-              json["locus"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
-            }
-          } else {
-            var locus = array[i].match(/\/locus_tag=.+/g);
-            if(locus != null && !json["name"]) {
-              json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
-              json["locus"] = json["name"];
-            } else {
-              var old_locus = array[i].match(/\/old_locus_tag=.+/g);
-              if(old_locus != null && !json["name"]) {
-                json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
-              } else {
-                json["name"] = "no-name";
-              }
-            }
+            json["name"] = nombre[0].match(/".+?"/g)[0].slice(1,-1);
           }
           if(array[i].match(/\s*tRNA\s{3,}/)) {
             json["name"] = json["product"];
@@ -423,9 +429,10 @@ function searchAndDraw(fields, files)
           } else {
             json["interest"] = false;
           }
-          genes.push(json);
+          lastJson = json;
         }
       }
+      genes.push(lastJson);
       genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
     }
     process.send({

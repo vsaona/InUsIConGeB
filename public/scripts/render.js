@@ -333,9 +333,10 @@ function redraw(genoma, y, el) {
             arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
         }
         var textTag = d3.select(this).select("text");
+        var textTagX = (start + end) / 2 - (Math.abs(end-start))/3;
         var textTagY = textTag.attr("y");
-        textTag.attr("x", (start + end) / 2 - (end-start)/3)
-            .attr("transform", "rotate(-15,"+((start + end) / 2 - (end-start)/3)+"," + textTagY + ")");
+        textTag.attr("x", textTagX)
+            .attr("transform", "rotate(-15, " + textTagX + ", " + textTagY + ")");
     });
     return(0);
 }
@@ -348,17 +349,14 @@ function drawAll(genomas) {
         var reverseAll = false;
         for(var j = 0; j < data.genes.length; j++) {
             if(data.genes[j].interest) {
-                difference = data.genes[j].start;
                 reverseAll = data.genes[j].complement;
+                difference = reverseAll ? data.genes[j].end : data.genes[j].start;
             }
         }
         if(difference == -1) {
             data.genes[0].interest = true;
-            difference = data.genes[0].start;
             reverseAll = data.genes[0].complement;
-            if(reverseAll) {
-                difference = data.genes[data.genes.length - 1].end;
-            }
+            difference = reverseAll ? data.genes[data.genes.length - 1].end : data.genes[0].start;
         }
         for(var j = 0; j < data.genes.length; j++) {
             data.genes[j].start -= difference;
@@ -429,4 +427,5 @@ function zoom(value) {
     var canvas = document.getElementById("canvas");
     canvas.style.width = "auto";
     canvas.style.height = `${value}%`;
+    d3.select("body").style("width",document.getElementsByTagName("html")[0].scrollWidth)
 }
