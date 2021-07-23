@@ -16,6 +16,10 @@ mwc-drawer {
   --mdc-theme-surface: #6200EE;
 }
 
+mwc-drawer span {
+  color: white;
+}
+
 h1, h2, h3, h4 {
   margin-top: 30px;
 }

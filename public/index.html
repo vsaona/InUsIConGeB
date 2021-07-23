@@ -89,7 +89,7 @@
     <mwc-tab label = "Draw my contexts" id = "tabIndicator1"> </mwc-tab>
   </mwc-tab-bar>
   
-  <form id = "tab0" action="searchAndDraw" method="post" enctype="multipart/form-data" class="tabContent container">
+  <form id = "tab0" action="searchAndDraw" method="post" enctype="multipart/form-data" class="tabContent container invisible">
     <div class = "main">
       <div class = "hr">
         Your query
@@ -130,7 +130,7 @@
           <mwc-textarea
             outlined
             id = "fastaSearchSource"
-            label="Fasta sequence"
+            label="Protein fasta sequence"
             class = "genomaSpec fasta invisible formData"
             rows = "6"
             cols = "90">
@@ -270,6 +270,12 @@
       </div>
     </div>
     <input type="submit" class="submitInput" style = "opacity: 0;" id = "submitSearchHomologous" onClick = "document.getElementById('blastSearch').show();">
+    <div>
+      <mwc-button id="blastDrawItButton" label="Draw it!" raised onclick = "document.getElementById(document.getElementById('tab-bar').activeIndex?'submitMyContexts':'submitSearchHomologous').click();"></mwc-button>
+      <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
+        Generate the genomic context graphic using the specified contexts.
+      </span> </span>
+    </div>
   </form>
   <form id = "tab1" action="fileUploadAndRender" method="post" enctype="multipart/form-data" class="tabContent container invisible">
     <div class="main">
@@ -369,11 +375,13 @@
     </div>
     
     <input type="submit" class = "submitInput" style = "opacity: 0;" id = "submitMyContexts" onClick = "document.getElementById('blastSearch').show();">
+    <div>
+      <mwc-button id="myContextsDrawItButton" label="Draw it!" raised onclick = "document.getElementById(document.getElementById('tab-bar').activeIndex?'submitMyContexts':'submitSearchHomologous').click();"></mwc-button>
+      <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
+        Generate the genomic context graphic using the specified contexts.
+      </span> </span>
+    </div>
   </form>
-  <mwc-button id="myButton" label="Draw it!" raised onclick = "document.getElementById(document.getElementById('tab-bar').activeIndex?'submitMyContexts':'submitSearchHomologous').click();"></mwc-button>
-  <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-    Generate the genomic context graphic using the specified contexts.
-  </span> </span>
   <footer>
     <div class = "footer-column">
       <div class = "footer-link">
@@ -405,7 +413,6 @@
     labelText = "Uploading your data, please wait a few seconds.">
   </mwc-snackbar>
   <script>
-    document.getElementById("tabIndicator0").click();
     document.getElementById("oneOfEach").value = "6";
     document.getElementById("databaseToSearch").value = "refseq_protein";
 
