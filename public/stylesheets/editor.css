@@ -54,6 +54,10 @@ text:active {
 .hideButton {
   --mdc-theme-primary: #E94343;
 }
+.toolBar mwc-button {
+  margin-top: auto;
+  margin-bottom: auto;
+}
 #downloadButton {
   margin: 10px;
 }

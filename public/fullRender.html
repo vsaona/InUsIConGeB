@@ -80,8 +80,21 @@
                 <mwc-list-item value="arrow">Arrows</mwc-list-item>
                 <mwc-list-item value="triangle">Triangles</mwc-list-item>
                 <mwc-list-item value="tag">Tags</mwc-list-item>
-              </mwc-select>
-            
+            </mwc-select>
+            <mwc-button
+                id = "geneHideButton"
+                outlined
+                label="Hide this gene"
+                class = "hideButton"
+                onclick = "hideGene(true)">
+            </mwc-button>
+            <mwc-button
+                id = "geneShowButton"
+                raised
+                label="Show this gene"
+                class = "invisible"
+                onclick = "hideGene(false)">
+            </mwc-button>
             <mwc-button raised onclick = "setInterestGene()"> Align this gene </mwc-button>
         </div>
         <div id = "arrowTextToolBar" class = "invisible toolBar">

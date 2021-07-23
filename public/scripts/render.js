@@ -13,6 +13,7 @@ var viewBox = [];
 var genomaElement = null;
 var d3Genomas;
 var itIsTheFirstTimeTheySelect = true;
+var lastDeletedgene = null;
 
 var dragHandler = d3.drag().on("start", function () {
     var current = d3.select(this);
@@ -83,6 +84,8 @@ function activate(type, element, data) {
         setTimeout(function() { document.getElementById("arrowStyleSelector").value = arrowStyle; }, 200);
         arrowColor.value = data.color;
         d3.select(arrowColor).style("background-color", arrowColor.value);
+        d3.select("#geneHideButton").classed("invisible", data.hidden != null && data.hidden);
+        d3.select("#geneShowButton").classed("invisible", data.hidden == null || !data.hidden);
         updateShownData(data, true);
     } else if (type == "arrowText") {
         d3.select("#arrowTextToolBar").classed("invisible", false);
@@ -194,6 +197,18 @@ function hideContext() {
     minStart = 0;
     maxEnd = 0;
     drawAll(genomas);
+}
+function hideGene(shouldItBeHidden) {
+    var geneToRemove = d3.select(activeElement).data()[0];
+    for(var i = 0; i < genomas.length; i++) {
+        if(genomas[i].genes.includes(geneToRemove)) {
+            var index = genomas[i].genes.indexOf(geneToRemove);
+            genomas[i].genes[index].hidden = shouldItBeHidden;
+            d3.select(activeElement.parentElement).style("opacity", shouldItBeHidden? "0" : "100");
+        }
+    }
+    d3.select("#geneHideButton").classed("invisible", shouldItBeHidden);
+    d3.select("#geneShowButton").classed("invisible", !shouldItBeHidden);
 }
 function updateArrowStyle(input) {
     arrowStyle = input.value;

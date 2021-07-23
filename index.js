@@ -362,10 +362,17 @@ app.post('/processFile', function(req, res, next) {
         var json = {};
         var fields = array[i].match(/.+/g);
         if (fields != null){
-          console.log(array[i]);
-          var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g);
-          var start = length[0].match(/\d+/g)[0];
-          var end = length[0].match(/\d+/g)[1];
+          if(array[i].match(/..\s{10,}\/pseudo/)) {
+            continue;
+          }
+          var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g)[0];
+          var start = length.match(/\d+/g)[0];
+          var end = length.match(/\d+/g)[1];
+          if(array[i].match(/^.*join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)) {
+            length = array[i].match(/(?<=^.*)join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)[0];
+            start = length.match(/\d+/g)[0];
+            end = length.match(/\d+/g)[3];
+          }
           if(lastJson && start === lastJson.start && end === lastJson.end) {
             json = {...json, ...lastJson};
           } else {
@@ -375,7 +382,7 @@ app.post('/processFile', function(req, res, next) {
               genes.push(lastJson);
             }
           }
-          json["complement"] = array[i].includes("complement(" + length[0] + ")");
+          json["complement"] = array[i].includes("complement(" + length + ")");
 
           // We extract the data for showing outside the graphic
           var inference = array[i].match(/\/inference=\s*"((?:.|\n)*?)"/);
@@ -401,8 +408,10 @@ app.post('/processFile', function(req, res, next) {
           }
           var locus = array[i].match(/\/locus_tag=.+/g);
           if(locus != null) {
-            json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
+            try {
+            json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0].split("_")[1];
             json["locus"] = json["name"];
+            } catch(ex){}
           }
           var nombre = array[i].match(/\/gene=.+/g);
           if(nombre != null) {
@@ -440,217 +449,6 @@ app.post('/processFile', function(req, res, next) {
   } catch (ex) {
     console.error(ex);
     res.json({error: "Ha habido un error desconocido. Favor contactar a los desarrolladores."});
-  }
-});
-
-app.post('/searchHomologous', function(req, res, next) {
-  try {
-    var form = new formidable.IncomingForm();
-    var filePath;
-    var identifier = Date.now() + Math.random();
-    var error;
-    form.uploadDir = "./data"
-    form.parse(req, function (err, fields, files){
-      console.log("[searchHomologous] form fields:");
-      console.log(fields);
-      var fastaSequence;
-      var thisFtpPath;
-      var thisSubmitter;
-      var thisTaxid;
-      if(fields["genomaSearchSourceType"] == "accesion") {
-        liner = new readlines("../blast/assembly_summary_refseq.txt");
-        if(fields["accesionSearchSource"].includes("GCA")) {
-          liner = new readlines("../blast/assembly_summary_genbank.txt");
-        }
-        var line;
-        while (line = liner.next()) {
-          line = line.toString("UTF-8");
-          if(line.match(fields["accesionSearchSource"])) {
-            var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
-            thisFtpPath = summaryData[3];
-            thisSubmitter = summaryData[2];
-            thisTaxid = summaryData[1];
-            filePath = "../blast/" + thisFtpPath.substring(6) + "/" + thisFtpPath.split("/")[thisFtpPath.split("/").length - 1] + "_genomic.gbff"; // + ".gz"
-            if(!download_gbff(filePath)) {
-              error = `There's been an error downloading ${thisFtpPath}, so you will probably see one context less. Please try again later.`// `Ha habido un error al descargar desde ${thisFtpPath}. Esto puede hacer que no se vea uno de los contextos encontrados. Por favor inténtelo de nuevo más tarde`
-            }
-            break;
-          }
-        }
-        try {
-          liner.close();
-        } catch {
-          res.writeHead(400,{'Content-Type':'text/html'});
-          res.write(`<html lang="en">
-          <body>
-          <h1> Error </h1> <p> The specified assembly accession number is not part of GenBank assemblies. </p>
-          </body>`);
-          res.end();
-          return;
-        }
-      }
-      var taxids = []; var coverages = []; var identities = []; var paths = []; var accesions = []; var taxonGroups = [];
-      if(fields["genomaSearchSourceType"] == "file" || fields["genomaSearchSourceType"] == "accesion") {
-        filePath = filePath ?? files["fileSearchSource"].path;
-        // We extract the fasta sequence
-        var liner = new readlines(filePath);
-        var interestGene = false;
-        var line;
-        while (line = liner.next()) {
-          line = line.toString("UTF-8");
-          if(line.includes(fields["searchFileLocusTag"])) {
-            interestGene = true;
-          }
-          if(interestGene && line.match(/\/translation=/)) {
-            fastaSequence = line.match(/translation=\s*"(\w+)/)[1];
-            while (line = liner.next()) {
-              line = line.toString("UTF-8");
-              fastaSequence = fastaSequence + line.match(/\s*(\w+)"?/)[1];
-              if(line.includes('"')) {
-                break;
-              }
-            }
-            break;
-          }
-        }        
-        if(fields["genomaSearchSourceType"] == "file") {
-          paths.push([{path: filePath.replace("\\", "/"), submitter: "you"}]);
-          taxids.push(0);
-        } else {
-          paths.push([{path: filePath.replace("\\", "/"), ftpPath: thisFtpPath, submitter: thisSubmitter}]);
-          taxids.push(thisTaxid);
-        }
-        coverages.push(100);
-        identities.push(100);
-        accesions.push(fields["searchFileLocusTag"]);
-        // End of fasta extracting
-      } else if(fields["genomaSearchSourceType"] == "fasta") {
-        fastaSequence = "";
-        var fastaLines = fields["fastaSearchSource"].split(/\n\r?/);
-        for(var fastaLineIndex = 0; fastaLineIndex < fastaLines.length; fastaLineIndex++) {
-          if(!fastaLines[fastaLineIndex].match(/$\>/)) {
-            fastaSequence = fastaSequence + fastaLines[fastaLineIndex];
-          }
-        }
-      }
-      
-      var query = "blast_inputs/" + identifier + ".fas";
-      fs.writeFileSync(query, ">" + identifier + "\n" + fastaSequence);
-
-      // Search homologous
-      var outFileName = "blast_outputs/results_" + identifier + ".out";
-      console.log("BLAST command")
-      console.log( "../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
-      shelljs.exec("blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
-      // shelljs.exec("../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/refseq_protein/refseq_protein.00 -query " + query + " -out " + outFileName + " -outfmt \"6 staxid qcovs pident sacc\" -num_threads 24");
-      shelljs.exec("rm blast_inputs/" + identifier + ".fas");
-
-      var liner = new readlines(outFileName);
-      var line;
-      var failures = 0;
-      fields["includeOnly"] = fields["includeOnly"].toLowerCase();
-      fields["useOneOfEach"] = fields["useOneOfEach"] === "true";
-
-      while ((line = liner.next()) && (identities.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {
-        line = line.toString("UTF-8");
-        console.log("[searchHomologous] Reading blast result line:");
-        console.log(line);
-        var lineFields = line.match(/(\d+)\t(\d+)\t((?:\d|\.)+)\t(.*)/);
-        var taxid = lineFields[1];
-        var coverage = parseFloat(lineFields[2]);
-        var identity = parseFloat(lineFields[3]);
-        if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"]) {
-          if((fields["useOneOfEach"] && fields["oneOfEach"] < "6") || fields["includeOnly"] != "") {
-            var taxonomicGroup = shelljs.exec(`echo ${taxid} | ./taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
-            var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";");
-            taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";")[fields["oneOfEach"]];
-            if((!fields["useOneOfEach"] || !taxonGroups.includes(taxonomicGroup)) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
-              taxids.push(taxid);
-              coverages.push(coverage);
-              identities.push(identity);
-              accesions.push(lineFields[4]);
-              taxonGroups.push(taxonomicGroup);
-            }
-          } else if(fields["useOneOfEach"] && fields["oneOfEach"] == "6") {
-            if(!taxids.includes(taxid)) {
-              taxids.push(taxid);
-              coverages.push(coverage);
-              identities.push(identity);
-              accesions.push(lineFields[4]);
-              taxonGroups.push(taxonomicGroup);
-            }
-          } else {
-            taxids.push(taxid);
-            coverages.push(coverage);
-            identities.push(identity);
-            accesions.push(lineFields[4]);
-            taxonGroups.push(taxonomicGroup);
-          }
-        } else {
-          failures++;
-        }
-      }
-      shelljs.exec("rm " + outFileName);
-      for(var i = 0; i < taxids.length; i++) {
-        paths.push([]);
-      }
-      console.log("[searchHomologous] unique taxids:");
-      console.log(taxids);
-      var summaryLiner = new readlines("../blast/assembly_summary_refseq.txt");
-      while ((line = summaryLiner.next())) {
-        line = line.toString("UTF-8");
-        if(line[0] == "#") {
-          continue;
-        }
-        var lineFields = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
-        if(taxids.includes(lineFields[1])) {
-          var i = taxids.indexOf(lineFields[1]);
-          paths[i].push({submitter: lineFields[2], ftpPath: lineFields[3], path: "../blast/" + lineFields[3].substring(6) + "/" + lineFields[3].split("/")[lineFields[3].split("/").length - 1] + "_genomic.gbff"});
-        }
-      }
-      console.log("[searchHomologous] File paths:");
-      console.log(paths);
-    
-      // We need to get the specific locus of interest
-
-      // This part is identical to the "fileUploadAndRender" function
-
-      res.writeHead(200,{'Content-Type':'text/html'});
-      res.write(`<html lang="en">
-      <head>
-        <meta charset="UTF-8">`);
-      res.write("<script> ");
-      res.write("var contextSources = [");
-      var writtenGenomas = 0;
-      var isFirst = true;
-      for(var j = 0; (j < paths.length) && (writtenGenomas < parseInt(fields["contextsQuantity"])); j++) {
-        if(paths[j].length) {
-          res.write((isFirst? ``: `, `) + `{ "type": "midAccesion", "fileName": ${JSON.stringify(paths[j])}, "midLocus": "${accesions[j]}", "upStream": "5", "downStream": "5", "taxid": "${taxids[j]}", "identity": "${identities[j]}", "coverage": "${coverages[j]}"${error ? ", error: " + error : ""}}`);
-          writtenGenomas++;
-          isFirst = false;
-        }
-      }
-      fs.readFile('./public/render.html', null, function(error,data){
-        res.write(" ]; </script>");
-        if(error){
-          //res.writeHead(404);
-          res.write('File not found!');
-        } else {
-          res.write(data);
-        }
-        res.end();
-      });
-    });
-  } catch (ex) {
-    console.log(ex);
-    res.writeHead(400,{'Content-Type':'text/html'});
-    res.write(`<html lang="en">
-      <body>
-        <h1> Error </h1> <p> ha habido un error desconocido. Por favor contactar a los desarrolladores. </p>
-      </body>`
-    );
-    res.end();
-    return;
   }
 });
 
