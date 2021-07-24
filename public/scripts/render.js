@@ -81,7 +81,7 @@ function activate(type, element, data) {
         document.getElementById("arrowStrokeWidthMwcTextField").layout();
         //document.getElementById("arrowOpacity").layout();
         document.getElementById("arrowColor").layout();
-        setTimeout(function() { document.getElementById("arrowStyleSelector").value = arrowStyle; }, 200);
+        // setTimeout(function() { document.getElementById("arrowStyleSelector").value = arrowStyle; }, 200);
         arrowColor.value = data.color;
         d3.select(arrowColor).style("background-color", arrowColor.value);
         d3.select("#geneHideButton").classed("invisible", data.hidden != null && data.hidden);
@@ -427,5 +427,5 @@ function zoom(value) {
     var canvas = document.getElementById("canvas");
     canvas.style.width = "auto";
     canvas.style.height = `${value}%`;
-    d3.select("body").style("width",document.getElementsByTagName("html")[0].scrollWidth)
+    d3.select("body").style("min-width", document.getElementsByTagName("svg")[0].scrollWidth)
 }

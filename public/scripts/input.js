@@ -108,10 +108,14 @@ function preventDefaults (e) {
   function handleDrop(e) {
     for(let i = 0; i < e.path.length; i++) {
       if(e.path[i].classList && e.path[i].classList.contains("genomaData")) {
-        e.path[i].getElementsByClassName("genomaSourceType")[0].value = "file";
-        e.path[i].getElementsByClassName("genomaSourceType")[0].onchange();
-        e.path[i].getElementsByClassName("form-control-file")[0].files = e.dataTransfer.files;
-        e.path[i].getElementsByClassName("form-control-file")[0].onchange();
+        if(e.dataTransfer.files.length > 1) {
+            alert("Sorry, but you should select the files one by one.");
+        } else {
+            e.path[i].getElementsByClassName("genomaSourceType")[0].value = "file";
+            e.path[i].getElementsByClassName("genomaSourceType")[0].onchange();
+            e.path[i].getElementsByClassName("form-control-file")[0].files = e.dataTransfer.files;
+            e.path[i].getElementsByClassName("form-control-file")[0].onchange();
+        }
         break;
       }
     }
