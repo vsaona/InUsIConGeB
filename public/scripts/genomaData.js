@@ -1,4 +1,4 @@
-amountOfContexts = 1;
+window.amountOfContexts = 1;
 function newGenomaData(id) {
   amountOfContexts++;
   var genomaData = document.createElement("div");
@@ -13,6 +13,7 @@ function newGenomaData(id) {
   genomaSourceType.label = "Source";
   genomaSourceType.id = "genomaSourceType" + id;
   genomaSourceType.classList.add("formData");
+  genomaSourceType.classList.add("genomaSourceType");
   genomaSourceType.onchange = (function() {
       changeGenomaSource(genomaSourceType.value, id);
   });
@@ -168,5 +169,20 @@ function newGenomaData(id) {
   extraInput.appendChild(context);
   genomaData.appendChild(extraInput);
   
+  // drag-and-drop files logic
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    genomaData.addEventListener(eventName, preventDefaults, false)
+  });
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    genomaData.addEventListener(eventName, preventDefaults, false)
+  });
+  ['dragenter', 'dragover'].forEach(eventName => {
+    genomaData.addEventListener(eventName, highlight, false)
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    genomaData.addEventListener(eventName, unhighlight, false)
+  })
+  genomaData.addEventListener('drop', handleDrop, false);
+
   return(genomaData);
 }

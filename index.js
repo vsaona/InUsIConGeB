@@ -237,7 +237,7 @@ app.post('/processFile', function(req, res, next) {
       liner = new readlines(contextSources[j]["fileName"]);
       var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
       genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
-      var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/);
+      var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/); // TODO: What if one is region and the other is locus tag? (begin - end)
       if(isRegionSpecified) {
         contextSources[j]["locusBegin"] = parseInt(contextSources[j]["locusBegin"]);
         contextSources[j]["locusEnd"] = parseInt(contextSources[j]["locusEnd"]);

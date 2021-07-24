@@ -286,7 +286,7 @@
         </div>
         <div class = "genomaData" id = "genomaData0">
           <div id = "genomaSource0">
-            <mwc-select outlined label="Source" id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);" class = "formData">
+            <mwc-select outlined label="Source" id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);" class = "genomaSourceType formData">
               <mwc-list-item value="file">From file</mwc-list-item>
               <!-- <mwc-list-item value="locus">locus tag</mwc-list-item> -->
               <mwc-list-item value="accesion">Assembly accession</mwc-list-item>
@@ -374,7 +374,7 @@
       </div>
     </div>
     
-    <input type="submit" class = "submitInput" style = "opacity: 0;" id = "submitMyContexts" onClick = "document.getElementById('blastSearch').show();">
+    <input type="submit" class = "submitInput" style = "opacity: 0;" id = "submitMyContexts" onClick = "document.getElementById('upload').show();">
     <div>
       <mwc-button id="myContextsDrawItButton" label="Draw it!" raised onclick = "document.getElementById(document.getElementById('tab-bar').activeIndex?'submitMyContexts':'submitSearchHomologous').click();"></mwc-button>
       <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -437,7 +437,7 @@
       for(let el of formElements) {
         event.formData.append(el.id, el.value);
       }
-      event.formData.append("amountOfContexts", amountOfContexts);
+      event.formData.append("amountOfContexts", window.amountOfContexts);
     });
 
     window.addEventListener('load', (event) => {
@@ -472,9 +472,22 @@
         document.getElementById("tutorial2").show();
       }
     });
-    if(tutorial) {
+    if(window.tutorial) {
       document.getElementById("tutorial1").show();
     }
+
+    // Adding drag-and-drop files logic
+    let genomaData0Element = document.getElementById("genomaData0");
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      genomaData0Element.addEventListener(eventName, preventDefaults, false)
+    });
+    ['dragenter', 'dragover'].forEach(eventName => {
+      genomaData0Element.addEventListener(eventName, highlight, false)
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      genomaData0Element.addEventListener(eventName, unhighlight, false)
+    })
+    genomaData0Element.addEventListener('drop', handleDrop, false);
   </script>
 </body>
 </html>

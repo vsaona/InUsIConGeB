@@ -78,3 +78,41 @@ function updateFileName(value, id) {
     var path = value.split('\\');
     document.getElementById('fileName' + id).innerText = path[path.length - 1];
 }
+
+// drag-and-drop functionality
+function preventDefaults (e) {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  function highlight(e) {
+    for(let i = 0; i < e.path.length; i++) {
+      if(e.path[i].classList && e.path[i].classList.contains("genomaData")) {
+        if(!e.path[i].classList.contains("highlight")) {
+          e.path[i].classList.add("highlight");
+        }
+        break;
+      }
+    }
+  }
+  function unhighlight(e) {
+    for(let i = 0; i < e.path.length; i++) {
+      if(e.path[i].classList && e.path[i].classList.contains("genomaData")) {
+        if(e.path[i].classList.contains("highlight")) {
+          e.path[i].classList.remove("highlight");
+        }
+        break;
+      }
+    }
+  }
+
+  function handleDrop(e) {
+    for(let i = 0; i < e.path.length; i++) {
+      if(e.path[i].classList && e.path[i].classList.contains("genomaData")) {
+        e.path[i].getElementsByClassName("genomaSourceType")[0].value = "file";
+        e.path[i].getElementsByClassName("genomaSourceType")[0].onchange();
+        e.path[i].getElementsByClassName("form-control-file")[0].files = e.dataTransfer.files;
+        e.path[i].getElementsByClassName("form-control-file")[0].onchange();
+        break;
+      }
+    }
+  }

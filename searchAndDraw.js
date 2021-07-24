@@ -162,7 +162,7 @@ function searchAndDraw(fields, files)
       // End of fasta extracting
     } else if(fields["genomaSearchSourceType"] == "fasta") {
       fastaSequence = "";
-      var fastaLines = fields["fastaSearchSource"].split(/\n\r?/);
+      var fastaLines = fields["fastaSearchSource"].split(/(\n|\r){1,2}/);
       for(var fastaLineIndex = 0; fastaLineIndex < fastaLines.length; fastaLineIndex++) {
         if(!fastaLines[fastaLineIndex].match(/$\>/)) {
           fastaSequence = fastaSequence + fastaLines[fastaLineIndex];

@@ -82,6 +82,11 @@ header {
     justify-content: space-around;
     animation: build-up .3  s ease-in-out 0s;
     margin: 0;
+    border-radius: 5px;
+}
+
+.highlight {
+    border: 2px dashed #6200EE;
 }
 
 .hr {
@@ -95,31 +100,6 @@ hr {
 
 .genomaSpec, .searchCustomization, .extraInput {
     animation: fade-in .5s ease-in-out 0s;
-}
-
-footer {
-    background: #555;
-    color: pink;
-    display: -webkit-flex;
-    display: flex;
-    flex-direction: row;
-    padding: 50px;
-    margin: 0px;
-    margin-top: auto;
-}
-
-.footer-column {
-    display: -webkit-flex;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    margin: 0;
-}
-
-a {
-    margin: 0;
-    color: #A2A0FF;
-    text-decoration: underline;
 }
 
 .option-column {
@@ -170,6 +150,31 @@ mwc-dialog {
 
 mwc-snackbar {
     margin: 0;
+}
+
+footer {
+    background: #555;
+    color: pink;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    padding: 50px;
+    margin: 0px;
+    margin-top: auto;
+}
+
+.footer-column {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin: 0;
+}
+
+a {
+    margin: 0;
+    color: #A2A0FF;
+    text-decoration: underline;
 }
 
 /*
