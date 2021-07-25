@@ -76,10 +76,10 @@
                 min = "0"
                 oninput = "updateOpacity(this)">
             </mwc-textfield>-->
-            <mwc-select outlined label="Arrow style"id = "arrowStyleSelector" onchange = "updateArrowStyle(this)">
-                <mwc-list-item value="arrow">Arrows</mwc-list-item>
-                <mwc-list-item value="triangle">Triangles</mwc-list-item>
-                <mwc-list-item value="tag">Tags</mwc-list-item>
+            <mwc-select outlined label="Arrow style" id = "arrowStyleSelector" onchange = "updateArrowStyle(this)">
+                <mwc-list-item value = "arrow"   > Arrows    </mwc-list-item>
+                <mwc-list-item value = "triangle"> Triangles </mwc-list-item>
+                <mwc-list-item value = "tag"     > Tags      </mwc-list-item>
             </mwc-select>
             <mwc-button
                 id = "geneHideButton"
@@ -235,6 +235,11 @@
                 </span>
                 <span id = "geneCoverageContent" class = "dataContent datuum">
                 </span>
+            </div>
+        </div>
+        <div id = "invitationToEditData">
+            <div id = "invitation" style= "margin: 20px; text-align: center;">
+                Click anywhere in the diagram to edit.
             </div>
         </div>
         <mwc-snackbar id = "Rendering"

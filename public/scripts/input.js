@@ -81,42 +81,27 @@ function updateFileName(value, id) {
 
 // drag-and-drop functionality
 function preventDefaults (e) {
-    e.preventDefault()
-    e.stopPropagation()
+  e.preventDefault()
+  e.stopPropagation()
+}
+function highlight(e) {
+  if(!this.classList.contains("highlight")) {
+    this.classList.add("highlight");
   }
-  function highlight(e) {
-    for(let i = 0; i < e.path.length; i++) {
-      if(e.path[i].classList && e.path[i].classList.contains("genomaData")) {
-        if(!e.path[i].classList.contains("highlight")) {
-          e.path[i].classList.add("highlight");
-        }
-        break;
-      }
-    }
+}
+function unhighlight(e) {
+  if(this.classList.contains("highlight")) {
+    this.classList.remove("highlight");
   }
-  function unhighlight(e) {
-    for(let i = 0; i < e.path.length; i++) {
-      if(e.path[i].classList && e.path[i].classList.contains("genomaData")) {
-        if(e.path[i].classList.contains("highlight")) {
-          e.path[i].classList.remove("highlight");
-        }
-        break;
-      }
-    }
-  }
+}
 
-  function handleDrop(e) {
-    for(let i = 0; i < e.path.length; i++) {
-      if(e.path[i].classList && e.path[i].classList.contains("genomaData")) {
-        if(e.dataTransfer.files.length > 1) {
-            alert("Sorry, but you should select the files one by one.");
-        } else {
-            e.path[i].getElementsByClassName("genomaSourceType")[0].value = "file";
-            e.path[i].getElementsByClassName("genomaSourceType")[0].onchange();
-            e.path[i].getElementsByClassName("form-control-file")[0].files = e.dataTransfer.files;
-            e.path[i].getElementsByClassName("form-control-file")[0].onchange();
-        }
-        break;
-      }
-    }
+function handleDrop(e) {
+  if(e.dataTransfer.files.length > 1) {
+      alert("Sorry, but you should select the files one by one.");
+  } else {
+      this.getElementsByClassName("genomaSourceType")[0].value = "file";
+      this.getElementsByClassName("genomaSourceType")[0].onchange();
+      this.getElementsByClassName("form-control-file")[0].files = e.dataTransfer.files;
+      this.getElementsByClassName("form-control-file")[0].onchange();
   }
+}

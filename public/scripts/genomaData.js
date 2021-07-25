@@ -35,7 +35,7 @@ function newGenomaData(id) {
   var helpGenomaSourceType = document.createElement("span");
   helpGenomaSourceType.classList.add("tooltip");
   helpGenomaSourceType.innerHTML = `<img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Where to get the context from. It may be from a GenBank flat file (.gbff), specifying locus tag or accession number, so whe can get it from the database.
+              Where to get the context from. It may be from a GenBank flat file (.gbff), specifying locus tag or accession number, so we can get it from the database.
             </span>`;
 
   genomaSource.appendChild(genomaSourceType);
