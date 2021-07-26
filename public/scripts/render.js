@@ -1,21 +1,20 @@
 // I think I'm using too much global variables :(
 Array.prototype.last = function(){return this[this.length - 1];};
 Array.prototype.first = function(){return this[0];};
-var genomaHeight = 1;
-var fontSize = 24;
-var activeElement = null;
-var arrowStyle = "arrow";
-var difference = -1;
-var minStart = 0;
-var maxEnd = 0;
-var genomas;
-var viewBox = [];
-var genomaElement = null;
-var d3Genomas;
-var itIsTheFirstTimeTheySelect = true;
-var lastDeletedgene = null;
+window.genomaHeight = 1;
+window.fontSize = 24;
+window.activeElement = null;
+window.arrowStyle = "arrow";
+window.difference = -1;
+window.minStart = 0;
+window.maxEnd = 0;
+window.viewBox = [];
+window.genomaElement = null;
+window.d3Genomas;
+window.itIsTheFirstTimeTheySelect = true;
+window.lastDeletedgene = null;
 
-var dragHandler = d3.drag().on("start", function () {
+window.dragHandler = d3.drag().on("start", function () {
     var current = d3.select(this);
     deltaX = current.attr("x") - d3.event.x;
     deltaY = current.attr("y") - d3.event.y;
@@ -87,6 +86,7 @@ function activate(type, element, data) {
         d3.select(arrowColor).style("background-color", arrowColor.value);
         d3.select("#geneHideButton").classed("invisible", data.hidden != null && data.hidden);
         d3.select("#geneShowButton").classed("invisible", data.hidden == null || !data.hidden);
+        d3.select("#alignGeneButton").classed("invisible", data.scale);
         updateShownData(data, true);
     } else if (type == "arrowText") {
         d3.select("#arrowTextToolBar").classed("invisible", false);
@@ -107,8 +107,8 @@ function activate(type, element, data) {
     activeElement = element;
 }
 
-function draw(genoma, y, group){
-    group.selectAll("g").data(genoma.genes).enter().append("g").classed("jscolor", true).each(function(gene, index) {
+function draw(genoma, y, group, scale = false){
+    group.selectAll("g").data(genoma.genes).enter().append("g").each(function(gene, index) {
         var arrow = d3.select(this).attr("id", "group__"+y+"__"+index).append("polygon").classed("arrow", true).attr("id", "arrow__"+y+"__"+index);
         if(gene.complement) {
             start = gene.end;
@@ -137,6 +137,7 @@ function draw(genoma, y, group){
         } else {
             gene.opacity = 1;
         }
+        gene.scale = scale;
         this.getElementsByTagName("polygon")[0].addEventListener("click", function(){activate("arrow", this, gene);}, false);
         var textGeneX = (gene.start + gene.end) / 2 - ((gene.end - gene.start) / 3);
         var textGeneY = y - genomaHeight/4;
@@ -201,7 +202,9 @@ function hideContext() {
 }
 function hideGene(shouldItBeHidden) {
     var geneToRemove = d3.select(activeElement).data()[0];
-    for(var i = 0; i < genomas.length; i++) {
+    if(geneToRemove.scale) {
+        d3.select(activeElement.parentElement).style("opacity", shouldItBeHidden? "0" : "100");
+    } else for(var i = 0; i < genomas.length; i++) {
         if(genomas[i].genes.includes(geneToRemove)) {
             var index = genomas[i].genes.indexOf(geneToRemove);
             genomas[i].genes[index].hidden = shouldItBeHidden;
@@ -415,7 +418,7 @@ function drawAll(genomas) {
     // We build the scale indicator arrow
     scaleGroup = d3.select("#canvas").append("g");
     scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)"}], name: ""}
-    draw(scaleData, genomas.length * genomaHeight, scaleGroup);
+    draw(scaleData, genomas.length * genomaHeight, scaleGroup, true);
     // Setting viewbox
     var begin = minStart - 100;
     var width = maxEnd + 10 - begin + 20 * fontSize;

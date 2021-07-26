@@ -122,7 +122,7 @@ app.get("/", function(req, res, next) {
           res.write(`<html lang="en">
                       <head>
                       <meta charset="UTF-8"></meta>
-                      <script>var tutorial = true;</script>`);
+                      <script>window.tutorial = true;</script>`);
           res.write(data);
           
           res.end();
@@ -164,7 +164,7 @@ app.post('/fileUploadAndRender', function(req, res, next) {
     <head>
       <meta charset="UTF-8">`);
     res.write("<script> ");
-    res.write("var contextSources = [");
+    res.write("window.contextSources = [");
     console.log("[fileUploadAndRender] fields[amountOfContexts]");
     console.log(fields["amountOfContexts"]);
     for(var j = 0; j < fields["amountOfContexts"]; j++) {
@@ -424,7 +424,7 @@ app.post('/searchAndDraw', function(req, res, next) {
         <head>
           <meta charset="UTF-8">`);
         res.write("<script> ");
-        res.write("var genomas = ");
+        res.write("window.genomas = ");
         res.write(JSON.stringify(message.genomas));
         fs.readFile('./public/fullRender.html', null, function(error,data){
           res.write("; </script>");

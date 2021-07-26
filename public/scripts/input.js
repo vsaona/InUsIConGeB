@@ -14,8 +14,8 @@ function changeTab(activeTabIndex) {
     }
 }
 
-var addedInputGenomaisEven = true;
-var genomas = 1;
+window.addedInputGenomaisEven = true;
+window.genomas = 1;
 function addGenoma() {
     var clone = newGenomaData(genomas);
     var hr = document.createElement("div");

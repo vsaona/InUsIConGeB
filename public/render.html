@@ -96,7 +96,7 @@
                 onclick = "hideGene(false)">
             </mwc-button>
             
-            <mwc-button raised onclick = "setInterestGene()"> Align this gene </mwc-button>
+            <mwc-button id = "alignGeneButton" raised onclick = "setInterestGene()"> Align this gene </mwc-button>
         </div>
         <div id = "arrowTextToolBar" class = "invisible toolBar">
             <mwc-textfield
@@ -261,7 +261,7 @@
                     alert("Error: " + data.error);
                     document.getElementById("goBackInCaseOfErrorDiv").classList.remove("invisible");
                 }
-                genomas = data.genomas;
+                window.genomas = data.genomas;
                 if(contextSources.length && !genomas.length) {
                     document.getElementById("Rendering").close();
                     alert("We are sorry, but we have nothing to show you.\nPlease go read the documentation or contact the developers.");
