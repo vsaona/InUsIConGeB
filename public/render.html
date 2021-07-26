@@ -237,7 +237,7 @@
                 </span>
             </div>
         </div>
-        <div id = "invitationToEditData">
+        <div id = "invitationToEditData" class = "invisible">
             <div id = "invitation" style= "margin: 20px; text-align: center;">
                 Click anywhere in the diagram to edit.
             </div>
@@ -270,6 +270,7 @@
                     drawAll(genomas);
                     document.getElementById("Rendering").close();
                     document.getElementById("imageToolBar").classList.remove("invisible");
+                    document.getElementById("invitationToEditData").classList.remove("invisible");
                 }
             });
         </script>

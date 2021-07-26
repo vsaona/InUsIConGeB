@@ -234,6 +234,7 @@ app.post('/processFile', function(req, res, next) {
     
       var interestGenes = false;
       var lastGene = false;
+      var postLastGene = false;
       liner = new readlines(contextSources[j]["fileName"]);
       var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
       genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
@@ -255,8 +256,9 @@ app.post('/processFile', function(req, res, next) {
 
         // Extracting genes data
         if(!isRegionSpecified) {
-          contents = contents + line + "\n";
+          
           if(!interestGenes) {
+            contents = contents + line + "\n";
             if(contextSources[j]["locusBegin"] && line.includes(contextSources[j]["locusBegin"])) {
               interestGenes = true;
             } else if(!contextSources[j]["locusBegin"] && line.match(/^..\s{3}\w+\s{2}/)) {
@@ -269,12 +271,17 @@ app.post('/processFile', function(req, res, next) {
             }
           } else {
             if(contextSources[j]["locusEnd"] && line.includes(contextSources[j]["locusEnd"])) {
+              contents = contents + line + "\n";
               lastGene = true;
             } else if(lastGene && (line.match(/^..\s{3}\w+\s{2}/) || line.match(/^..[^\s]/))) {
+              if(!contents.match(line.substring(20))){
+                break;
+              }
+              contents = contents + line + "\n";
+            } else if(line.match(/^..[^\s]/) || line.match(/^\/\//)) {
               break;
-            }
-            if(line.match(/^..[^\s]/) || line.match(/^\/\//)) {
-              break;
+            } else {
+              contents = contents + line + "\n";
             }
           }
         } else {
