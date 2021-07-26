@@ -165,7 +165,7 @@ function searchAndDraw(fields, files)
       var fastaLines = fields["fastaSearchSource"].split(/\r\n|\n\r|\n|\r/);
       for(var fastaLineIndex = 0; fastaLineIndex < fastaLines.length; fastaLineIndex++) {
         if(!fastaLines[fastaLineIndex].match(/$\>/)) {
-          fastaSequence = fastaSequence + fastaLines[fastaLineIndex];
+          fastaSequence = fastaSequence + fastaLines[fastaLineIndex] + "\n";
         }
       }
     }
