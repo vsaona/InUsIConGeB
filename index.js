@@ -274,7 +274,8 @@ app.post('/processFile', function(req, res, next) {
               contents = contents + line + "\n";
               lastGene = true;
             } else if(lastGene && (line.match(/^..\s{3}\w+\s{2}/) || line.match(/^..[^\s]/))) {
-              if(!contents.match(line.substring(20))){
+              
+              if(line.match(/^..\s{3}\w+\s{2}/) && !contents.includes(line.substring(20))){
                 break;
               }
               contents = contents + line + "\n";
