@@ -109,7 +109,7 @@ function activate(type, element, data) {
 
 function draw(genoma, y, group, scale = false){
     group.selectAll("g").data(genoma.genes).enter().append("g").each(function(gene, index) {
-        var arrow = d3.select(this).attr("id", "group__"+y+"__"+index).append("polygon").classed("arrow", true).attr("id", "arrow__"+y+"__"+index);
+        var arrow = d3.select(this).attr("id", scale? "scaleGroup" : "group__"+y+"__"+index).append("polygon").classed("arrow", true).attr("id", "arrow__"+y+"__"+index);
         if(gene.complement) {
             start = gene.end;
             end = gene.start;
@@ -314,6 +314,10 @@ function setInterestGene() {
         d3.select(this).attr("x1", minStart - 25)
             .attr("x2", maxEnd + 25);
     });
+    // And now we move the scale
+    console.log(d3.select("#scaleGroup"));
+    console.log(d3.select("#scaleGroup").data());
+    d3.select("#scaleGroup").attr("transform", `translate(${maxEnd - d3.select("#scaleGroup").data()[0].end}, 0)`);
     
 }
 
