@@ -450,10 +450,10 @@ function triggerZoomIn() {
 }
 
 function toogleItalic() {
-    d3.select('.genomaTag').classed('italic', !window.italic);
+    d3.selectAll('.genomaTag').classed('italic', !window.italic);
     window.italic = !window.italic;
 }
 function toogleUnderlined() {
-    d3.select('.genomaTag').classed('underlined', !window.underlined);
+    d3.selectAll('.genomaTag').classed('underlined', !window.underlined);
     window.underlined = !window.underlined;
 }
