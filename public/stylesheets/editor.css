@@ -46,9 +46,10 @@ text:active {
   flex-flow: row wrap;
   justify-content: left;
 
-  /*position: -webkit-sticky;
+  position: -webkit-sticky;
   position: sticky;
-  left: 0;*/
+  left: 0;
+  z-index: 1;
   max-width: 100vw;
 }
 #imageToolBar {
@@ -87,9 +88,10 @@ text:active {
   border-radius: 20px;
   margin: 20px;
   padding: 0px;
-  /*position: -webkit-sticky;
+  position: -webkit-sticky;
   position: sticky;
-  left: 0;*/
+  left: 0;
+  z-index: 0;
   max-width : 80vw;
 }
 .dataEntry {
@@ -101,10 +103,12 @@ text:active {
   flex: 0 1 20%;
 }
 .dataContent {
-  flex-grow: 4;
+  flex: 0 1 80%;
 }
 .datuum {
   padding: 10px;
+  word-wrap: break-word;
+  min-width: 20%;
 }
 
 .invisible {
