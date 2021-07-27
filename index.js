@@ -434,16 +434,16 @@ app.post('/searchAndDraw', function(req, res, next) {
         res.write("<script> ");
         res.write("window.genomas = ");
         res.write(JSON.stringify(message.genomas));
-        fs.readFile('./public/fullRender.html', null, function(error,data){
+        fs.readFile('./public/fullRender.html', null, function(error,data) {
           res.write("; </script>");
           if(error){
-            res.write('File not found!');
+            res.write('Oops! Looks like something is wrong. Please try again!');
           } else {
             res.write(data);
           }
           res.end();
         });
-      }  
+      }
     });
   });
 });

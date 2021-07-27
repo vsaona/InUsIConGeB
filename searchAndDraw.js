@@ -120,7 +120,7 @@ function searchAndDraw(fields, files)
         process.send({
           error  : ex,
           errorCode: 400,
-          errorMessage : "he specified assembly accession number is not part of GenBank assemblies."
+          errorMessage : "The specified assembly accession number is not part of GenBank assemblies."
         });
         process.disconnect();
       }

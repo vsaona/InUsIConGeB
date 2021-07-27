@@ -36,6 +36,7 @@ function updateShownData(data, isGene) {
         document.getElementById("geneNoteContent").innerText = data.note;
         document.getElementById("geneProductContent").innerText = data.product;
         document.getElementById("geneTranslationContent").innerText = data.translation;
+        document.getElementById("geneSizeContent").innerText = data.end - data.start;
         d3.select("#geneData").classed("invisible", false);
         if(data.identity || data.coverage) {
             document.getElementById("geneIdentityContent").innerText = data.identity;
@@ -436,4 +437,23 @@ function zoom(value) {
     canvas.style.width = "auto";
     canvas.style.height = `${value}%`;
     d3.select("body").style("min-width", document.getElementsByTagName("svg")[0].scrollWidth)
+}
+function triggerZoomOut() {
+    var zoomBar = document.getElementById('zoomBar');
+    zoomBar.value -= 10;
+    zoom(zoomBar.value);
+}
+function triggerZoomIn() {
+    var zoomBar = document.getElementById('zoomBar');
+    zoomBar.value += 10;
+    zoom(zoomBar.value);
+}
+
+function toogleItalic() {
+    d3.select('.genomaTag').classed('italic', !window.italic);
+    window.italic = !window.italic;
+}
+function toogleUnderlined() {
+    d3.select('.genomaTag').classed('underlined', !window.underlined);
+    window.underlined = !window.underlined;
 }
