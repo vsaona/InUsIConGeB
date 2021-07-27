@@ -39,8 +39,9 @@
                 icon = "⇩">
             </mwc-button>
             <mwc-formfield>
-                <img src = 'images/zoom_in_black_24dp.svg' style = 'width: 20px;'>
+                <img src = 'images/zoom_out_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "document.getElementById('zoomBar').value -= 10">
                 <mwc-slider
+                    id = "zoomBar"
                     step="10"
                     pin
                     min="50"
@@ -48,6 +49,7 @@
                     value="100"
                     onchange = "zoom(this.value)">
                 </mwc-slider>
+                <img src = 'images/zoom_in_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "document.getElementById('zoomBar').value += 10">
             </mwc-formfield>
             <img id = 'goToBarIndicator' src = 'images/arrow_downward_black_24dp.svg' style = 'width: 40px;' class = "invisible disappear">
         </div>
@@ -80,7 +82,7 @@
                 min = "0"
                 oninput = "updateOpacity(this)">
             </mwc-textfield>-->
-            <mwc-select outlined label="Arrow style"id = "arrowStyleSelector" onchange = "updateArrowStyle(this)">
+            <mwc-select outlined label="Arrow style" id = "arrowStyleSelector" onchange = "updateArrowStyle(this)">
                 <mwc-list-item value="arrow">Arrows</mwc-list-item>
                 <mwc-list-item value="triangle">Triangles</mwc-list-item>
                 <mwc-list-item value="tag">Tags</mwc-list-item>
@@ -134,6 +136,8 @@
                 value = ""
                 oninput = "updateName(this)">
             </mwc-textfield>
+            <img src = 'images/format_italic_black_24dp.svg' class = "clickableIcon" onclick = "toogleItalic()">
+            <img src = 'images/format_underlined_black_24dp.svg' class = "clickableIcon" onclick = "toogleUnderlined()">
             <mwc-textfield
                 id = "midLineWidth"
                 outlined
@@ -216,6 +220,13 @@
                 <span id = "geneNoteContent" class = "dataContent datuum">
                 </span>
             </div>
+            <div id = "geneSize" class = "dataEntry">
+                <span id = "geneSizeTag" class = "dataTag datuum">
+                    Size
+                </span>
+                <span id = "geneSizeContent" class = "dataContent datuum">
+                </span>
+            </div>
             <div id = "geneTranslation" class = "dataEntry">
                 <span id = "geneTranslationTag" class = "dataTag datuum">
                     Translation
@@ -250,11 +261,10 @@
             labelText = "Analyzing the genomes, please wait.">
         </mwc-snackbar>
         <script>
-            
             document.getElementById("Rendering").show();
             if(!genomas.length) {
                 document.getElementById("Rendering").close();
-                alert("We are sorry, but we have nothing to show you.\nPlease go read the documentation or contact the developers.");
+                alert("We are sorry, but we have nothing to show you.\nPlease check your query or go read the documentation.");
                 document.getElementById("goBackInCaseOfErrorDiv").classList.remove("invisible");
             } else {
                 drawAll(genomas);
