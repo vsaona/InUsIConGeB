@@ -12,6 +12,8 @@ function changeTab(activeTabIndex) {
         textFields[i].focus();
         textFields[i].blur();
     }
+    if(activeTabIndex == 0)
+        document.getElementById("databaseToSearch").layout();
 }
 
 window.addedInputGenomaisEven = true;
