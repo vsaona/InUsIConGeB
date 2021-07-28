@@ -35,7 +35,7 @@
                 icon = "⇩">
             </mwc-button>
             <mwc-formfield>
-                <img src = 'images/zoom_out_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "document.getElementById('zoomBar').value -= 10">
+                <img src = 'images/zoom_out_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "triggerZoomOut()">
                 <mwc-slider
                     id = "zoomBar"
                     step="10"
@@ -45,7 +45,7 @@
                     value="100"
                     onchange = "zoom(this.value)">
                 </mwc-slider>
-                <img src = 'images/zoom_in_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "document.getElementById('zoomBar').value += 10">
+                <img src = 'images/zoom_in_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "triggerZoomIn()">
             </mwc-formfield>
             <img id = 'goToBarIndicator' src = 'images/arrow_downward_black_24dp.svg' style = 'width: 40px;' class = "invisible disappear">
         </div>

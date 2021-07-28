@@ -425,7 +425,7 @@
     tab0.addEventListener('formdata', event => {
       var formElements = document.getElementById("tab0").getElementsByClassName("formData");
       for(let el of formElements) {
-        event.formData.append(el.id, el.tagName == "MWC-CHECKBOX" ? el.checked : el.value);
+        event.formData.append(el.id, el.tagName == "MWC-CHECKBOX" ? el.checked : el.value.trim());
       }
     });
 
@@ -436,7 +436,7 @@
     tab1.addEventListener('formdata', event => {
       var formElements = document.getElementById("tab1").getElementsByClassName("formData");
       for(let el of formElements) {
-        event.formData.append(el.id, el.value);
+        event.formData.append(el.id, el.value.trim());
       }
       event.formData.append("amountOfContexts", window.amountOfContexts);
     });
