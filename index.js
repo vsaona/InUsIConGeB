@@ -168,14 +168,14 @@ app.post('/fileUploadAndRender', function(req, res, next) {
     console.log("[fileUploadAndRender] fields[amountOfContexts]");
     console.log(fields["amountOfContexts"]);
     for(var j = 0; j < fields["amountOfContexts"]; j++) {
-      if(fields["genomaSourceType" + j] == "file") {
+      if(fields["genomaSourceType" + j] == "file" && files["file" + j].size) {
         var oldpath = files["file" + j].path;
         var newpath = './data/' + files["file" + j].name + Date.now();
         fs.renameSync(oldpath, newpath);
         res.write((j? `, `: ``) + `{ "type": "file", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);    // Todo lo que se necesita saber del formulario
-      } else if(fields["genomaSourceType" + j] == "locus") {
+      } else if(fields["genomaSourceType" + j] == "locus" && fields["locus"+j]) {
         res.write((j? `, `: ``) + `{ "type": "locus", "locusTag": "${fields["locus"+j]}", "genesBefore": "${fields["contextoAntes"+j]}", "genesAfter": "${fields["contextoDespues"+j]}"}`);
-      }else if(fields["genomaSourceType" + j] == "accesion") {
+      } else if(fields["genomaSourceType" + j] == "accesion" && fields["accesion"+j]) {
         res.write((j? `, `: ``) + `{ "type": "accesion", "accesion": "${fields["accesion"+j]}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);
       }
     }
@@ -287,14 +287,9 @@ app.post('/processFile', function(req, res, next) {
           }
         } else {
           var featureDefinition = line.match(/^..\s{3}\w+\s{2}.*?(\d+)\.\.(?:\d+\s,\s\d+\.\.)?(\d+)/);
-          if(featureDefinition) {
-            console.log("featureDefinition");
-            console.log(featureDefinition);
-          }
           if(!interestGenes) {
             if(featureDefinition) {
               if(parseInt(featureDefinition[1]) >= contextSources[j]["locusBegin"]) {
-                console.log("Begin!");
                 interestGenes = true;
                 contents = line + "\n";
               }
@@ -409,7 +404,7 @@ app.post('/processFile', function(req, res, next) {
 
 app.post('/searchAndDraw', function(req, res, next) {
   var form = new formidable.IncomingForm();
-  console.log("hola");
+  console.log("[searchAndDraw] request received.");
   form.uploadDir = "./data"
   form.parse(req, function (err, fields, files){
     var child = child_process.fork('searchAndDraw.js');

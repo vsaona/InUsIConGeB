@@ -184,7 +184,7 @@ function searchAndDraw(fields, files)
     var liner = new readlines(outFileName);
     var line;
     var failures = 0;
-    fields["includeOnly"] = fields["includeOnly"].toLowerCase();
+    fields["includeOnly"] = fields["useIncludeOnly"] === "true" ? fields["includeOnly"].toLowerCase() : "";
     fields["useOneOfEach"] = fields["useOneOfEach"] === "true";
 
     while ((line = liner.next()) && (identities.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {

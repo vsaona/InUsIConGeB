@@ -175,22 +175,18 @@
             </span> </span>
           </div>
           <div class = "search-option" style = "display: flex;">
-            <mwc-formfield label="One of each">
-              <mwc-checkbox id = "useOneOfEach" class = "formData" onChange = "document.getElementById('oneOfEach').disabled = !this.checked;">
+            <mwc-formfield label="Include only">
+              <mwc-checkbox id = "useIncludeOnly" class = "formData" onChange = "document.getElementById('includeOnly').disabled = !this.checked;">
               </mwc-checkbox>
             </mwc-formfield>
-            <mwc-select disabled outlined id = "oneOfEach" class = "formData">
-              <mwc-list-item value="0">Kingdom</mwc-list-item>
-              <mwc-list-item value="1">Phylum</mwc-list-item>
-              <mwc-list-item value="2">Class</mwc-list-item>
-              <mwc-list-item value="3">Order</mwc-list-item>
-              <mwc-list-item value="4">Family</mwc-list-item>
-              <mwc-list-item value="5">Genre</mwc-list-item>
-              <mwc-list-item value="6">Species</mwc-list-item>
-              <!-- <mwc-list-item value="7">Entry</mwc-list-item> -->
-            </mwc-select>
+            <mwc-textfield disabled
+              outlined
+              id = "includeOnly"
+              label="Taxonomic group"
+              class = "formData"> <!-- Autocompletar -->
+            </mwc-textfield> <!-- blastp -taxids  -->
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Not to draw many contexts from the same specified taxonomic group.
+              Search only subjects from a determined taxonomic group (examples: Bacteria, Betaproteobacteria)
             </span> </span>
           </div>
           <div class = "search-option">
@@ -214,7 +210,9 @@
         </div>
         <div class = "option-column">
           <div class = "search-option" >
-            <mwc-select outlined label="Database" id = "databaseToSearch" naturalMenuWidth="true" class = "formData">
+            <mwc-formfield label="Database">
+            </mwc-formfield>
+            <mwc-select outlined id = "databaseToSearch" naturalMenuWidth="true" class = "formData">
               <!-- <mwc-list-item value="nr">Non-redundant protein sequences</mwc-list-item> -->
               <!-- <mwc-list-item value="refseq_select">RefSeq Select proteins</mwc-list-item> -->
               <mwc-list-item value="refseq_protein">Reference proteins (RefSeq)</mwc-list-item>
@@ -229,17 +227,26 @@
               Look for homologous into which database.
             </span> </span>
           </div>
-          <div class = "search-option">
-            <mwc-textfield
-              outlined
-              id = "includeOnly"
-              label="Include only"
-              class = "formData"> <!-- Autocompletar -->
-            </mwc-textfield> <!-- blastp -taxids  -->
+          <div class = "search-option" style = "display: flex;">
+            <mwc-formfield label="One of each">
+              <mwc-checkbox id = "useOneOfEach" class = "formData" onChange = "document.getElementById('oneOfEach').disabled = !this.checked;">
+              </mwc-checkbox>
+            </mwc-formfield>
+            <mwc-select disabled outlined id = "oneOfEach" class = "formData">
+              <mwc-list-item value="0">Kingdom</mwc-list-item>
+              <mwc-list-item value="1">Phylum</mwc-list-item>
+              <mwc-list-item value="2">Class</mwc-list-item>
+              <mwc-list-item value="3">Order</mwc-list-item>
+              <mwc-list-item value="4">Family</mwc-list-item>
+              <mwc-list-item value="5">Genre</mwc-list-item>
+              <mwc-list-item value="6">Species</mwc-list-item>
+              <!-- <mwc-list-item value="7">Entry</mwc-list-item> -->
+            </mwc-select>
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-              Search only subjects from a determined taxonomic group (examples: Bacteria, Betaproteobacteria)
+              Not to draw many contexts from the same specified taxonomic group.
             </span> </span>
           </div>
+          
           <div class = "search-option">
             Minimum identity:
             <mwc-textfield
@@ -314,7 +321,8 @@
               outlined
               id = "accesion0"
               label="accession number"
-              class = "genomaSpec accesion invisible formData">
+              class = "genomaSpec accesion invisible formData"
+              pattern = "GC(A|F)_.*">
             </mwc-textfield>
           </div>
 
