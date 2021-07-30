@@ -96,7 +96,7 @@
       </div>
       <div class = "genomaData" id = "genomaSearchData">
         <div id = "genomaSearchSource">
-          <mwc-select outlined label="Query source" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');" class = "formData">
+          <mwc-select outlined label="Query source" id = "genomaSearchSourceType" onchange = "changeGenomaSource(this.value, 'SearchSource');" class = "formData genomaSourceType">
             <mwc-list-item value="file">From .gbff file</mwc-list-item>
             <!-- <mwc-list-item value="locus">locus tag</mwc-list-item> -->
             <mwc-list-item value="accesion">Assembly accession</mwc-list-item>
@@ -493,17 +493,20 @@
     }
 
     // Adding drag-and-drop files logic
-    let genomaData0Element = document.getElementById("genomaData0");
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      genomaData0Element.addEventListener(eventName, preventDefaults, false)
+    ["genomaData0", "genomaSearchData"].forEach(function (id) {
+      let genomaDataElement = document.getElementById(id);
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        genomaDataElement.addEventListener(eventName, preventDefaults, false)
+      });
+      ['dragenter', 'dragover'].forEach(eventName => {
+        genomaDataElement.addEventListener(eventName, highlight, false)
+      });
+      ['dragleave', 'drop'].forEach(eventName => {
+        genomaDataElement.addEventListener(eventName, unhighlight, false)
+      });
+      genomaDataElement.addEventListener('drop', handleDrop, false);
     });
-    ['dragenter', 'dragover'].forEach(eventName => {
-      genomaData0Element.addEventListener(eventName, highlight, false)
-    });
-    ['dragleave', 'drop'].forEach(eventName => {
-      genomaData0Element.addEventListener(eventName, unhighlight, false)
-    })
-    genomaData0Element.addEventListener('drop', handleDrop, false);
+    
   </script>
 </body>
 </html>
