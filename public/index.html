@@ -183,7 +183,8 @@
               outlined
               id = "includeOnly"
               label="Taxonomic group"
-              class = "formData"> <!-- Autocompletar -->
+              class = "formData"
+              pattern = "\w*"> <!-- Autocompletar -->
             </mwc-textfield> <!-- blastp -taxids  -->
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
               Search only subjects from a determined taxonomic group (examples: Bacteria, Betaproteobacteria)
@@ -374,12 +375,12 @@
           </div>
         </div>
       </div>
-      <div>
+      <!--<div>
         <mwc-button onClick = "addGenoma()" id = "addGenomaButton" label = "Add context" icon = "add" outlined></mwc-button>
         <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
           Add other context to draw below the other ones in the same image.
         </span> </span>
-      </div>
+      </div>-->
     </div>
     
     <input type="submit" class = "submitInput" style = "opacity: 0;" id = "submitMyContexts" onClick = "document.getElementById('upload').show();">

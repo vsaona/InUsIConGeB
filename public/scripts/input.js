@@ -38,6 +38,12 @@ function addGenoma() {
 }
 
 function changeGenomaSource(value, id) {
+    console.log("lets log");
+    console.log(id);
+    console.log(window.genomas);
+    if(value && id == (window.genomas - 1).toString()) {
+        addGenoma();
+    }
     if(!value) return;
     var element;
     if(id != 'SearchSource') {
