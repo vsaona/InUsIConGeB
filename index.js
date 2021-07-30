@@ -42,7 +42,11 @@ function assignColors(genomas) {
             count: 1,
             color: "#BD3B32"
           });
-        } else {
+        } else if(gene.product == "hypothetical protein") {
+          colors.push({names: [gene.name, gene.product],
+            count: 1,
+            color: "#C7C7C7"});
+        }else {
           colors.push({
             names: [gene.name, gene.product],
             count: 1

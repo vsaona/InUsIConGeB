@@ -422,7 +422,7 @@ function drawAll(genomas) {
     console.log(d3Genomas);
     // We build the scale indicator arrow
     scaleGroup = d3.select("#canvas").append("g");
-    scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)"}], name: ""}
+    scaleData = {genes: [{start: maxEnd - 1000, end: maxEnd, name: "(1kb)", locus: "Scale", note: "Just a size reference. Length is 1kb"}], name: ""}
     draw(scaleData, genomas.length * genomaHeight, scaleGroup, true);
     // Setting viewbox
     var begin = minStart - 100;
