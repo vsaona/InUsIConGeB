@@ -172,11 +172,11 @@ app.post('/fileUploadAndRender', function(req, res, next) {
         var oldpath = files["file" + j].path;
         var newpath = './data/' + files["file" + j].name + Date.now();
         fs.renameSync(oldpath, newpath);
-        res.write((j? `, `: ``) + `{ "type": "file", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);    // Todo lo que se necesita saber del formulario
+        res.write((j? `, `: ``) + `{ "type": "file", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j].toUpperCase()}", "locusEnd": "${fields["hasta"+j].toUpperCase()}"}`);    // Todo lo que se necesita saber del formulario
       } else if(fields["genomaSourceType" + j] == "locus" && fields["locus"+j]) {
-        res.write((j? `, `: ``) + `{ "type": "locus", "locusTag": "${fields["locus"+j]}", "genesBefore": "${fields["contextoAntes"+j]}", "genesAfter": "${fields["contextoDespues"+j]}"}`);
+        res.write((j? `, `: ``) + `{ "type": "locus", "locusTag": "${fields["locus"+j].toUpperCase()}", "genesBefore": "${fields["contextoAntes"+j]}", "genesAfter": "${fields["contextoDespues"+j]}"}`);
       } else if(fields["genomaSourceType" + j] == "accesion" && fields["accesion"+j]) {
-        res.write((j? `, `: ``) + `{ "type": "accesion", "accesion": "${fields["accesion"+j]}", "locusBegin": "${fields["desde"+j]}", "locusEnd": "${fields["hasta"+j]}"}`);
+        res.write((j? `, `: ``) + `{ "type": "accesion", "accesion": "${fields["accesion"+j].toUpperCase()}", "locusBegin": "${fields["desde"+j].toUpperCase()}", "locusEnd": "${fields["hasta"+j].toUpperCase()}"}`);
       }
     }
     fs.readFile('./public/render.html', null, function(error,data){

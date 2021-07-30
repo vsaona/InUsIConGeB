@@ -134,7 +134,7 @@ function searchAndDraw(fields, files)
       var line;
       while (line = liner.next()) {
         line = line.toString("UTF-8");
-        if(line.includes(fields["searchFileLocusTag"])) {
+        if(line.includes(fields["searchFileLocusTag"].toUpperCase())) {
           interestGene = true;
         }
         if(interestGene && line.match(/\/translation=/)) {
