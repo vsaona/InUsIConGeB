@@ -74,6 +74,10 @@ header {
     width: 300px;
 }
 
+.fasta {
+    font-family: monospace;
+}
+
 .searchCustomization, .genomaData {
     display: -webkit-flex;
     display: flex;

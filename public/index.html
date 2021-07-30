@@ -17,7 +17,7 @@
   <div id = "Explicacion" class = "mdc-typography">
     This tool can help you draw high-quality genomic context graphics.<br>
     Please, choose the contexts you want to draw. You can do this with "Draw my contexts" if you know exactly what you want to draw,
-    or you may do a BLAST search with "Search homologous".
+    or you may do a BLAST search with "BLAST &amp; Draw", and draw the results in their context.
   </div>
   <div id = "opciones">
     <mwc-button id = "language" label = "Ver en español" onclick = "document.getElementById('submit').click();">
@@ -85,7 +85,7 @@
 </mwc-dialog>
 
   <mwc-tab-bar onclick = "changeTab(this.activeIndex)" id = "tab-bar" activeIndex = "0">
-    <mwc-tab label = "Search homologous" id = "tabIndicator0" > </mwc-tab>
+    <mwc-tab label = "BLAST & Draw" id = "tabIndicator0" > </mwc-tab>
     <mwc-tab label = "Draw my contexts" id = "tabIndicator1"> </mwc-tab>
   </mwc-tab-bar>
   
@@ -119,13 +119,15 @@
             outlined
             id = "locusSearchSource"
             label="locus tag"
-            class = "genomaSpec locus invisible formData">
+            class = "genomaSpec locus invisible formData"
+            pattern = "\s*[a-zA-Z]\w*_.*\s*">
           </mwc-textfield>
           <mwc-textfield
             outlined
             id = "accesionSearchSource"
             label="accession number"
-            class = "genomaSpec accesion invisible formData">
+            class = "genomaSpec accesion invisible formData"
+            pattern = "[Gg][Cc]([Aa]|[Ff])_.*">
           </mwc-textfield>
           <mwc-textarea
             outlined
@@ -144,7 +146,8 @@
               label = "locus tag"
               type = "text"
               id = "searchFileLocusTag"
-              class = "formData">
+              class = "formData"
+              pattern = "\s*[a-zA-Z]\w*_.*\s*">
               <!-- autocompletar -->
             </mwc-textfield>
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -316,14 +319,15 @@
               outlined
               id = "locus0"
               label="locus tag"
-              class = "genomaSpec locus invisible formData">
+              class = "genomaSpec locus invisible formData"
+              pattern = "\s*[a-zA-Z]\w*_.*\s*">
             </mwc-textfield>
             <mwc-textfield
               outlined
               id = "accesion0"
               label="accession number"
               class = "genomaSpec accesion invisible formData"
-              pattern = "GC(A|F)_.*">
+              pattern = "[Gg][Cc]([Aa]|[Ff])_.*">
             </mwc-textfield>
           </div>
 
@@ -333,13 +337,15 @@
                 outlined
                 id = "desde0"
                 label = "From"
-                class = "formData">
+                class = "formData"
+                pattern = "\s*([a-zA-Z]\w*_.*|\d+)\s*">
               </mwc-textfield>
               <mwc-textfield
                 outlined
                 label = "To"
                 id = "hasta0"
-                class = "formData">
+                class = "formData"
+                pattern = "\s*([a-zA-Z]\w*_.*|\d+)\s*">
               </mwc-textfield>
               <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
                 Which adjacent genes you wish to draw. Please specify the first and last locus tag to be included.

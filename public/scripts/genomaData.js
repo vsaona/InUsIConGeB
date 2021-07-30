@@ -94,6 +94,7 @@ function newGenomaData(id) {
   accesionDef.outlined = true;
   accesionDef.id = "accesion" + id;
   accesionDef.label = "Accession number";
+  accesionDef.pattern = "[Gg][Cc]([Aa]|[Ff])_.*"
   accesionDef.classList.add("genomaSpec");
   accesionDef.classList.add("accesion");
   accesionDef.classList.add("invisible");
@@ -114,12 +115,14 @@ function newGenomaData(id) {
   desde.outlined = true;
   desde.label = "From";
   desde.id = "desde" + id;
+  desde.pattern = "\\s*([a-zA-Z]\\w*_.*|\\d+)\\s*"
   desde.classList.add("formData");
   genomaBoundaries.appendChild(desde);
   var hasta = document.createElement("mwc-textfield");
   hasta.outlined = true;
   hasta.label = "To";
   hasta.id = "hasta" + id;
+  hasta.pattern = "\\s*([a-zA-Z]\\w*_.*|\\d+)\\s*"
   hasta.classList.add("formData");
   genomaBoundaries.appendChild(hasta);
 
