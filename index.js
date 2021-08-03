@@ -266,7 +266,7 @@ app.post('/processFile', function(req, res, next) {
             if(contextSources[j]["locusBegin"] && line.includes(contextSources[j]["locusBegin"])) {
               interestGenes = true;
             } else if(!contextSources[j]["locusBegin"] && line.match(/^..\s{3}\w+\s{2}/)) {
-              if(!line.match(/^..\s{3}source\s{10}/)) {
+              if(!line.match(/^..\s{3}(source\s{10}|region\s{10}|protocluster\s{3}|proto_core\s{5}|cand_cluster\s{3}|Misc\s{11})/)) {
                 contents = line + "\n";
                 interestGenes = true;
               }
