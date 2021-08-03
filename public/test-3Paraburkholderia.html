@@ -271,6 +271,16 @@
                 document.getElementById("Rendering").close();
                 document.getElementById("imageToolBar").classList.remove("invisible");
             }
+
+            ["#arrowStrokeWidthMwcTextField", "#geneFontSize", "#genomaTextSizeInput", "#midLineWidth"]
+            .forEach(function (id) {
+                var textfield = document.querySelector(id);
+                textfield.validityTransform = (newValue, nativeValidity) => {
+                    return {
+                        valid: true
+                    };
+                }
+            });
         </script>
     </body>
 </html>

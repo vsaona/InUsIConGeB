@@ -287,6 +287,16 @@
                     document.getElementById("invitationToEditData").classList.remove("invisible");
                 }
             });
+
+            ["#arrowStrokeWidthMwcTextField", "#geneFontSize", "#genomaTextSizeInput", "#midLineWidth"]
+            .forEach(function (id) {
+                var textfield = document.querySelector(id);
+                textfield.validityTransform = (newValue, nativeValidity) => {
+                    return {
+                        valid: true
+                    };
+                }
+            });
         </script>
         
     </body>
