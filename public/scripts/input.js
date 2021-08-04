@@ -128,7 +128,7 @@ function handleSearchDrop(e) {
   console.log(e.dataTransfer.files.item(0));
   if(e.dataTransfer.files.length > 1) {
     alert("Sorry, but you should use only one file.");
-  } else if(e.dataTransfer.files.item(0).name.match(/\.f.*/)) {
+  } else if(e.dataTransfer.files.item(0).name.match(/\.f[^\.]|\.mpf[^\.]/)) {
     if(e.dataTransfer.files.item(0).size < 2000) {
       e.dataTransfer.files.item(0).text().then(function (text) {
         document.getElementById("fastaSearchSource").value = text;

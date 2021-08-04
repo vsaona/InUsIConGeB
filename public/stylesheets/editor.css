@@ -34,8 +34,8 @@ text:active {
   max-width: none;
 }
 .canvas {
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 70vh;
 }
 
 .toolBar {
