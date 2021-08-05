@@ -100,10 +100,10 @@
             <mwc-list-item value="file">From .gbff file</mwc-list-item>
             <!-- <mwc-list-item value="locus">locus tag</mwc-list-item> -->
             <mwc-list-item value="accesion">Assembly accession</mwc-list-item>
-            <mwc-list-item value="fasta">fasta sequence</mwc-list-item>
+            <mwc-list-item value="fasta">FASTA sequence</mwc-list-item>
           </mwc-select>
           <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
-            The query sequence for searching homologous. It can be inside a GenBank flat file (.gbff or .gbk), you may specify the locus tag for it to be extractes from a database, or you can directly write down the aminoacid sequence in fasta format.
+            The query sequence for searching homologous. It can be inside a GenBank flat file (.gbff or .gbk), you may specify the locus tag for it to be extractes from a database, or you can directly write down the aminoacid sequence in FASTA format.
           </span> </span>
           <br>
           <span
@@ -132,7 +132,7 @@
           <mwc-textarea
             outlined
             id = "fastaSearchSource"
-            label="Protein fasta sequence"
+            label="Protein FASTA sequence"
             class = "genomaSpec fasta invisible formData"
             rows = "6"
             cols = "90">
@@ -430,7 +430,7 @@
   </mwc-snackbar>
   <script>
     document.getElementById("oneOfEach").value = "6";
-    document.getElementById("databaseToSearch").value = "refseq_protein";
+    document.getElementById("databaseToSearch").value = "refseq_protein.00";
 
     /* set event listeners for form uploading */
     var tab0 = document.getElementById("tab0");
