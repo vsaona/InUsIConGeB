@@ -1,0 +1,26 @@
+.profile {
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: row;
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-top: 5vh;
+    margin-bottom: 5vh;
+    justify-content: center;
+}
+.profile-picture {
+    flex: 0 1 10vw
+}
+.profile-picture img {
+    border-radius: 50%;
+    width: 150px;
+}
+.profile-description {
+    flex: 1 1 20vw
+}
+h1, h2, h3 {
+    margin: 20px;
+}
+p {
+    margin: 20px;
+}

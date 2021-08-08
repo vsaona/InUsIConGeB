@@ -7,6 +7,21 @@ body {
   margin: 0;
 }
 
+header {
+  background-color: #6200EE;
+  color: aliceblue;
+  margin: 0;
+  padding: 20px;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: space-between;
+}
+
+#language, #goBack {
+  --mdc-theme-primary: white;
+  --mdc-theme-on-primary: #6200EE;
+}
+
 /* Style the header */
 mwc-top-app-bar {
   --mdc-theme-primary: #6200EE;
@@ -56,7 +71,8 @@ footer {
   display: flex;
   flex-direction: row;
   padding: 50px;
-  margin: 0;
+  margin: 0px;
+  margin-top: auto;
 }
 
 .footer-column {
@@ -65,6 +81,10 @@ footer {
   flex-direction: column;
   justify-content: space-around;
   margin: 0;
+}
+
+.footer-link {
+  margin: 5px;
 }
 
 a {

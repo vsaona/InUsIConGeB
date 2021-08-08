@@ -20,7 +20,7 @@
     or you may do a BLAST search with "BLAST &amp; Draw", and draw the results in their context.
   </div>
   <div id = "opciones">
-    <mwc-button id = "language" label = "Ver en español" onclick = "document.getElementById('submit').click();">
+    <mwc-button id = "language" label = "Ver en español">
     </mwc-button>
   </div>
 </header>
@@ -397,29 +397,12 @@
       </span> </span>
     </div>
   </form>
-  <footer>
-    <div class = "footer-column">
-      <div class = "footer-link">
-        <a href = "/user_manual.html">
-          User manual
-        </a>
-      </div>
-      <div class = "footer-link">
-        Developed by Durán, R. & Saona, V. on 2021
-        <a>
-          Cite us
-        </a>
-      </div>
-      <div class = "footer-link">
-        <a>
-          Read about how was this built
-        </a>
-      </div>
-      <div class = "footer-link">
-        Any questions, please write to vicente.saona@sansano.usm.cl
-      </div>
-    </div>
-  </footer>
+  <mwc-dialog id = "citeUsDialog" class = "container" heading = "Cite us">
+    Roberto E. Durán, Vicente Saona Urmeneta (2021) "Genomic context diagram editor" Unpublished work, available at http://200.1.19.244:3030/
+    <mwc-button dialogAction = "close" slot = "primaryAction" raised>
+      Close
+    </mwc-button>
+  </mwc-dialog>
   <mwc-snackbar id = "blastSearch"
     timeoutMs = "-1"
     labelText = "Searching for homologous, please wait a few minutes.">
@@ -428,6 +411,29 @@
     timeoutMs = "-1"
     labelText = "Uploading your data, please wait a few seconds.">
   </mwc-snackbar>
+  <footer>
+    <div class = "footer-column">
+      <div class = "footer-link">
+        <a href = "/user_manual.html">
+          Read user manual
+        </a>
+      </div>
+      <div class = "footer-link">
+        <a href = "/about_us.html">
+          About us
+        </a>
+      </div>
+      <div class = "footer-link">
+        <a onclick = "document.getElementById('citeUsDialog').show()">
+          Cite us
+        </a>
+      </div>
+      <div class = "footer-link">
+        Any questions, please write to vicente.saona@sansano.usm.cl
+      </div>
+    </div>
+  </footer>
+  
   <script>
     document.getElementById("oneOfEach").value = "6";
     document.getElementById("databaseToSearch").value = "refseq_protein.00";

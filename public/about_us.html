@@ -1,0 +1,89 @@
+<title>Genomic context diagram editor</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no">
+  <script src="../mwc_bundle/mwc-material-bundle.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script src="../scripts/genomaData.js"></script>
+  <script src="../scripts/input.js"></script>
+  
+  <link rel="stylesheet" href="../stylesheets/mdc.css">
+  <link rel="stylesheet" href="../stylesheets/input.css">
+  <link rel="stylesheet" href="../stylesheets/about_us.css">
+  <!-- Your application must load the Roboto and Material Icons fonts. -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
+  <link rel="icon" href="/images/favicon.png">
+</head>
+<body>
+<header>
+  <div id = "Explicacion">
+    <mwc-button id = "goBack" label = "Go back" onClick = "window.location.href = '/';">
+    </mwc-button>
+  </div>
+  <div id = "opciones">
+    <mwc-button id = "language" label = "Ver en español">
+    </mwc-button>
+  </div>
+</header>
+  <section class = "profile">
+    <div class = "profile-picture">
+      <img src = "images/Roberto.jpg"/>
+    </div>
+    <div class = "profile-description">
+      <h1> Roberto E. Durán Vargas </h1>
+    <p>
+      Roberto is a Master of Science (M.Sc.) in Biochemistry (Environmental Biochemistry) and Research Assistant at Laboratorio de Microbiología Molecular y Biotecnología Ambiental in Valparaíso, Chile.
+    </p>
+    <p>
+      He has published multiple research jobs in genomic sequence analysis, including:
+      <ul>
+        <li>Genomic and Physiological Traits of the Marine Bacterium Alcaligenes aquatilis QD168 Isolated From Quintero Bay, Central Chile, Reveal a Robust Adaptive Response to Environmental Stressors</li>
+        <li>Complete Genome Sequence of the Marine Hydrocarbon Degrader Alcaligenes aquatilis QD168, Isolated from Crude Oil-Polluted Sediment of Quintero Bay, Central Chile</li>
+        <li>Complete genome sequence of the hydrocarbon-degrading strain Achromobacter sp. B7, isolated during petroleum hydrocarbon bioremediation in the Valparaiso region, Chile</li>
+      </ul>
+    </p>
+    </div>
+  </section>
+  <section class = "profile">
+    <div class = "profile-picture">
+      <img src = "images/Vicente.jpg"/>
+    </div>
+    <div class = "profile-description">
+      <h1> Vicente Saona Urmeneta </h1>
+    <p>
+        Vicente is a Computer Science Student at Universidad Técnica Federico Santa María in Valparaíso, Chile
+    </p>
+    <p>
+        As part of his graduate work, he develpoed this web app. <a target="_blank" href = "https://docs.google.com/document/d/1lx83yeidM0S6Kq7lZNKVljIjSY0Pn8ZB_J-G6baVWug/edit?usp=sharing"> Read his work.</a>
+    </p>
+    </div>
+  </section>
+  <mwc-dialog id = "citeUsDialog" class = "container" heading = "Cite us">
+    Roberto E. Durán, Vicente Saona Urmeneta (2021) "Genomic context diagram editor" Unpublished work, available at http://200.1.19.244:3030/
+    <mwc-button dialogAction = "close" slot = "primaryAction" raised>
+      Close
+    </mwc-button>
+  </mwc-dialog>
+  <footer>
+    <div class = "footer-column">
+      <div class = "footer-link">
+        <a href = "/">
+          Main page
+        </a>
+      </div>
+      <div class = "footer-link">
+        <a href = "/user_manual.html">
+          Read user manual
+        </a>
+      </div>
+      <div class = "footer-link">
+        <a onclick = "document.getElementById('citeUsDialog').show()">
+          Cite us
+        </a>
+      </div>
+      <div class = "footer-link">
+        Any questions, please write to vicente.saona@sansano.usm.cl
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -47,7 +47,7 @@ function assignColors(genomas) {
           colors.push({
             names: [gene.name, gene.product],
             count: 1,
-            color: "#BD3B32"
+            color: "#BD3B32" // "#D60019" corresponde al rojo de la marca USM
           });
         } else {
           colors.push({

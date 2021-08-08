@@ -10,22 +10,29 @@
   <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
 </head>
 <body>
-
-  <mwc-drawer hasHeader>
-    <span slot="title">Index</span>
-    <div>
-      <ul>
-        <li><a href="#Introduction">Introduction</a></li>
-        <li><a href="#BLAST">BLAST</a></li>
-        <li><a href="#MyContexts">My contexts</a></li>
-        <li><a href="#DiagramEdit">Diagram edit</a></li>
-      </ul>
+  <header>
+    <div id = "Explicacion">
+      <mwc-button id = "goBack" label = "Go back" onClick = "window.location.href = '/';">
+      </mwc-button>
     </div>
-    <div slot="appContent">
-      <mwc-top-app-bar>
-          <div slot="title">Genomic context diagram editor</div>
-      </mwc-top-app-bar>
-      <article>
+    <div id = "opciones">
+      <mwc-button id = "language" label = "Ver en español">
+      </mwc-button>
+    </div>
+  </header>
+  <!--<mwc-drawer hasHeader>-->
+    <div style = "padding: 40px;">
+      <article style = "padding: 20px;">
+        <h1> <big> User Manual </big> </h1>
+        <h1>Index</h1>
+        <div>
+          <ul>
+            <li><a href="#Introduction">Introduction</a></li>
+            <li><a href="#BLAST">BLAST</a></li>
+            <li><a href="#MyContexts">My contexts</a></li>
+            <li><a href="#DiagramEdit">Diagram edit</a></li>
+          </ul>
+        </div>
         <h1 id = "Introduction">Introduction</h1>
         <p>
           This app allows you to generate a genomic context diagram. You can use any genome assembly from GenBank and even use your own .gbff files.
@@ -102,7 +109,7 @@
         <p>When you're ready with your diagram, click on the "Download" button to download the diagram as a .svg image file.</p>
       </article>
     </div>
-</mwc-drawer>
+<!--</mwc-drawer>-->
   
     
   </section>
@@ -110,19 +117,18 @@
   <footer>
     <div class = "footer-column">
       <div class = "footer-link">
-        <a href = "/user_manual.html">
-          User manual
+        <a href = "/">
+          Main page
         </a>
       </div>
       <div class = "footer-link">
-        Developed by Durán,R. & Saona, V. on 2021
-        <a>
+        <a href = "/about_us.html">
+          About us
+        </a>
+      </div>
+      <div class = "footer-link">
+        <a onclick = "document.getElementById('citeUsDialog').show()">
           Cite us
-        </a>
-      </div>
-      <div class = "footer-link">
-        <a>
-          Read about how was this built
         </a>
       </div>
       <div class = "footer-link">

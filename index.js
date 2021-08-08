@@ -112,7 +112,7 @@ app.all("/*", function(req, res, next) {
   next();
 });
 
-app.get("/", function(req, res, next) {
+function serveHome(req, res, next) {
   if(req.cookies.drawnDiagram == undefined) {
     if(req.cookies.knowsTutorial == undefined) {
       fs.readFile('./public/index.html', null, function(error,data){
@@ -150,50 +150,57 @@ app.get("/", function(req, res, next) {
     }
   } else {
   }
-});
+}
+app.get("/", serveHome);
 
 app.use(express.static(path.join(process.cwd(), 'public')));
 
 // Esta es la funcion original, responde correctamente a las vistas de Node.
 app.post('/fileUploadAndRender', function(req, res, next) {
-  console.log("DEBUG: POST FUNCTION /fileUpload");
-  var form = new formidable.IncomingForm();
-  form.uploadDir = "./data"
-  form.parse(req, function (err, fields, files){
-    if(err) throw err;
-    console.log("[fileUploadAndRender] form fields");
-    console.log(fields);
-    res.writeHead(200,{'Content-Type':'text/html'});
-    res.write(`<html lang="en">
-    <head>
-      <meta charset="UTF-8">`);
-    res.write("<script> ");
-    res.write("window.contextSources = [");
-    console.log("[fileUploadAndRender] fields[amountOfContexts]");
-    console.log(fields["amountOfContexts"]);
-    for(var j = 0; j < fields["amountOfContexts"]; j++) {
-      if(fields["genomaSourceType" + j] == "file" && files["file" + j].size) {
-        var oldpath = files["file" + j].path;
-        var newpath = './data/' + files["file" + j].name + Date.now();
-        fs.renameSync(oldpath, newpath);
-        res.write((j? `, `: ``) + `{ "type": "file", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j].toUpperCase()}", "locusEnd": "${fields["hasta"+j].toUpperCase()}"}`);    // Todo lo que se necesita saber del formulario
-      } else if(fields["genomaSourceType" + j] == "locus" && fields["locus"+j]) {
-        res.write((j? `, `: ``) + `{ "type": "locus", "locusTag": "${fields["locus"+j].toUpperCase()}", "genesBefore": "${fields["contextoAntes"+j]}", "genesAfter": "${fields["contextoDespues"+j]}"}`);
-      } else if(fields["genomaSourceType" + j] == "accesion" && fields["accesion"+j]) {
-        res.write((j? `, `: ``) + `{ "type": "accesion", "accesion": "${fields["accesion"+j].toUpperCase()}", "locusBegin": "${fields["desde"+j].toUpperCase()}", "locusEnd": "${fields["hasta"+j].toUpperCase()}"}`);
+  try {
+    console.log("DEBUG: POST FUNCTION /fileUpload");
+    var form = new formidable.IncomingForm();
+    form.uploadDir = "./data"
+    form.parse(req, function (err, fields, files){
+      if(err) throw err;
+      console.log("[fileUploadAndRender] form fields");
+      console.log(fields);
+      res.writeHead(200,{'Content-Type':'text/html'});
+      res.write(`<html lang="en">
+      <head>
+        <meta charset="UTF-8">`);
+      res.write("<script> ");
+      res.write("window.contextSources = [");
+      console.log("[fileUploadAndRender] fields[amountOfContexts]");
+      console.log(fields["amountOfContexts"]);
+      for(var j = 0; j < fields["amountOfContexts"]; j++) {
+        if(fields["genomaSourceType" + j] == "file" && files["file" + j].size) {
+          var oldpath = files["file" + j].path;
+          var newpath = './data/' + files["file" + j].name + Date.now();
+          fs.renameSync(oldpath, newpath);
+          res.write((j? `, `: ``) + `{ "type": "file", "fileName": "${newpath}", "locusBegin": "${fields["desde"+j].toUpperCase()}", "locusEnd": "${fields["hasta"+j].toUpperCase()}"}`);    // Todo lo que se necesita saber del formulario
+        } else if(fields["genomaSourceType" + j] == "locus" && fields["locus"+j]) {
+          res.write((j? `, `: ``) + `{ "type": "locus", "locusTag": "${fields["locus"+j].toUpperCase()}", "genesBefore": "${fields["contextoAntes"+j]}", "genesAfter": "${fields["contextoDespues"+j]}"}`);
+        } else if(fields["genomaSourceType" + j] == "accesion" && fields["accesion"+j]) {
+          res.write((j? `, `: ``) + `{ "type": "accesion", "accesion": "${fields["accesion"+j].toUpperCase()}", "locusBegin": "${fields["desde"+j].toUpperCase()}", "locusEnd": "${fields["hasta"+j].toUpperCase()}"}`);
+        }
       }
-    }
-    fs.readFile('./public/render.html', null, function(error,data){
-      res.write(" ]; </script>");
-      if(error){
-        //res.writeHead(404);
-        res.write('File not found!');
-      } else {
-        res.write(data);
-      }
-      res.end();
+      fs.readFile('./public/render.html', null, function(error,data){
+        res.write(" ]; </script>");
+        if(error){
+          //res.writeHead(404);
+          res.write('File not found!');
+        } else {
+          res.write(data);
+        }
+        res.end();
+      });
     });
-  });
+  } catch (ex) {
+    console.log("Unknown error");
+    console.log(ex);
+    res.write("Oops! There's been an unknown error. Please contact the developers.")
+  }
 });
 
 app.post('/processFile', function(req, res, next) {
@@ -487,6 +494,7 @@ app.post('/freeSpace', function(req, res, next) { // We remove files.
   }
   res.end();
 });
+app.use(serveHome);
 app.listen(PORT, function () {
   console.log('Listening on port ' + PORT);
 });
