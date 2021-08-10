@@ -332,14 +332,15 @@ function redraw(genoma, y, el) {
             start = gene.start;
             end = gene.end;
         }
+        let g6 = genomaHeight/(2*2*1.61803398874);
         if (arrowStyle == "triangle") {
             arrow.attr("points", start+","+(y - genomaHeight/4)+" "+start+","+(y + genomaHeight/4)+" "+end+","+y);
         } else if (arrowStyle == "tag") {
             middle = (start + end * 3) / 4;
-            arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+end+","+y+" "+middle+","+(y - genomaHeight/6));
+            arrow.attr("points", start+","+(y - g6)+" "+start+","+(y + g6)+" "+middle+","+(y + g6)+" "+end+","+y+" "+middle+","+(y - g6));
         } else {
             middle = (start + end * 3) / 4
-            arrow.attr("points", start+","+(y - genomaHeight/6)+" "+start+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - genomaHeight/6));
+            arrow.attr("points", start+","+(y - g6)+" "+start+","+(y + g6)+" "+middle+","+(y + g6)+" "+middle+","+(y + genomaHeight/4)+" "+end+","+y+" "+middle+","+(y - genomaHeight/4)+" "+middle+","+(y - g6));
         }
         var textTag = d3.select(this).select("text");
         var textTagX = (start + end) / 2 - (Math.abs(end-start))/3;
