@@ -40,7 +40,7 @@
                     id = "zoomBar"
                     step="10"
                     pin
-                    min="50"
+                    min="20"
                     max="500"
                     value="100"
                     onchange = "zoom(this.value)">
@@ -65,6 +65,7 @@
                 label = "Stroke width"
                 type = "number"
                 value = "0"
+                step = "5"
 		        min = "0"
                 oninput = "updateStrokeWidth(this)">
             </mwc-textfield>
@@ -79,9 +80,9 @@
                 oninput = "updateOpacity(this)">
             </mwc-textfield>-->
             <mwc-select outlined label="Arrow style" id = "arrowStyleSelector" onchange = "updateArrowStyle(this)">
-                <mwc-list-item value="arrow">Arrows</mwc-list-item>
-                <mwc-list-item value="triangle">Triangles</mwc-list-item>
-                <mwc-list-item value="tag">Tags</mwc-list-item>
+                <mwc-list-item value = "arrow"   > Arrows    </mwc-list-item>
+                <mwc-list-item value = "triangle"> Triangles </mwc-list-item>
+                <mwc-list-item value = "tag"     > Tags      </mwc-list-item>
             </mwc-select>
             <mwc-button
                 id = "geneHideButton"
@@ -97,7 +98,7 @@
                 class = "invisible"
                 onclick = "hideGene(false)">
             </mwc-button>
-            <mwc-button raised onclick = "setInterestGene()"> Align this gene </mwc-button>
+            <mwc-button id = "alignGeneButton" raised onclick = "setInterestGene()"> Align this gene </mwc-button>
         </div>
         <div id = "arrowTextToolBar" class = "invisible toolBar">
             <mwc-textfield
@@ -105,6 +106,7 @@
                 outlined
                 label = "Font size"
                 value = "24"
+                step = "10"
                 type = "number"
                 oninput = "updateGeneFontSize(this)">
             </mwc-textfield>
@@ -122,6 +124,7 @@
                 outlined
                 label = "Font size"
                 value = "24"
+                step = "10"
                 type = "number"
                 oninput = "updateGenomaFontSize(this)">
             </mwc-textfield>
@@ -138,6 +141,7 @@
                 outlined
                 label = "Midline Width"
                 type = "number"
+                step = "10"
                 value = ""
                 oninput = "updateMidLineWidth(this)">
             </mwc-textfield>
@@ -246,7 +250,7 @@
                 </span>
             </div>
         </div>
-        <div id = "invitationToEditData" class = "data">
+        <div id = "invitationToEditData" class = "invisible data" style = "border: none;">
             <div id = "invitation" style= "margin: 20px; text-align: center;">
                 Click anywhere in the diagram to edit.
             </div>
@@ -265,6 +269,7 @@
                 drawAll(genomas);
                 document.getElementById("Rendering").close();
                 document.getElementById("imageToolBar").classList.remove("invisible");
+                document.getElementById("invitationToEditData").classList.remove("invisible");
             }
 
             ["#arrowStrokeWidthMwcTextField", "#geneFontSize", "#genomaTextSizeInput", "#midLineWidth"]

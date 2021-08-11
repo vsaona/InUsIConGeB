@@ -112,7 +112,7 @@
             <div>
               <input id = "fileSelectButtonSearchSource" onChange = "updateFileName(this.value, 'SearchSource')" type="file" class="form-control-file" name="fileSearchSource" style="opacity: 0; margin-bottom: -100%;">
             </div>
-            <mwc-button onclick = "selectFile('SearchSource')" label = "Browse file" outlined></mwc-button>
+            <mwc-button id = "fileSearchSourceButton" onclick = "selectFile('SearchSource')" label = "Browse file" outlined></mwc-button>
             <div id = "fileNameSearchSource" lang="en"> No file selected </div>
           </span>
           <mwc-textfield
@@ -187,7 +187,7 @@
               id = "includeOnly"
               label="Taxonomic group"
               class = "formData"
-              pattern = "\w*"> <!-- Autocompletar -->
+              pattern = "\s*\w*(\s\w+)?\s*"> <!-- Autocompletar -->
             </mwc-textfield> <!-- blastp -taxids  -->
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
               Search only subjects from a determined taxonomic group (examples: Bacteria, Betaproteobacteria)
@@ -282,7 +282,7 @@
     </div>
     <input type="submit" class="submitInput" style = "opacity: 0;" id = "submitSearchHomologous" onClick = "document.getElementById('blastSearch').show();">
     <div>
-      <mwc-button id="blastDrawItButton" label="Draw it!" raised onclick = "document.getElementById(document.getElementById('tab-bar').activeIndex?'submitMyContexts':'submitSearchHomologous').click();"></mwc-button>
+      <mwc-button id="blastDrawItButton" label="Draw it!" raised onclick = "checkAndSend()"></mwc-button>
       <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
         Generate the genomic context graphic using the specified contexts.
       </span> </span>
@@ -410,6 +410,10 @@
   <mwc-snackbar id = "upload"
     timeoutMs = "-1"
     labelText = "Uploading your data, please wait a few seconds.">
+  </mwc-snackbar>
+  <mwc-snackbar id = "errorSnackbar"
+    timeoutMs = "4000"
+    labelText = "Something's odd here.">
   </mwc-snackbar>
   <footer>
     <div class = "footer-column">

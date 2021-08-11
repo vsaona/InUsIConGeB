@@ -44,6 +44,7 @@
         <p>
           You may do a BLAST search for homologous genes, and we'll draw the results in their respective contexts.
         </p>
+        <img src = "images/tutorial3.png" style = "height: 70vh">
         <p>
           See all about the genes, edit your drawing colors, shapes, and show the information you want to show.
         </p>
@@ -54,8 +55,8 @@
   
         <h1 id = "BLAST">BLAST</h1>
         <p>
-          BLAST finds regions of similarity between biological sequences.
-          The program compares nucleotide or protein sequences to sequence databases and calculates the statistical significance.
+          BLAST (Basic Local Alignment Search Tool) finds regions of similarity between biological sequences.
+          The program compares protein sequences to sequence databases and calculates the statistical significance.
           We are using <a href = "https://blast.ncbi.nlm.nih.gov/Blast.cgi"> NCBI's implementation of protein BLAST </a>
         </p>
         <h2> Specifying your query </h2>
@@ -85,10 +86,10 @@
           You may specify the database to use for the search. This means the program will show you the best matches from all the genes in that particular database.
         </p>
         <p>
-          "One of each" limits the results to not have two (nor more) of the specified taxonomic group. That is, if you say "One of each class", and the best match is from a Paraburkholderia xenovorans assembly (Betaproteobacteria class), and the second best match is from a Pseudoxanthomonas spadix assembly (Betaproteobacteria class), it will show only the Xenovorans' gene context.
+          "Include only" limits the results to a certain taxonomic group. That is, if you say "Include only Xanthomonadales", and the best match is from a Paraburkholderia xenovorans (Burkholderiales) assembly, it won't be shown.
         </p>
         <p>
-          "Include only" limits the results to a certain taxonomic group. That is, if you say "Include only Xanthomonadales", and the best match is from a Paraburkholderia xenovorans (Burkholderiales) assembly, it won't be shown.
+          "One of each" limits the results to not have two (nor more) of the specified taxonomic group. That is, if you say "One of each class", and the best match is from a Paraburkholderia xenovorans assembly (Betaproteobacteria class), and the second best match is from a Pseudoxanthomonas spadix assembly (Betaproteobacteria class), it will show only the Xenovorans' gene context.
         </p>
         <p>
           Both "Minimum identity" and "Minimum coverage" limit the results. If these number are too high, it is possible to have less results drawn that the number specified in "Best X matches".
@@ -105,6 +106,7 @@
         <p>Click on the gene tag to change the text or font size.</p>
         <p>Click on the gene itself (the arrow) to change the color, shape, border width or put that gene in the center of the image.</p>
         <p>Click on the assembly tag to change the text or font size. You'll also see general data aboout the assembly.</p>
+        <p>Both gene tags and assembly tags are draggable. This means you can drag them around to change their position. Use this if two tags are too close, or if you want to give your diagram an unique look.</p>
         <img src = "images/tutorial3.png" style = "height: 70vh">
         <p>When you're ready with your diagram, click on the "Download" button to download the diagram as a .svg image file.</p>
       </article>
@@ -114,6 +116,13 @@
     
   </section>
 
+  <mwc-dialog id = "citeUsDialog" class = "container" heading = "Cite us">
+    Roberto E. Durán, Vicente Saona Urmeneta (2021) "Genomic context diagram editor" Unpublished work, available at http://200.1.19.244:3030/
+    <mwc-button dialogAction = "close" slot = "primaryAction" raised>
+      Close
+    </mwc-button>
+  </mwc-dialog>
+  
   <footer>
     <div class = "footer-column">
       <div class = "footer-link">

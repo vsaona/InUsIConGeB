@@ -34,8 +34,8 @@ text:active {
   max-width: none;
 }
 .canvas {
-  width: auto;
-  height: 70vh;
+  width: 100%;
+  height: auto;
 }
 
 .toolBar {
@@ -82,7 +82,6 @@ text:active {
 .data {
   display: -webkit-flex;
   display: flex;
-  max-width: none;
   flex-direction: column;
   border: solid #6200EE;
   border-radius: 20px;

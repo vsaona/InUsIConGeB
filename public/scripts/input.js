@@ -143,3 +143,76 @@ function handleSearchDrop(e) {
     this.getElementsByClassName("form-control-file")[0].onchange();
   }
 }
+
+function checkAndSend() {
+  if(!document.getElementById('tab-bar').activeIndex) {
+    var sourceType = document.getElementById('genomaSearchSourceType').value;
+    if(sourceType == "file") {
+      if(!document.getElementById("fileSelectButtonSearchSource").files.length) {
+        document.getElementById("errorSnackbar").labelText = "You should specify your query first.";
+        document.getElementById("errorSnackbar").show();
+        document.getElementById("fileSearchSourceButton").focus();
+        return;
+      }
+      if(!document.getElementById("searchFileLocusTag").value || !document.getElementById("searchFileLocusTag").checkValidity()) {
+        document.getElementById("errorSnackbar").labelText = "You should specify your query sequence first.";
+        document.getElementById("errorSnackbar").show();
+        document.getElementById("searchFileLocusTag").focus();
+        return;
+      }
+    } else if(sourceType == "accesion") {
+      if(!document.getElementById("accesionSearchSource").value || !document.getElementById("accesionSearchSource").checkValidity()) {
+        document.getElementById("errorSnackbar").labelText = "You should specify your query first.";
+        document.getElementById("errorSnackbar").show();
+        document.getElementById("accesionSearchSource").focus();
+        return;
+      } else if(!document.getElementById("searchFileLocusTag").value || !document.getElementById("searchFileLocusTag").checkValidity()) {
+        document.getElementById("errorSnackbar").labelText = "You should specify your query sequence first.";
+        document.getElementById("errorSnackbar").show();
+        document.getElementById("searchFileLocusTag").focus();
+        return;
+      }
+    } else if(sourceType == "fasta") {
+      if(!document.getElementById("fastaSearchSource").value) {
+        document.getElementById("errorSnackbar").labelText = "You should specify your query sequence first.";
+        document.getElementById("errorSnackbar").show();
+        document.getElementById("fastaSearchSource").focus();
+        
+        return;
+      }
+    }
+    if(!document.getElementById("contextsQuantity").checkValidity()) {
+      document.getElementById("errorSnackbar").labelText = "This is not a valid number!";
+      document.getElementById("errorSnackbar").show();
+      document.getElementById("contextsQuantity").focus();
+      return;
+    } else if(document.getElementById("useIncludeOnly").checked && !document.getElementById("includeOnly").checkValidity()) {
+      document.getElementById("errorSnackbar").labelText = "Insert only one Taxonomic group!";
+      document.getElementById("errorSnackbar").show();
+      document.getElementById("includeOnly").focus();
+      return;
+    } else if(!document.getElementById("minCoverage").checkValidity()) {
+      document.getElementById("errorSnackbar").labelText = "This is not a valid percentage!";
+      document.getElementById("errorSnackbar").show();
+      document.getElementById("minCoverage").focus();
+      return;
+    } else if(!document.getElementById("minIdentity").checkValidity()) {
+      document.getElementById("errorSnackbar").labelText = "This is not a valid percentage!";
+      document.getElementById("errorSnackbar").show();
+      document.getElementById("minIdentity").focus();
+      return;
+    }
+    document.getElementById('submitSearchHomologous').click();
+  } else {
+    var tab = document.getElementById('genomaList').getElementsByTagName("mwc-textfield")
+    for(let field of tab) {
+      if(!field.checkValidity()) {
+        document.getElementById("errorSnackbar").labelText = "There is something wrong!";
+      document.getElementById("errorSnackbar").show();
+        field.focus();
+        return;
+      }
+    }
+    document.getElementById('submitMyContexts').click();
+  }
+}

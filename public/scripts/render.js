@@ -428,8 +428,12 @@ function drawAll(genomas) {
     // Setting viewbox
     var begin = minStart - 100;
     var width = maxEnd + 10 - begin + 20 * fontSize;
-    viewBox = [begin, (-(genomaHeight)), width, (genomaHeight*(genomas.length + 1.5))];
+    var height = (genomaHeight*(genomas.length + 1.5));
+    viewBox = [begin, (-(genomaHeight)), width, height];
     document.getElementById("canvas").setAttribute("viewBox", ""+viewBox[0]+" "+viewBox[1]+" "+viewBox[2]+" "+viewBox[3]);
+    if(width / height > 10) {
+        zoom("50");
+    }
     return(true);
 }
 
