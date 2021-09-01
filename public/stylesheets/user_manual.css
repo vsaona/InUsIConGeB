@@ -87,10 +87,11 @@ footer {
   margin: 5px;
 }
 
-a {
+.footer-link a {
   margin: 0;
   color: #A2A0FF;
   text-decoration: underline;
+  cursor: pointer;
 }
   
 /* Responsive layout - makes the menu and the content (inside the section) sit on top of each other instead of next to each other */

@@ -54,14 +54,6 @@ function changeGenomaSource(value, id) {
       extraDataSpace.style.width = "0px";
     }
   }
-  for (let el of element.children[0].children) {
-    if (el.classList.contains("genomaSpec")) {
-      el.classList.add("invisible");
-      if (el.classList.contains(value)) {
-        el.classList.remove("invisible");
-      }
-    }
-  }
   for (let el of element.getElementsByClassName("extraInput")[0].children) {
     el.classList.add("invisible");
     if ((value == "file" || value == "accesion") && el.classList.contains("genomaBoundaries")) {
@@ -75,6 +67,16 @@ function changeGenomaSource(value, id) {
     textFields[i].focus();
     textFields[i].blur();
   }
+  for (let el of element.children[0].children) {
+    if (el.classList.contains("genomaSpec")) {
+      el.classList.add("invisible");
+      if (el.classList.contains(value)) {
+        el.classList.remove("invisible");
+        el.focus();
+      }
+    }
+  }
+  
 }
 
 function selectFile(id) {

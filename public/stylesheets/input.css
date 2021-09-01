@@ -176,7 +176,7 @@ footer {
     margin: 0;
 }
 
-a {
+.footer-link a {
     margin: 0;
     color: #A2A0FF;
     text-decoration: underline;
