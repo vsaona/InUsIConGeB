@@ -429,7 +429,7 @@ app.post('/searchAndDraw', function(req, res, next) {
         res.writeHead(message.errorCode,{'Content-Type':'text/html'});
         res.write(`<html lang="en"> <head><meta charset="UTF-8"></head>
           <body><h2>Error</h2>
-          <p> ${message.error}</p>`
+          <p> ${message.errorMessage}</p>`
         );
         res.end();
       } else {
