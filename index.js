@@ -160,9 +160,9 @@ app.post('/fileUploadAndRender', function(req, res, next) {
   try {
     console.log("DEBUG: POST FUNCTION /fileUpload");
     var form = new formidable.IncomingForm();
-    form.uploadDir = "./data"
+    form.uploadDir = "./data";
     form.parse(req, function (err, fields, files){
-      if(err) throw err;
+      if(err) return; // throw err;
       console.log("[fileUploadAndRender] form fields");
       console.log(fields);
       res.writeHead(200,{'Content-Type':'text/html'});
@@ -174,6 +174,10 @@ app.post('/fileUploadAndRender', function(req, res, next) {
       console.log("[fileUploadAndRender] fields[amountOfContexts]");
       console.log(fields["amountOfContexts"]);
       for(var j = 0; j < fields["amountOfContexts"]; j++) {
+        fields["desde"+j] = fields["desde"+j] || "";
+        fields["hasta"+j] = fields["hasta"+j] || "";
+        fields["contextoAntes"+j] = fields["contextoAntes"+j] || "5";
+        fields["contextoDespues"+j] = fields["contextoDespues"+j] || "5";
         if(fields["genomaSourceType" + j] == "file" && files["file" + j].size) {
           var oldpath = files["file" + j].path;
           var newpath = './data/' + files["file" + j].name + Date.now();
@@ -349,6 +353,7 @@ app.post('/processFile', function(req, res, next) {
             json["end"] = end;
             if(lastJson) {
               genes.push(lastJson);
+              //console.log(lastJson);
             }
           }
           json["complement"] = array[i].includes("complement(" + length + ")");
