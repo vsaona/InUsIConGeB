@@ -3,24 +3,6 @@ import colorsys from "colorsys";
 import shelljs from "shelljs";
 import readlines from "n-readlines";
 
-function download_gbff(fileName) {
-  try {
-    if (!fs.existsSync(fileName)) {
-      console.log("[ProcessFile] Downloading " + fileName);
-      console.log(`wget -r -l 0 https://${fileName.substring(9)}.gz -O ${fileName}.gz`);
-      process.chdir('../blast');
-      console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz`).stdout);
-      console.log(shelljs.exec(`gzip --decompress --force ${fileName}.gz`).stdout);
-    }
-    return(true);
-  } catch(err) {
-    console.error(err);
-    return(false);
-  } finally {
-    process.chdir('../InUsIConGeB');
-  }
-}
-
 function assignColors(genomas) {
   var DifferentColors = 0;
   var names = [];
@@ -101,6 +83,14 @@ function searchAndDraw(fields, files)
       }
       var line;
       while (line = liner.next()) {
+        /*Integrate
+          getGenomebyLocus(
+          lower_limit: Float!
+          upper_limit: Float!
+          locus_tag: String!
+          assembly_accession: String
+        ): Genome
+        */
         line = line.toString("UTF-8");
         if(line.match(fields["accesionSearchSource"])) {
           var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
