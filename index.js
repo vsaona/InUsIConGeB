@@ -189,7 +189,7 @@ app.post('/fileUploadAndRender', function(req, res, next) {
           res.write((j? `, `: ``) + `{ "type": "accesion", "accesion": "${fields["accesion"+j].toUpperCase()}", "locusBegin": "${fields["desde"+j].toUpperCase()}", "locusEnd": "${fields["hasta"+j].toUpperCase()}"}`);
         }
       }
-      fs.readFile('./public/render.html', null, function(error,data){
+      fs.readFile('./public/render200.html', null, function(error,data){
         res.write(" ]; </script>");
         if(error){
           //res.writeHead(404);
