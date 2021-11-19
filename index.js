@@ -220,6 +220,17 @@ app.post('/processFile', function(req, res, next) {
       var liner;
       var genomaName; var genomaDefinition = null ; var genomaAccession = null;
       if(contextSources[j]["type"] == "accesion") {
+        fetch('http://localhost:4002/graphql', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            "query": `query { getGenomebyAccession(accession: "${contextSources[j]["accesion"]}", locus_start: "${contextSources[j]["locusBegin"]}", locus_end: "${contextSources[j]["locusEnd"]}") { _id definition assembly_info{taxid specie submitter ftp_rpt} features{ _id location key mobile_element_type locus_tag gene product translation genome_accession } }}`
+        })
+        }).then(r => r.json())
+          .then(data => console.log('data returned:', data));
         liner = new readlines("../blast/assembly_summary_refseq.txt");
         if(contextSources[j]["accesion"].includes("GCA")) {
           liner = new readlines("../blast/assembly_summary_genbank.txt");

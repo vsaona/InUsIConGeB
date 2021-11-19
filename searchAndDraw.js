@@ -3,6 +3,24 @@ import colorsys from "colorsys";
 import shelljs from "shelljs";
 import readlines from "n-readlines";
 
+function download_gbff(fileName) {
+  try {
+    if (!fs.existsSync(fileName)) {
+      console.log("[ProcessFile] Downloading " + fileName);
+      console.log(`wget -r -l 0 https://${fileName.substring(9)}.gz -O ${fileName}.gz`);
+      process.chdir('../blast');
+      console.log(shelljs.exec(`wget -r -l 0 https://${fileName.substring(9)}.gz`).stdout);
+      console.log(shelljs.exec(`gzip --decompress --force ${fileName}.gz`).stdout);
+    }
+    return(true);
+  } catch(err) {
+    console.error(err);
+    return(false);
+  } finally {
+    process.chdir('../InUsIConGeB');
+  }
+}
+
 function assignColors(genomas) {
   var DifferentColors = 0;
   var names = [];
@@ -168,8 +186,8 @@ function searchAndDraw(fields, files)
     console.log("BLAST command")
     var db = fields["databaseToSearch"];
     console.log(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
-    shelljs.exec(`blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
-    // shelljs.exec(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
+    // shelljs.exec(`blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
+    shelljs.exec(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
     shelljs.exec("rm blast_inputs/" + identifier + ".fas");
 
     var liner = new readlines(outFileName);
