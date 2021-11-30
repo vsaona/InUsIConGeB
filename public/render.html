@@ -280,6 +280,20 @@
                     alert("We are sorry, but we have nothing to show you.\nPlease check your query or go read the documentation.");
                     document.getElementById("goBackInCaseOfErrorDiv").classList.remove("invisible");
                 } else {
+                    for(var i = 0; i < genomas.length; i++) {
+                        for(var j = 0; j < genomas[i].genes.length; j++) {
+                            if(!genomas[i].genes[j].start) {
+                                
+                                genomas[i].genes[j].start = genomas[i].genes[j].location.match(/\d+/g)[0];
+                                genomas[i].genes[j].end = genomas[i].genes[j].location.match(/\d+/g)[1];
+                                if(genomas[i].genes[j].location.match(/^.*join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)) {
+                                    var length = genomas[i].genes[j].location.match(/(?<=^.*)join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)[0];
+                                    genomas[i].genes[j].start = length.match(/\d+/g)[0];
+                                    genomas[i].genes[j].end = length.match(/\d+/g)[3];
+                                }
+                            }
+                        }
+                    }
                     drawAll(genomas);
                     document.getElementById("Rendering").close();
                     document.getElementById("imageToolBar").classList.remove("invisible");

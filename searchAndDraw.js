@@ -186,8 +186,8 @@ function searchAndDraw(fields, files)
     console.log("BLAST command")
     var db = fields["databaseToSearch"];
     console.log(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
-    // shelljs.exec(`blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
-    shelljs.exec(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
+    shelljs.exec(`blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
+    // shelljs.exec(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
     shelljs.exec("rm blast_inputs/" + identifier + ".fas");
 
     var liner = new readlines(outFileName);

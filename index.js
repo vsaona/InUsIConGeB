@@ -8,8 +8,71 @@ import shelljs from "shelljs";
 import readlines from "n-readlines";
 import child_process from "child_process";
 import cookieParser from "cookie-parser";
+import http from 'http';
 
 const PORT = 3030;
+
+function getGenome(type, identifier, beggining, ending, retries=10) {
+  var query = "";
+  switch(type) {
+    case "assembly":
+      query = `query { getGenomebyAssembly(assembly_accession: "${identifier}",
+          locus_start: "${beggining}", locus_end: "${ending}")`;
+      break;
+    case "accession":
+      query = `query { getGenomebyAccession(accession: "${identifier}",
+          locus_start: "${beggining}", locus_end: "${ending}")`;
+      break;
+    case "locus":
+      query = `query { getGenomebyLocus(locus_tag: "${identifier}",
+          lower_limit: "${beggining}", upper_limit: "${ending}")`;
+      break;
+  }
+  var data = new TextEncoder().encode(
+    JSON.stringify({
+      "query": query + `
+      { _id definition assembly_info{taxid specie submitter ftp_rpt}
+      features{ location key mobile_element_type locus_tag gene product translation genome_accession } }}`
+    })
+  );
+  console.log("data");
+  console.log(new TextDecoder().decode(data));
+  var promise = new Promise((resolve, reject) => {
+    var graphReq = http.request({
+      hostname: 'localhost',
+      port: 4002,
+      path: '/graphql',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    }, res => {
+      console.log(`statusCode: ${res.statusCode}`);
+      res.on('data', d => {
+        d = JSON.parse(d);
+        if(d.data && d.data.getGenomebyAssembly) {
+          console.log("Resolved!");
+          resolve(d.data.getGenomebyAssembly);
+        } else if(retries && d.errors && d.errors[0] && d.errors[0].message && (d.errors[0].message == "Genome not found in db but being processed" || d.errors[0].message == "Genome is being processed")) {
+          getGenome(type, identifier, beggining, ending, retries).then( (answer) => {resolve(answer);})
+          //resolve( d.errors);//getGenome(type, identifier, beggining, ending, retries--));
+        } else {
+          reject("Couldn't get the genome");
+        }
+      })
+    })
+    graphReq.on('error', error => {
+      console.log("GraphQl error type 1");
+      reject(error);
+    });
+    
+    graphReq.write(data);
+    graphReq.end();
+  });
+  return(promise);
+
+}
 
 /* I wish there was a more efficient way to do this, I would like to re-think this.
  * Probably integrating it with the rest of the analysis would help.
@@ -219,18 +282,35 @@ app.post('/processFile', function(req, res, next) {
       var thisFtpPath; var thisTaxid; var thisSubmitter;
       var liner;
       var genomaName; var genomaDefinition = null ; var genomaAccession = null;
-      if(contextSources[j]["type"] == "accesion") {
-        fetch('http://localhost:4002/graphql', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            "query": `query { getGenomebyAccession(accession: "${contextSources[j]["accesion"]}", locus_start: "${contextSources[j]["locusBegin"]}", locus_end: "${contextSources[j]["locusEnd"]}") { _id definition assembly_info{taxid specie submitter ftp_rpt} features{ _id location key mobile_element_type locus_tag gene product translation genome_accession } }}`
-        })
-        }).then(r => r.json())
-          .then(data => console.log('data returned:', data));
+      var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/); // TODO: What if one is region and the other is locus tag? (begin - end)
+      if(contextSources[j]["type"] == "accesion" && !isRegionSpecified) {
+
+        var genome = getGenome("assembly", contextSources[j]["accesion"], contextSources[j]["locusBegin"], contextSources[j]["locusEnd"]).then( (data) => {
+
+          // Here we will merge features that refer to the same gene. Example: gene and CDS
+          var realFeatures = [data.features[0]];
+          var j = 0;
+          for(var i = 0; i < data.features.length; i++) {
+            if(realFeatures[j].location == data.features[i].location) {
+              realFeatures[j] = {...(realFeatures[j]), ...(data.features[i])};
+            } else {
+              realFeatures.push(data.features[i]);
+              j++;
+            }
+            realFeatures[j].name = realFeatures[j].gene || realFeatures[j].locus_tag;
+          }
+
+          genomas.push({genes: realFeatures, name: data.assembly_info.specie, definition: data.definition, accesion: data._id, ftpPath: data.assembly_info.ftp_rpt, taxid: data.assembly_info.taxid, submitter: data.assembly_info.submitter});
+          console.log("todo bien");
+          if(genomas.length == contextSources.length) {
+            res.json({genomas: assignColors(genomas), error: thereIsAnError});
+          }
+          //console.log(data);
+        }).catch((error) => {
+          console.log("There's been an error");
+          console.log(error);
+        });
+      } else if(contextSources[j]["type"] == "accesion") {
         liner = new readlines("../blast/assembly_summary_refseq.txt");
         if(contextSources[j]["accesion"].includes("GCA")) {
           liner = new readlines("../blast/assembly_summary_genbank.txt");
@@ -252,177 +332,188 @@ app.post('/processFile', function(req, res, next) {
         }
         liner.close();
       }
+      if(contextSources[j]["type"] == "file" || isRegionSpecified) {
 
-      var contents = "";
-      var line;
-      console.log("[processFile] contextSources");
-      console.log(contextSources);
-    
-      var interestGenes = false;
-      var lastGene = false;
-      var postLastGene = false;
-      liner = new readlines(contextSources[j]["fileName"]);
-      var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
-      genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
-      var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/); // TODO: What if one is region and the other is locus tag? (begin - end)
-      if(isRegionSpecified) {
-        contextSources[j]["locusBegin"] = parseInt(contextSources[j]["locusBegin"]);
-        contextSources[j]["locusEnd"] = parseInt(contextSources[j]["locusEnd"]);
-      }
-      while (line = liner.next()) {
-        line = line.toString("UTF-8");
+        var contents = "";
+        var line;
+        console.log("[processFile] contextSources");
+        console.log(contextSources);
+      
+        var interestGenes = false;
+        var lastGene = false;
+        var postLastGene = false;
+        liner = new readlines(contextSources[j]["fileName"]);
+        var fileName = contextSources[j]["fileName"].split("/")[contextSources[j]["fileName"].split("/").length - 1];
+        genomaName = fileName.split(".").slice(0, fileName.split(".").length - 1).join('');
+        
+        if(isRegionSpecified) {
+          contextSources[j]["locusBegin"] = parseInt(contextSources[j]["locusBegin"]);
+          contextSources[j]["locusEnd"] = parseInt(contextSources[j]["locusEnd"]);
+        }
+        while (line = liner.next()) {
+          line = line.toString("UTF-8");
 
-        // Extracting key data from the genoma
-        if(line.match(/\s*ORGANISM\s+(.*)/))
-          genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
-        else if(line.match(/\s*DEFINITION\s+(.*)/))
-          genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
-        else if(line.match(/\s*ACCESSION\s+(.*)/))
-          genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
+          // Extracting key data from the genoma
+          if(line.match(/\s*ORGANISM\s+(.*)/))
+            genomaName = line.match(/\s*ORGANISM\s+(.*)/)[1];
+          else if(line.match(/\s*DEFINITION\s+(.*)/))
+            genomaDefinition = line.match(/\s*DEFINITION\s+(.*)/)[1];
+          else if(line.match(/\s*ACCESSION\s+(.*)/))
+            genomaAccession = line.match(/\s*ACCESSION\s+(.*)/)[1];
 
-        // Extracting genes data
-        if(!isRegionSpecified) {
-          
-          if(!interestGenes) {
-            contents = contents + line + "\n";
-            if(contextSources[j]["locusBegin"] && line.includes(contextSources[j]["locusBegin"])) {
-              interestGenes = true;
-            } else if(!contextSources[j]["locusBegin"] && line.match(/^..\s{3}\w+\s{2}/)) {
-              if(!line.match(/^..\s{3}(source\s{10}|region\s{10}|protocluster\s{3}|proto_core\s{5}|cand_cluster\s{3}|Misc\s{11})/)) {
-                contents = line + "\n";
-                interestGenes = true;
-              }
-            } else if(line.match(/^..\s{3}\w+\s{2}.*\d+\.\./)){
-              contents = line + "\n";
-            }
-          } else {
-            if(contextSources[j]["locusEnd"] && line.includes(contextSources[j]["locusEnd"])) {
+          // Extracting genes data
+          if(!isRegionSpecified) {
+            
+            if(!interestGenes) {
               contents = contents + line + "\n";
-              lastGene = true;
-            } else if(lastGene && (line.match(/^..\s{3}\w+\s{2}/) || line.match(/^..[^\s]/))) {
-              
-              if(line.match(/^..\s{3}\w+\s{2}/) && !contents.includes(line.substring(20))){
+              if(contextSources[j]["locusBegin"] && line.includes(contextSources[j]["locusBegin"])) {
+                interestGenes = true;
+              } else if(!contextSources[j]["locusBegin"] && line.match(/^..\s{3}\w+\s{2}/)) {
+                if(!line.match(/^..\s{3}(source\s{10}|region\s{10}|protocluster\s{3}|proto_core\s{5}|cand_cluster\s{3}|Misc\s{11})/)) {
+                  contents = line + "\n";
+                  interestGenes = true;
+                }
+              } else if(line.match(/^..\s{3}\w+\s{2}.*\d+\.\./)){
+                contents = line + "\n";
+              }
+            } else {
+              if(contextSources[j]["locusEnd"] && line.includes(contextSources[j]["locusEnd"])) {
+                contents = contents + line + "\n";
+                lastGene = true;
+              } else if(lastGene && (line.match(/^..\s{3}\w+\s{2}/) || line.match(/^..[^\s]/))) {
+                
+                if(line.match(/^..\s{3}\w+\s{2}/) && !contents.includes(line.substring(20))){
+                  break;
+                }
+                contents = contents + line + "\n";
+              } else if(line.match(/^..[^\s]/) || line.match(/^\/\//)) {
                 break;
-              }
-              contents = contents + line + "\n";
-            } else if(line.match(/^..[^\s]/) || line.match(/^\/\//)) {
-              break;
-            } else {
-              contents = contents + line + "\n";
-            }
-          }
-        } else {
-          var featureDefinition = line.match(/^..\s{3}\w+\s{2}.*?(\d+)\.\.(?:\d+\s,\s\d+\.\.)?(\d+)/);
-          if(!interestGenes) {
-            if(featureDefinition) {
-              if(parseInt(featureDefinition[1]) >= contextSources[j]["locusBegin"]) {
-                interestGenes = true;
-                contents = line + "\n";
+              } else {
+                contents = contents + line + "\n";
               }
             }
           } else {
-            if(featureDefinition && parseInt(featureDefinition[2]) > contextSources[j]["locusEnd"]) {
-              interestGenes = false;
-              break;
+            var featureDefinition = line.match(/^..\s{3}\w+\s{2}.*?(\d+)\.\.(?:\d+\s,\s\d+\.\.)?(\d+)/);
+            if(!interestGenes) {
+              if(featureDefinition) {
+                if(parseInt(featureDefinition[1]) >= contextSources[j]["locusBegin"]) {
+                  interestGenes = true;
+                  contents = line + "\n";
+                }
+              }
             } else {
-              contents = contents + line + "\n";
+              if(featureDefinition && parseInt(featureDefinition[2]) > contextSources[j]["locusEnd"]) {
+                interestGenes = false;
+                break;
+              } else {
+                contents = contents + line + "\n";
+              }
             }
           }
         }
-      }
-      genomaDefinition = genomaDefinition ?? genomaName;
-      genomaAccession = genomaAccession ?? "";
-      var array = contents.split(/\n(?=..\s{3}\w+\s{2})/g); // \u0020 -> caracter espacio
-      var genes = [];
-      /*console.log("\n\n\nContents:");
-      console.log(contents);
-      console.log("Contents end\n\n\n");*/
-      if(contents.match(/$\s+^/)) {
-        thereIsAnError = thereIsAnError + " ; " + `Error con ${genomaName}: No se han encontrado los locus tag especificados.`;
-        continue;
-      }
-      var lastJson = null;
-      for(var i = 0; i < array.length;i++){
-        var json = {};
-        var fields = array[i].match(/.+/g);
-        if (fields != null){
-          if(array[i].match(/..\s{10,}\/pseudo/)) {
-            continue;
-          }
-          var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g)[0];
-          var start = length.match(/\d+/g)[0];
-          var end = length.match(/\d+/g)[1];
-          if(array[i].match(/^.*join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)) {
-            length = array[i].match(/(?<=^.*)join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)[0];
-            start = length.match(/\d+/g)[0];
-            end = length.match(/\d+/g)[3];
-          }
-          if(lastJson && start === lastJson.start && end === lastJson.end) {
-            json = {...json, ...lastJson};
-          } else {
-            json["start"] = start;
-            json["end"] = end;
-            if(lastJson) {
-              genes.push(lastJson);
-              //console.log(lastJson);
-            }
-          }
-          json["complement"] = array[i].includes("complement(" + length + ")");
-
-          // We extract the data for showing outside the graphic
-          var inference = array[i].match(/\/inference=\s*"((?:.|\n)*?)"/);
-          if(inference != null) {
-            json["inference"] = inference[1].replace("\n", " ").replace(/\s+/g, " ");
-          }
-          var note = array[i].match(/\/note=\s*"((?:.|\n)*?)"/);
-          if(note != null) {
-            json["note"] = note[1].replace("\n", " ").replace(/\s+/g, " ");
-          }
-          var product = array[i].match(/\/product=\s*"((?:.|\n)*?)"/);
-          if(product != null) {
-            json["product"] = product[1].replace("\n", " ").replace(/\s+/g, " ");
-          }
-          var translation = array[i].match(/\/translation=\s*"((?:.|\n)*?)"/);
-          if(translation != null) {
-            json["translation"] = translation[1].replace("\n", " ").replace(/\s+/g, " ");
-          }
-
-          var old_locus = array[i].match(/\/old_locus_tag=.+/g);
-          if(old_locus != null) {
-            json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
-          }
-          var locus = array[i].match(/\/locus_tag=.+/g);
-          if(locus != null) {
-            try {
-              json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0].split("_")[1];
-              json["locus"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
-            } catch(ex){}
-          }
-          var nombre = array[i].match(/\/gene=.+/g);
-          if(nombre != null) {
-            json["name"] = nombre[0].match(/".+?"/g)[0].slice(1,-1);
-          }
-
-          if(array[i].match(/^..\s{3}tRNA\s{3}/)) {
-            json["name"] = json["product"];
-          } else if (array[i].match(/^..\s{3}rRNA\s{3}/)) {
-            if(json["product"].match(/.* ribosomal RNA/)) {
-              json["name"] = json["product"].replace("ribosomal RNA", "RNA");
-            } else {
-              json["name"] = "rRNA"
-            }
-          }
-          json["interest"] = false;
-          lastJson = json;
+        genomaDefinition = genomaDefinition ?? genomaName;
+        genomaAccession = genomaAccession ?? "";
+        var array = contents.split(/\n(?=..\s{3}\w+\s{2})/g); // \u0020 -> caracter espacio
+        var genes = [];
+        /*console.log("\n\n\nContents:");
+        console.log(contents);
+        console.log("Contents end\n\n\n");*/
+        if(contents.match(/$\s+^/)) {
+          thereIsAnError = thereIsAnError + " ; " + `Error con ${genomaName}: No se han encontrado los locus tag especificados.`;
+          continue;
         }
+        var lastJson = null;
+        for(var i = 0; i < array.length;i++){
+          var json = {};
+          var fields = array[i].match(/.+/g);
+          if (fields != null){
+            if(array[i].match(/..\s{10,}\/pseudo/)) {
+              continue;
+            }
+            var length = array[i].match(/<?(\d+)\.\.>?(\d+)/g)[0];
+            var start = length.match(/\d+/g)[0];
+            var end = length.match(/\d+/g)[1];
+            if(array[i].match(/^.*join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)) {
+              length = array[i].match(/(?<=^.*)join\(<?(\d+)\.\.>?(\d+)\s*,\s*<?(\d+)\.\.>?(\d+)\)/)[0];
+              start = length.match(/\d+/g)[0];
+              end = length.match(/\d+/g)[3];
+            }
+            if(lastJson && start === lastJson.start && end === lastJson.end) {
+              json = {...json, ...lastJson};
+            } else {
+              json["start"] = start;
+              json["end"] = end;
+              if(lastJson) {
+                genes.push(lastJson);
+                //console.log(lastJson);
+              }
+            }
+            json["complement"] = array[i].includes("complement(" + length + ")");
+
+            // We extract the data for showing outside the graphic
+            var inference = array[i].match(/\/inference=\s*"((?:.|\n)*?)"/);
+            if(inference != null) {
+              json["inference"] = inference[1].replace("\n", " ").replace(/\s+/g, " ");
+            }
+            var note = array[i].match(/\/note=\s*"((?:.|\n)*?)"/);
+            if(note != null) {
+              json["note"] = note[1].replace("\n", " ").replace(/\s+/g, " ");
+            }
+            var product = array[i].match(/\/product=\s*"((?:.|\n)*?)"/);
+            if(product != null) {
+              json["product"] = product[1].replace("\n", " ").replace(/\s+/g, " ");
+            }
+            var translation = array[i].match(/\/translation=\s*"((?:.|\n)*?)"/);
+            if(translation != null) {
+              json["translation"] = translation[1].replace("\n", " ").replace(/\s+/g, " ");
+            }
+
+            var old_locus = array[i].match(/\/old_locus_tag=.+/g);
+            if(old_locus != null) {
+              json["name"] = old_locus[0].match(/[^(")]\w+?(?=")/g)[0];
+            }
+            var locus = array[i].match(/\/locus_tag=.+/g);
+            if(locus != null) {
+              try {
+                json["name"] = locus[0].match(/[^(")]\w+?(?=")/g)[0].split("_")[1];
+                json["locus"] = locus[0].match(/[^(")]\w+?(?=")/g)[0];
+              } catch(ex){}
+            }
+            var nombre = array[i].match(/\/gene=.+/g);
+            if(nombre != null) {
+              json["name"] = nombre[0].match(/".+?"/g)[0].slice(1,-1);
+            }
+
+            if(array[i].match(/^..\s{3}tRNA\s{3}/)) {
+              json["name"] = json["product"];
+            } else if (array[i].match(/^..\s{3}rRNA\s{3}/)) {
+              if(json["product"].match(/.* ribosomal RNA/)) {
+                json["name"] = json["product"].replace("ribosomal RNA", "RNA");
+              } else {
+                json["name"] = "rRNA"
+              }
+            }
+            json["interest"] = false;
+            lastJson = json;
+          }
+        }
+        genes.push(lastJson);
+        genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
       }
-      genes.push(lastJson);
-      genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
     }
     if(thereIsAnError) {
-      res.json({genomas: assignColors(genomas), error: thereIsAnError});
+      if(genomas.length == contextSources.length) {
+        console.log("si");
+        res.json({genomas: assignColors(genomas), error: thereIsAnError});
+      }
     }
-    res.json({genomas: assignColors(genomas)});
+    else {
+      console.log("no");
+      if(genomas.length == contextSources.length) {
+        console.log("si");
+        res.json({genomas: assignColors(genomas)});
+      }
+    }
   } catch (ex) {
     console.error(ex);
     res.json({error: "Ha habido un error desconocido. Favor contactar a los desarrolladores."});
