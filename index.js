@@ -12,7 +12,10 @@ import http from 'http';
 
 const PORT = 3030;
 
-function getGenome(type, identifier, beggining, ending, retries=10) {
+function getGenome(type, identifier, beggining, ending, retries=2000) {
+  if(type == "accession" && identifier.match(/^\s*[Gg][Cc]([Aa]|[Ff])_.*/)) {
+    type = "assembly";
+  }
   var query = "";
   switch(type) {
     case "assembly":
@@ -25,13 +28,16 @@ function getGenome(type, identifier, beggining, ending, retries=10) {
       break;
     case "locus":
       query = `query { getGenomebyLocus(locus_tag: "${identifier}",
-          lower_limit: "${beggining}", upper_limit: "${ending}")`;
+          lower_limit: ${beggining}, upper_limit: ${ending})`;
       break;
   }
   var data = new TextEncoder().encode(
     JSON.stringify({
       "query": query + `
-      { _id definition assembly_info{taxid specie submitter ftp_rpt}
+      { _id definition
+        assembly_info{taxid specie submitter ftp_rpt}
+        biosample_info{title organism organization publication_date}
+        bioproject_info{organism_name submitter}
       features{ location key mobile_element_type locus_tag gene product translation genome_accession } }}`
     })
   );
@@ -51,14 +57,24 @@ function getGenome(type, identifier, beggining, ending, retries=10) {
       console.log(`statusCode: ${res.statusCode}`);
       res.on('data', d => {
         d = JSON.parse(d);
-        if(d.data && d.data.getGenomebyAssembly) {
+        if(d.data && (d.data.getGenomebyAssembly || d.data.getGenomebyAccession || d.data.getGenomebyLocus)) {
           console.log("Resolved!");
-          resolve(d.data.getGenomebyAssembly);
+          resolve(d.data.getGenomebyAssembly || d.data.getGenomebyAccession || d.data.getGenomebyLocus);
         } else if(retries && d.errors && d.errors[0] && d.errors[0].message && (d.errors[0].message == "Genome not found in db but being processed" || d.errors[0].message == "Genome is being processed")) {
-          getGenome(type, identifier, beggining, ending, retries).then( (answer) => {resolve(answer);})
+          console.log("getting: " + identifier + ", retries left: " + retries + " minutes: " + (new Date().getHours()) + ":" + (new Date().getMinutes())); // --retries
+          setTimeout(function(){
+            getGenome(type, identifier, beggining, ending, --retries).then( (answer) => {
+              resolve(answer);}).catch( (error) => { reject(error)
+            });
+          }, 1000);
           //resolve( d.errors);//getGenome(type, identifier, beggining, ending, retries--));
         } else {
-          reject("Couldn't get the genome");
+          console.log(d);
+          if(d.errors && d.errors[0] && d.errors[0].message) {
+            reject(d.errors[0].message);
+          } else {
+            reject("Couldn't get the genome for unknown reasons");
+          }
         }
       })
     })
@@ -282,10 +298,12 @@ app.post('/processFile', function(req, res, next) {
       var thisFtpPath; var thisTaxid; var thisSubmitter;
       var liner;
       var genomaName; var genomaDefinition = null ; var genomaAccession = null;
-      var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/); // TODO: What if one is region and the other is locus tag? (begin - end)
+      if(contextSources[j]["type"] == "accession" || contextSources[j]["type"] == "file") {
+        var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/); // TODO: What if one is region and the other is locus tag? (begin - end)
+      }
       if(contextSources[j]["type"] == "accesion" && !isRegionSpecified) {
 
-        var genome = getGenome("assembly", contextSources[j]["accesion"], contextSources[j]["locusBegin"], contextSources[j]["locusEnd"]).then( (data) => {
+        getGenome("accession", contextSources[j]["accesion"], contextSources[j]["locusBegin"], contextSources[j]["locusEnd"]).then( (data) => {
 
           // Here we will merge features that refer to the same gene. Example: gene and CDS
           var realFeatures = [data.features[0]];
@@ -300,7 +318,25 @@ app.post('/processFile', function(req, res, next) {
             realFeatures[j].name = realFeatures[j].gene || realFeatures[j].locus_tag;
           }
 
-          genomas.push({genes: realFeatures, name: data.assembly_info.specie, definition: data.definition, accesion: data._id, ftpPath: data.assembly_info.ftp_rpt, taxid: data.assembly_info.taxid, submitter: data.assembly_info.submitter});
+          var name; var definition; var submitter; var ftp_path; var taxid;
+          if(data.assembly_info) {
+            name = data.assembly_info.specie;
+            definition = data.definition;
+            submitter = data.assembly_info.submitter;
+            ftp_path = data.assembly_info.ftp_rpt;
+            taxid = data.assembly_info.taxid || data.assembly_info.specieTaxId;
+          }
+          if(data.biosample_info) {
+            name = name || data.biosample_info.title || data.biosample_info.organism;
+            definition = definition || data.biosample_info.title;
+            submitter = submitter || data.biosample_info.organization;
+          }
+          if(data.bioproject_info) {
+            name = name || data.bioproject_info.organism_name;
+            definition = definition || data.bioproject_info.organism_name;
+            submitter = submitter || data.bioproject_info.submitter;
+          }
+          genomas.push({genes: realFeatures, name: name, definition: definition, accesion: data._id, ftpPath: ftp_path, taxid: taxid, submitter: submitter});
           console.log("todo bien");
           if(genomas.length == contextSources.length) {
             res.json({genomas: assignColors(genomas), error: thereIsAnError});
@@ -309,6 +345,7 @@ app.post('/processFile', function(req, res, next) {
         }).catch((error) => {
           console.log("There's been an error");
           console.log(error);
+          res.json({error: error});
         });
       } else if(contextSources[j]["type"] == "accesion") {
         liner = new readlines("../blast/assembly_summary_refseq.txt");
@@ -331,6 +368,51 @@ app.post('/processFile', function(req, res, next) {
           }
         }
         liner.close();
+      } else if(contextSources[j]["type"] == "locus") {
+        getGenome("locus", contextSources[j]["locusTag"], contextSources[j]["genesBefore"], contextSources[j]["genesAfter"]).then( (data) => {
+
+          // Here we will merge features that refer to the same gene. Example: gene and CDS
+          var realFeatures = [data.features[0]];
+          var j = 0;
+          for(var i = 0; i < data.features.length; i++) {
+            if(realFeatures[j].location == data.features[i].location) {
+              realFeatures[j] = {...(realFeatures[j]), ...(data.features[i])};
+            } else {
+              realFeatures.push(data.features[i]);
+              j++;
+            }
+            realFeatures[j].name = realFeatures[j].gene || realFeatures[j].locus_tag;
+          }
+
+          var name; var definition; var submitter; var ftp_path; var taxid;
+          if(data.assembly_info) {
+            name = data.assembly_info.specie;
+            definition = data.definition;
+            submitter = data.assembly_info.submitter;
+            ftp_path = data.assembly_info.ftp_rpt;
+            taxid = data.assembly_info.taxid || data.assembly_info.specieTaxId;
+          }
+          if(data.biosample_info) {
+            name = name || data.biosample_info.title || data.biosample_info.organism;
+            definition = definition || data.biosample_info.title;
+            submitter = submitter || data.biosample_info.organization;
+          }
+          if(data.bioproject_info) {
+            name = name || data.bioproject_info.organism_name;
+            definition = definition || data.bioproject_info.organism_name;
+            submitter = submitter || data.bioproject_info.submitter;
+          }
+          genomas.push({genes: realFeatures, name: name, definition: definition, accesion: data._id, ftpPath: ftp_path, taxid: taxid, submitter: submitter});
+          console.log("todo bien");
+          if(genomas.length == contextSources.length) {
+            res.json({genomas: assignColors(genomas), error: thereIsAnError});
+          }
+          //console.log(data);
+        }).catch((error) => {
+          console.log("There's been an error");
+          console.log(error);
+          res.json({error: error});
+        });
       }
       if(contextSources[j]["type"] == "file" || isRegionSpecified) {
 

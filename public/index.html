@@ -299,7 +299,7 @@
           <div id = "genomaSource0">
             <mwc-select outlined label="Source" id = "genomaSourceType0" onchange = "changeGenomaSource(this.value, 0);" class = "genomaSourceType formData">
               <mwc-list-item value="file">From file</mwc-list-item>
-              <!-- <mwc-list-item value="locus">locus tag</mwc-list-item> -->
+              <mwc-list-item value="locus">locus tag</mwc-list-item>
               <mwc-list-item value="accesion">Assembly accession</mwc-list-item>
             </mwc-select>
             <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>
@@ -327,7 +327,7 @@
               id = "accesion0"
               label="accession number"
               class = "genomaSpec accesion invisible formData"
-              pattern = "[Gg][Cc]([Aa]|[Ff])_.*">
+              pattern = ".*">
             </mwc-textfield>
           </div>
 
