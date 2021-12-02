@@ -29,7 +29,7 @@ function newGenomaData(id) {
   sourceAccesion.innerText = "Assembly accession";
 
   genomaSourceType.appendChild(sourceFile);
-  //genomaSourceType.appendChild(sourceLocus);
+  genomaSourceType.appendChild(sourceLocus);
   genomaSourceType.appendChild(sourceAccesion);
 
   var helpGenomaSourceType = document.createElement("span");
@@ -94,7 +94,7 @@ function newGenomaData(id) {
   accesionDef.outlined = true;
   accesionDef.id = "accesion" + id;
   accesionDef.label = "Accession number";
-  accesionDef.pattern = "[Gg][Cc]([Aa]|[Ff])_.*"
+  accesionDef.pattern = ".*"
   accesionDef.classList.add("genomaSpec");
   accesionDef.classList.add("accesion");
   accesionDef.classList.add("invisible");

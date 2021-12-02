@@ -32,7 +32,6 @@ window.dragHandler = d3.drag().on("start", function () {
 function updateShownData(data, isGene) {
     if(isGene) {
         document.getElementById("geneLocusContent").innerText = data.locus || data.locus_tag;
-        document.getElementById("geneInferenceContent").innerText = data.inference;
         document.getElementById("geneNoteContent").innerText = data.note || data.key;
         document.getElementById("geneProductContent").innerText = data.product;
         document.getElementById("geneTranslationContent").innerText = data.translation;
