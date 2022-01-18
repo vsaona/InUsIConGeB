@@ -41,8 +41,6 @@ function getGenome(type, identifier, beggining, ending, retries=2000) {
       features{ location key mobile_element_type locus_tag gene product translation genome_accession } }}`
     })
   );
-  console.log("data");
-  console.log(new TextDecoder().decode(data));
   var promise = new Promise((resolve, reject) => {
     var graphReq = http.request({
       hostname: 'localhost',
@@ -58,7 +56,6 @@ function getGenome(type, identifier, beggining, ending, retries=2000) {
       res.on('data', d => {
         d = JSON.parse(d);
         if(d.data && (d.data.getGenomebyAssembly || d.data.getGenomebyAccession || d.data.getGenomebyLocus)) {
-          console.log("Resolved!");
           resolve(d.data.getGenomebyAssembly || d.data.getGenomebyAccession || d.data.getGenomebyLocus);
         } else if(retries && d.errors && d.errors[0] && d.errors[0].message && (d.errors[0].message == "Genome not found in db but being processed" || d.errors[0].message == "Genome is being processed")) {
           console.log("getting: " + identifier + ", retries left: " + retries + " minutes: " + (new Date().getHours()) + ":" + (new Date().getMinutes())); // --retries
@@ -337,7 +334,6 @@ app.post('/processFile', function(req, res, next) {
             submitter = submitter || data.bioproject_info.submitter;
           }
           genomas.push({genes: realFeatures, name: name, definition: definition, accesion: data._id, ftpPath: ftp_path, taxid: taxid, submitter: submitter});
-          console.log("todo bien");
           if(genomas.length == contextSources.length) {
             res.json({genomas: assignColors(genomas), error: thereIsAnError});
           }
@@ -403,7 +399,6 @@ app.post('/processFile', function(req, res, next) {
             submitter = submitter || data.bioproject_info.submitter;
           }
           genomas.push({genes: realFeatures, name: name, definition: definition, accesion: data._id, ftpPath: ftp_path, taxid: taxid, submitter: submitter});
-          console.log("todo bien");
           if(genomas.length == contextSources.length) {
             res.json({genomas: assignColors(genomas), error: thereIsAnError});
           }
@@ -585,14 +580,11 @@ app.post('/processFile', function(req, res, next) {
     }
     if(thereIsAnError) {
       if(genomas.length == contextSources.length) {
-        console.log("si");
         res.json({genomas: assignColors(genomas), error: thereIsAnError});
       }
     }
     else {
-      console.log("no");
       if(genomas.length == contextSources.length) {
-        console.log("si");
         res.json({genomas: assignColors(genomas)});
       }
     }
@@ -608,7 +600,6 @@ app.post('/searchAndDraw', function(req, res, next) {
   form.uploadDir = "./data"
   form.parse(req, function (err, fields, files){
     var child = child_process.fork('searchAndDraw.js');
-    console.log("Se hizo el child");
     // So we can see the console logs // console.log("");
     child.on('message', function(message) {
       console.log('[parent] received message from child:', message);

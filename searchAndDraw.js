@@ -2,6 +2,7 @@ import fs from "fs"; //"var fs = require('fs');
 import colorsys from "colorsys";
 import shelljs from "shelljs";
 import readlines from "n-readlines";
+import http from 'http';
 
 function download_gbff(fileName) {
   try {
@@ -19,6 +20,90 @@ function download_gbff(fileName) {
   } finally {
     process.chdir('../InUsIConGeB');
   }
+}
+
+function getGenome(type, identifier, beggining, ending, additional, retries=2000) {
+  if(type == "accession" && identifier.match(/^\s*[Gg][Cc]([Aa]|[Ff])_.*/)) {
+    type = "assembly";
+  }
+  var query = "";
+  switch(type) {
+    case "assembly":
+      query = `query { getGenomebyAssembly(assembly_accession: "${identifier}",
+          locus_start: "${beggining}", locus_end: "${ending}")`;
+      break;
+    case "accession":
+      query = `query { getGenomebyAccession(accession: "${identifier}",
+          locus_start: "${beggining}", locus_end: "${ending}")`;
+      break;
+    case "locus":
+      query = `query { getGenomebyLocus(locus_tag: "${identifier}",
+          lower_limit: ${beggining}, upper_limit: ${ending}`;
+      if(additional) {
+        query = query + ` assembly_accession: "${additional}")`;
+      } else {
+        query = query + ")";
+      }
+      break;
+  }
+  var data = new TextEncoder().encode(
+    JSON.stringify({
+      "query": query + `
+      { _id definition
+        assembly_info{taxid specie submitter ftp_rpt}
+        biosample_info{title organism organization publication_date}
+        bioproject_info{organism_name submitter}
+      features{ location key mobile_element_type locus_tag gene product translation genome_accession } }}`
+    })
+  );
+  console.log("data");
+  console.log(new TextDecoder().decode(data));
+  var promise = new Promise((resolve, reject) => {
+    var graphReq = http.request({
+      hostname: 'localhost',
+      port: 4002,
+      path: '/graphql',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    }, res => {
+      console.log(`statusCode: ${res.statusCode}`);
+      res.on('data', d => {
+
+        d = JSON.parse(d);
+        if(d.data && (d.data.getGenomebyAssembly || d.data.getGenomebyAccession || d.data.getGenomebyLocus)) {
+          console.log("Resolved!");
+          resolve(d.data.getGenomebyAssembly || d.data.getGenomebyAccession || d.data.getGenomebyLocus);
+        } else if(retries && d.errors && d.errors[0] && d.errors[0].message && (d.errors[0].message == "Genome not found in db but being processed" || d.errors[0].message == "Genome is being processed")) {
+          console.log("getting: " + identifier + ", retries left: " + retries + " minutes: " + (new Date().getHours()) + ":" + (new Date().getMinutes())); // --retries
+          setTimeout(function(){
+            getGenome(type, identifier, beggining, ending, --retries).then( (answer) => {
+              resolve(answer);}).catch( (error) => { reject(error)
+            });
+          }, 1000);
+          //resolve( d.errors);//getGenome(type, identifier, beggining, ending, retries--));
+        } else {
+          console.log(d);
+          if(d.errors && d.errors[0] && d.errors[0].message) {
+            reject(d.errors[0].message);
+          } else {
+            reject("Couldn't get the genome for unknown reasons");
+          }
+        }
+      })
+    })
+    graphReq.on('error', error => {
+      console.log("GraphQl error type 1");
+      reject(error);
+    });
+    
+    graphReq.write(data);
+    graphReq.end();
+  });
+  return(promise);
+
 }
 
 function assignColors(genomas) {
@@ -81,20 +166,147 @@ function assignColors(genomas) {
   return(genomas);
 }
 
+function blast_search(fastaSequence, fields, identifier, firstGenoma = null) {
+
+  var query = "blast_inputs/" + identifier + ".fas";
+  fs.writeFileSync(query, ">" + identifier + "\n" + fastaSequence);
+
+  // Search homologous
+  var outFileName = "blast_outputs/results_" + identifier + ".out";
+  console.log("BLAST command")
+  var db = fields["databaseToSearch"];
+  console.log(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
+  shelljs.exec(`blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
+  // shelljs.exec(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
+  shelljs.exec("rm blast_inputs/" + identifier + ".fas");
+
+  var liner = new readlines(outFileName);
+  var line;
+  var failures = 0;
+  fields["includeOnly"] = fields["useIncludeOnly"] === "true" ? fields["includeOnly"].toLowerCase() : "";
+  fields["useOneOfEach"] = fields["useOneOfEach"] === "true";
+
+  var blastFoundGenomas = [];
+
+  while ((line = liner.next()) && (identities.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {
+    line = line.toString("UTF-8");
+    console.log("[searchHomologous] Reading blast result line:");
+    console.log(line);
+    var lineFields = line.match(/(\d+)\t(\d+)\t((?:\d|\.)+)\t(.*)/);
+    var taxid = lineFields[1];
+    var coverage = parseFloat(lineFields[2]);
+    var identity = parseFloat(lineFields[3]);
+    if(coverage >= fields["minCoverage"] && identity >= fields["minIdentity"]) {
+      if((fields["useOneOfEach"] && fields["oneOfEach"] < "6") || fields["includeOnly"] != "") {
+        var taxonomicGroup = shelljs.exec(`echo ${taxid} | ./taxonkit${process.platform == "win32" ? ".exe" : ""} reformat -I 1 --data-dir "../.taxonkit"`);
+        var allTaxGroups = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";");
+        taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";")[fields["oneOfEach"]];
+        if((!fields["useOneOfEach"] || !taxonGroups.includes(taxonomicGroup)) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
+          blastFoundGenomas.push({"taxid": taxid, "coverage": coverage, "identity": identity, "accession": lineFields[4]});
+          taxids.push(taxid);
+          coverages.push(coverage);
+          identities.push(identity);
+          accesions.push(lineFields[4]);
+          taxonGroups.push(taxonomicGroup);
+          failures = 0;
+        }
+      } else if(fields["useOneOfEach"] && fields["oneOfEach"] == "6") {
+        if(!taxids.includes(taxid)) {
+          blastFoundGenomas.push({"taxid": taxid, "coverage": coverage, "identity": identity, "accession": lineFields[4]});
+          taxids.push(taxid);
+          coverages.push(coverage);
+          identities.push(identity);
+          accesions.push(lineFields[4]);
+          taxonGroups.push(taxonomicGroup);
+          failures = 0;
+        }
+      } else {
+        blastFoundGenomas.push({"taxid": taxid, "coverage": coverage, "identity": identity, "accession": lineFields[4]});
+        taxids.push(taxid);
+        coverages.push(coverage);
+        identities.push(identity);
+        accesions.push(lineFields[4]);
+        taxonGroups.push(taxonomicGroup);
+        failures = 0;
+      }
+    } else {
+      failures++;
+    }
+  }
+  shelljs.exec("rm " + outFileName);
+  console.log("[blastSearch] :: Done BLAST selection\n");
+  console.log(blastFoundGenomas);
+}
+
+
 function searchAndDraw(fields, files)
 {
+  var UPSTREAMCONTEXTAMOUNT = 5;
+  var DOWNSTREAMCONTEXTAMOUNT = 5;
   try {
-    console.log("function begins!");
+    console.log("[searchAndDraw] :: function begins!");
     var filePath;
     var identifier = Date.now() + Math.random();
     var thereIsAnError;
-    console.log("[searchHomologous] form fields:");
+    console.log("[searchAndDraw] form fields:");
     console.log(fields);
     var fastaSequence;
     var thisFtpPath;
     var thisSubmitter;
     var thisTaxid;
-    if(fields["genomaSearchSourceType"] == "accesion") {
+    if(fields["genomaSearchSourceType"] == "accesion" || fields["genomaSearchSourceType"] == "locus") {
+      console.log("\n---\n\nparams");
+      console.log(fields["searchFileLocusTag"]);
+      console.log(UPSTREAMCONTEXTAMOUNT);
+      console.log(DOWNSTREAMCONTEXTAMOUNT);
+      getGenome("locus", fields["searchFileLocusTag"], UPSTREAMCONTEXTAMOUNT, DOWNSTREAMCONTEXTAMOUNT, fields["accesionSearchSource"]).then( (data) => {
+
+        // Here we will merge features that refer to the same gene. Example: 'gene' and 'CDS'
+        var realFeatures = [data.features[0]];
+        var j = 0;
+        for(var i = 0; i < data.features.length; i++) {
+          if(realFeatures[j].location == data.features[i].location) {
+            realFeatures[j] = {...(realFeatures[j]), ...(data.features[i])};
+          } else {
+            realFeatures.push(data.features[i]);
+            j++;
+            if(realFeatures[j].locus_tag && realFeatures[j].locus_tag == fields["searchFileLocusTag"]) {
+              fastaSequence = realFeatures[j].translation;
+            }
+          }
+          realFeatures[j].name = realFeatures[j].gene || realFeatures[j].locus_tag;
+        }
+
+        var name; var definition; var submitter; var ftp_path; var taxid;
+        if(data.assembly_info) {
+          name = data.assembly_info.specie;
+          definition = data.definition;
+          submitter = data.assembly_info.submitter;
+          ftp_path = data.assembly_info.ftp_rpt;
+          taxid = data.assembly_info.taxid || data.assembly_info.specieTaxId;
+        }
+        if(data.biosample_info) {
+          name = name || data.biosample_info.title || data.biosample_info.organism;
+          definition = definition || data.biosample_info.title;
+          submitter = submitter || data.biosample_info.organization;
+        }
+        if(data.bioproject_info) {
+          name = name || data.bioproject_info.organism_name;
+          definition = definition || data.bioproject_info.organism_name;
+          submitter = submitter || data.bioproject_info.submitter;
+        }
+        blast_search(fastaSequence, fields, identifier, {genes: realFeatures, name: name, definition: definition, accesion: data._id, ftpPath: ftp_path, taxid: taxid, submitter: submitter});
+        //console.log(data);
+      }).catch((error) => {
+        console.log("There's been an error");
+        console.log(error);
+        process.send({
+          error  : error,
+          errorCode: 500,
+          errorMessage : "Ha habido un error desconocido. Por favor contactar a los desarrolladores."
+        });
+        process.disconnect();
+      });
       liner = new readlines("../blast/assembly_summary_refseq.txt");
       if(fields["accesionSearchSource"].includes("GCA")) {
         liner = new readlines("../blast/assembly_summary_genbank.txt");
@@ -156,7 +368,7 @@ function searchAndDraw(fields, files)
           }
           break;
         }
-      }        
+      }
       if(fields["genomaSearchSourceType"] == "file") {
         paths.push([{path: filePath.replace("\\", "/"), submitter: "you"}]);
         taxids.push(0);
@@ -442,6 +654,7 @@ function searchAndDraw(fields, files)
         }
       }
       genes.push(lastJson);
+      blast_search(fastaSequence, fields, identifier, {genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: "none", taxid: thisTaxid, submitter: "you"});
       genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
     }
     process.send({
