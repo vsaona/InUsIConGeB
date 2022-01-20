@@ -119,6 +119,7 @@
             outlined
             id = "locusSearchSource"
             label="locus tag"
+            name = "locus"
             class = "genomaSpec locus invisible formData"
             pattern = "\s*[a-zA-Z]\w*_.*\s*">
           </mwc-textfield>
@@ -126,6 +127,7 @@
             outlined
             id = "accesionSearchSource"
             label="accession number"
+            name = "accession"
             class = "genomaSpec accesion invisible formData"
             pattern = "[Gg][Cc]([Aa]|[Ff])_.*">
           </mwc-textfield>
@@ -146,6 +148,7 @@
               label = "locus tag"
               type = "text"
               id = "searchFileLocusTag"
+              name = "locus"
               class = "formData"
               pattern = "\s*[a-zA-Z]\w*_.*\s*">
               <!-- autocompletar -->
@@ -319,12 +322,14 @@
               outlined
               id = "locus0"
               label="locus tag"
+              name = "locus"
               class = "genomaSpec locus invisible formData">
             </mwc-textfield>
             <mwc-textfield
               outlined
               id = "accesion0"
               label="accession number"
+              name = "accession"
               class = "genomaSpec accesion invisible formData"
               pattern = ".*">
             </mwc-textfield>
@@ -336,6 +341,7 @@
                 outlined
                 id = "desde0"
                 label = "From"
+                name = "locus"
                 class = "formData"
                 pattern = "\s*([a-zA-Z]\w*_.*|\d+)\s*">
               </mwc-textfield>
@@ -344,6 +350,7 @@
                 label = "To"
                 id = "hasta0"
                 class = "formData"
+                name = "locus"
                 pattern = "\s*([a-zA-Z]\w*_.*|\d+)\s*">
               </mwc-textfield>
               <span class = 'tooltip'><img src = 'images/help_outline_black_24dp.svg' style = 'width: 20px;'><span class = 'tooltiptext'>

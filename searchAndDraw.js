@@ -80,7 +80,9 @@ function getGenome(type, identifier, beggining, ending, additional, retries=2000
           console.log("getting: " + identifier + ", retries left: " + retries + " minutes: " + (new Date().getHours()) + ":" + (new Date().getMinutes())); // --retries
           setTimeout(function(){
             getGenome(type, identifier, beggining, ending, --retries).then( (answer) => {
-              resolve(answer);}).catch( (error) => { reject(error)
+              resolve(answer);
+            }).catch( (error) => {
+              reject(error);
             });
           }, 1000);
           //resolve( d.errors);//getGenome(type, identifier, beggining, ending, retries--));
@@ -104,6 +106,54 @@ function getGenome(type, identifier, beggining, ending, additional, retries=2000
   });
   return(promise);
 
+}
+
+function getFullGenome(type, identifier, beggining, ending, additional, retries=2000) {
+  var promise = new Promise((resolve, reject) => {
+    getGenome(type, identifier, beggining, ending, additional, retries).then( (data) => {
+      var realFeatures = [data.features[0]];
+      var j = 0;
+      for(var i = 0; i < data.features.length; i++) {
+        if(realFeatures[j].location == data.features[i].location) {
+          realFeatures[j] = {...(realFeatures[j]), ...(data.features[i])};
+        } else {
+          realFeatures.push(data.features[i]);
+          j++;
+        }
+        realFeatures[j].name = realFeatures[j].gene || realFeatures[j].locus_tag;
+      }
+      console.log("real features");
+      console.log(realFeatures);
+      var name; var definition; var submitter; var ftp_path; var taxid;
+      if(data.assembly_info) {
+        name = data.assembly_info.specie;
+        definition = data.definition;
+        submitter = data.assembly_info.submitter;
+        ftp_path = data.assembly_info.ftp_rpt;
+        taxid = data.assembly_info.taxid || data.assembly_info.specieTaxId;
+      }
+      if(data.biosample_info) {
+        name = name || data.biosample_info.title || data.biosample_info.organism;
+        definition = definition || data.biosample_info.title;
+        submitter = submitter || data.biosample_info.organization;
+      }
+      if(data.bioproject_info) {
+        name = name || data.bioproject_info.organism_name;
+        definition = definition || data.bioproject_info.organism_name;
+        submitter = submitter || data.bioproject_info.submitter;
+      }
+      data.name = name;
+      data.definition = definition;
+      data.submitter = submitter;
+      data.ftp_path = ftp_path;
+      data.taxid = taxid;
+      data.features = realFeatures;
+      resolve(data);
+    }).catch( (error) => {
+      reject(error);
+    });
+  });
+  return(promise);
 }
 
 function assignColors(genomas) {
@@ -178,7 +228,7 @@ function blast_search(fastaSequence, fields, identifier, firstGenoma = null) {
   console.log(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
   shelljs.exec(`blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
   // shelljs.exec(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
-  shelljs.exec("rm blast_inputs/" + identifier + ".fas");
+  //shelljs.exec("rm " + query);
 
   var liner = new readlines(outFileName);
   var line;
@@ -187,8 +237,11 @@ function blast_search(fastaSequence, fields, identifier, firstGenoma = null) {
   fields["useOneOfEach"] = fields["useOneOfEach"] === "true";
 
   var blastFoundGenomas = [];
+  var taxonGroups = [];
 
-  while ((line = liner.next()) && (identities.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {
+  console.log("So, BLAST search was ended. Now we should check each and every result.");
+  console.log(identifier);
+  while ((line = liner.next()) && (blastFoundGenomas.length < parseInt(fields["contextsQuantity"]) * 1.5) && (failures < 3)) {
     line = line.toString("UTF-8");
     console.log("[searchHomologous] Reading blast result line:");
     console.log(line);
@@ -203,29 +256,17 @@ function blast_search(fastaSequence, fields, identifier, firstGenoma = null) {
         taxonomicGroup = taxonomicGroup.stdout.slice(0, taxonomicGroup.stdout.length - 1).toLowerCase().split("\t")[1].split(";")[fields["oneOfEach"]];
         if((!fields["useOneOfEach"] || !taxonGroups.includes(taxonomicGroup)) && (fields["includeOnly"] == "" || allTaxGroups.includes(fields["includeOnly"]))) {
           blastFoundGenomas.push({"taxid": taxid, "coverage": coverage, "identity": identity, "accession": lineFields[4]});
-          taxids.push(taxid);
-          coverages.push(coverage);
-          identities.push(identity);
-          accesions.push(lineFields[4]);
           taxonGroups.push(taxonomicGroup);
           failures = 0;
         }
       } else if(fields["useOneOfEach"] && fields["oneOfEach"] == "6") {
         if(!taxids.includes(taxid)) {
           blastFoundGenomas.push({"taxid": taxid, "coverage": coverage, "identity": identity, "accession": lineFields[4]});
-          taxids.push(taxid);
-          coverages.push(coverage);
-          identities.push(identity);
-          accesions.push(lineFields[4]);
           taxonGroups.push(taxonomicGroup);
           failures = 0;
         }
       } else {
         blastFoundGenomas.push({"taxid": taxid, "coverage": coverage, "identity": identity, "accession": lineFields[4]});
-        taxids.push(taxid);
-        coverages.push(coverage);
-        identities.push(identity);
-        accesions.push(lineFields[4]);
         taxonGroups.push(taxonomicGroup);
         failures = 0;
       }
@@ -233,9 +274,10 @@ function blast_search(fastaSequence, fields, identifier, firstGenoma = null) {
       failures++;
     }
   }
-  shelljs.exec("rm " + outFileName);
+  //shelljs.exec("rm " + outFileName);
   console.log("[blastSearch] :: Done BLAST selection\n");
   console.log(blastFoundGenomas);
+  return blastFoundGenomas;
 }
 
 
@@ -247,10 +289,10 @@ function searchAndDraw(fields, files)
     console.log("[searchAndDraw] :: function begins!");
     var filePath;
     var identifier = Date.now() + Math.random();
-    var thereIsAnError;
+    var thereIsAnError = "";
     console.log("[searchAndDraw] form fields:");
     console.log(fields);
-    var fastaSequence;
+    var fastaSequence = "";
     var thisFtpPath;
     var thisSubmitter;
     var thisTaxid;
@@ -259,44 +301,22 @@ function searchAndDraw(fields, files)
       console.log(fields["searchFileLocusTag"]);
       console.log(UPSTREAMCONTEXTAMOUNT);
       console.log(DOWNSTREAMCONTEXTAMOUNT);
-      getGenome("locus", fields["searchFileLocusTag"], UPSTREAMCONTEXTAMOUNT, DOWNSTREAMCONTEXTAMOUNT, fields["accesionSearchSource"]).then( (data) => {
+      getFullGenome("locus", fields["searchFileLocusTag"], UPSTREAMCONTEXTAMOUNT, DOWNSTREAMCONTEXTAMOUNT, fields["accesionSearchSource"]).then( (data) => {
 
-        // Here we will merge features that refer to the same gene. Example: 'gene' and 'CDS'
-        var realFeatures = [data.features[0]];
-        var j = 0;
+        console.log("data");
+        console.log(data);
         for(var i = 0; i < data.features.length; i++) {
-          if(realFeatures[j].location == data.features[i].location) {
-            realFeatures[j] = {...(realFeatures[j]), ...(data.features[i])};
-          } else {
-            realFeatures.push(data.features[i]);
-            j++;
-            if(realFeatures[j].locus_tag && realFeatures[j].locus_tag == fields["searchFileLocusTag"]) {
-              fastaSequence = realFeatures[j].translation;
-            }
+          if(data.features[i].locus_tag && data.features[i].locus_tag == fields["searchFileLocusTag"] && data.features[i].translation) {
+            fastaSequence = data.features[i].translation;
           }
-          realFeatures[j].name = realFeatures[j].gene || realFeatures[j].locus_tag;
         }
+        
+        var blastResults = blast_search(fastaSequence, fields, identifier, {genes: data.features, name: data.name, definition: data.definition, accesion: data._id, ftpPath: data.ftp_path, taxid: data.taxid, submitter: data.submitter});
+        
+        console.log("blastResults");
+        console.log(blastResults);
 
-        var name; var definition; var submitter; var ftp_path; var taxid;
-        if(data.assembly_info) {
-          name = data.assembly_info.specie;
-          definition = data.definition;
-          submitter = data.assembly_info.submitter;
-          ftp_path = data.assembly_info.ftp_rpt;
-          taxid = data.assembly_info.taxid || data.assembly_info.specieTaxId;
-        }
-        if(data.biosample_info) {
-          name = name || data.biosample_info.title || data.biosample_info.organism;
-          definition = definition || data.biosample_info.title;
-          submitter = submitter || data.biosample_info.organization;
-        }
-        if(data.bioproject_info) {
-          name = name || data.bioproject_info.organism_name;
-          definition = definition || data.bioproject_info.organism_name;
-          submitter = submitter || data.bioproject_info.submitter;
-        }
-        blast_search(fastaSequence, fields, identifier, {genes: realFeatures, name: name, definition: definition, accesion: data._id, ftpPath: ftp_path, taxid: taxid, submitter: submitter});
-        //console.log(data);
+        showResults()
       }).catch((error) => {
         console.log("There's been an error");
         console.log(error);
@@ -313,14 +333,6 @@ function searchAndDraw(fields, files)
       }
       var line;
       while (line = liner.next()) {
-        /*Integrate
-          getGenomebyLocus(
-          lower_limit: Float!
-          upper_limit: Float!
-          locus_tag: String!
-          assembly_accession: String
-        ): Genome
-        */
         line = line.toString("UTF-8");
         if(line.match(fields["accesionSearchSource"])) {
           var summaryData = line.match(/[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t(\d+)\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t[^\t]*\t([^\t]*)\t[^\t]*\t[^\t]*\t([^\t]+)\t/);
@@ -577,8 +589,8 @@ function searchAndDraw(fields, files)
       var lastJson = null;
       for(var i = 0; i < array.length;i++){
         var json = {};
-        var fields = array[i].match(/.+/g);
-        if (fields != null){
+        var geneContent = array[i].match(/.+/g);
+        if (geneContent != null){
           if(array[i].match(/..\s{10,}\/pseudo/)) {
             continue;
           }
@@ -654,7 +666,7 @@ function searchAndDraw(fields, files)
         }
       }
       genes.push(lastJson);
-      blast_search(fastaSequence, fields, identifier, {genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: "none", taxid: thisTaxid, submitter: "you"});
+      //blast_search(fastaSequence, fields, identifier, {genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: "none", taxid: thisTaxid, submitter: "you"});
       genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
     }
     process.send({

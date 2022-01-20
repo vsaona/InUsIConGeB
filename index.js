@@ -296,7 +296,7 @@ app.post('/processFile', function(req, res, next) {
       var liner;
       var genomaName; var genomaDefinition = null ; var genomaAccession = null;
       if(contextSources[j]["type"] == "accession" || contextSources[j]["type"] == "file") {
-        var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/); // TODO: What if one is region and the other is locus tag? (begin - end)
+        var isRegionSpecified = contextSources[j]["locusBegin"].match(/^\d/) || contextSources[j]["locusEnd"].match(/^\d/);
       }
       if(contextSources[j]["type"] == "accesion" && !isRegionSpecified) {
 
