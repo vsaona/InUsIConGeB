@@ -1,14 +1,14 @@
         <meta name="viewport" content="width=device-width, user-scalable=no">
-        <script src="http://200.1.19.244:3030/jscolor.js"></script>
+        <script src="http://localhost:3030/jscolor.js"></script>
         <script src="https://d3js.org/d3.v5.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-        <script src="http://200.1.19.244:3030/mwc_bundle/mwc-material-bundle.min.js"></script>
+        <script src="http://localhost:3030/mwc_bundle/mwc-material-bundle.min.js"></script>
         <title>Genomic context diagram editor</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-        <link rel="stylesheet" href="http://200.1.19.244:3030/stylesheets/editor.css">
+        <link rel="stylesheet" href="http://localhost:3030/stylesheets/editor.css">
         <link rel="icon" href="/images/favicon.png">
-        <script src="http://200.1.19.244:3030/scripts/colorGenerator.js"></script>
-        <script src="http://200.1.19.244:3030/scripts/render.js"></script>
+        <script src="http://localhost:3030/scripts/colorGenerator.js"></script>
+        <script src="http://localhost:3030/scripts/render.js"></script>
     </head>
     <body>
         <div id = "goBackInCaseOfErrorDiv" class = "invisible">
@@ -26,12 +26,12 @@
             <mwc-button
                 raised
                 id = "downloadButton"
-                onClick = "var e = document.createElement('script'); e.setAttribute('src', 'http://200.1.19.244:3030/svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e);"
+                onClick = "var e = document.createElement('script'); e.setAttribute('src', 'http://localhost:3030/svg-crowbar.js'); e.setAttribute('class', 'svg-crowbar'); document.body.appendChild(e);"
                 label = "Download image"
             >
             </mwc-button>
             <mwc-formfield>
-                <img src = 'http://200.1.19.244:3030/images/zoom_out_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "triggerZoomOut()">
+                <img src = 'http://localhost:3030/images/zoom_out_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "triggerZoomOut()">
                 <mwc-slider
                     id = "zoomBar"
                     step="10"
@@ -41,9 +41,9 @@
                     value="100"
                     onchange = "zoom(this.value)">
                 </mwc-slider>
-                <img src = 'http://200.1.19.244:3030/images/zoom_in_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "triggerZoomIn()">
+                <img src = 'http://localhost:3030/images/zoom_in_black_24dp.svg' class = "clickableIcon" style = 'width: 20px;' onclick = "triggerZoomIn()">
             </mwc-formfield>
-            <img id = 'goToBarIndicator' src = 'http://200.1.19.244:3030/images/arrow_downward_black_24dp.svg' style = 'width: 40px;' class = "invisible disappear">
+            <img id = 'goToBarIndicator' src = 'http://localhost:3030/images/arrow_downward_black_24dp.svg' style = 'width: 40px;' class = "invisible disappear">
         </div>
         
         <div id = "arrowToolBar" class = "invisible toolBar">
@@ -265,7 +265,7 @@
                 alert("We couldn't find any genomes matching your criteria");
                 document.getElementById("goBackInCaseOfErrorDiv").classList.remove("invisible");
             }
-            $.post( "http://200.1.19.244:3030/processFile", {"contextSources": JSON.stringify(contextSources)}, function( data ) {
+            $.post( "http://localhost:3030/processFile", {"contextSources": JSON.stringify(contextSources)}, function( data ) {
                 if(data.error) {
                     alert("Error: " + data.error);
                     document.getElementById("goBackInCaseOfErrorDiv").classList.remove("invisible");
