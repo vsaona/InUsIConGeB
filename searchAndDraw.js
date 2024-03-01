@@ -2,6 +2,9 @@ import fs from "fs"; //"var fs = require('fs');
 import colorsys from "colorsys";
 import shelljs from "shelljs";
 import readlines from "n-readlines";
+import axios from "axios";
+import Buffer from "buffer";
+import zlib from "zlib";
 
 function download_gbff(fileName) {
   try {
@@ -79,6 +82,42 @@ function assignColors(genomas) {
     }
   }
   return(genomas);
+}
+
+
+
+async function getBlastAnswer(apiUrl, getParamsString, config) {
+  axios.put(apiUrl, getParamsString, config).then(response => {
+    return new Promise(function(resolve, reject) {
+      console.log("\n\n\nresponse.data");
+      console.log(response.data);
+
+      console.log("\n\n\ndecompressed response.data");
+      var responseData = zlib.inflate(Buffer.Buffer.from(response.data), (error, result) => {
+        console.log("decompressed result")
+        console.log(result);
+      });
+
+      console.log(responseData);
+      let results = JSON.parse(responseData);
+      console.log("results");
+      console.log(results);
+      if(results) {
+        
+        resolve(promise);
+
+        process.send({
+          genomas  : assignColors(results),
+          errorMessage: thereIsAnError
+        });
+        process.disconnect();
+      } else {
+        setTimeout( () => {getBlastAnswer(apiUrl, getParamsString, config);}, 30_000);
+      }
+    });
+  }).catch(error => {
+    console.error('Error:', error.message);
+  });
 }
 
 function searchAndDraw(fields, files)
@@ -173,7 +212,7 @@ function searchAndDraw(fields, files)
     var query = "blast_inputs/" + identifier + ".fas";
     fs.writeFileSync(query, ">" + identifier + "\n" + fastaSequence);
 
-    // Search homologous
+    /*// Search homologous
     var outFileName = "blast_outputs/results_" + identifier + ".out";
     console.log("BLAST command")
     var db = fields["databaseToSearch"];
@@ -181,8 +220,65 @@ function searchAndDraw(fields, files)
     shelljs.exec(`blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
     // shelljs.exec(`../blastPlus/ncbi-blast-2.12.0+/bin/blastp -db ../blast/${db}/${db} -query ${query} -out ${outFileName} -outfmt "6 staxid qcovs pident sacc" -num_threads 24`);
     shelljs.exec("rm blast_inputs/" + identifier + ".fas");
+*/
 
-    var liner = new readlines(outFileName);
+    // Search homologous using NCBI web API
+
+    const apiUrl = 'https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi';
+    const params = {
+      path: '/blast/Blast.cgi',
+      method: 'PUT',
+      CMD: 'PUT',
+      QUERY: "MTALTESSTSKFVKINEKGFSDFNIHYNEAGNGETVIMLHGGGPGAGGWSNYYRNVGPFVDAGYRVILKDSPGFNKSDAVVMDEQRGLVNARAVKGLMDALDIDRAHLVGNSMGGATALNFALEYPDRIGKLILMGPGGLGPSMFAPMPMEGIKLLFKLYAEPSYETLKQMLQVFLYDQSLITEELLQGRWEAIQRQPEHLKNFLISAQKAPLSTWDVTARLGEIKAKTFITWGRDDRFVPLDHGLKLLWNIDDARLHVFSKCGHWAQWEHADEFNRLVIDFLRHA",
+      DATABASE:"refseq_protein",
+      PROGRAM:"blastp"
+    };
+
+    const paramsString = new URLSearchParams(params).toString();
+
+    // Configuring the axios request
+    const config = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    };
+    console.log("axios put");
+    axios.put(apiUrl, paramsString, config).then(response => {
+      //console.log(response.data);
+      let RID = response.data.match(/name\s*=\s*["']RID["']\s*value\s*=\s*["']([\w\d]+)["']/);
+      console.log(RID);
+      if(!RID || response.status != 200) {
+        process.send({
+          error  : "",
+          errorCode: 400,
+          errorMessage : "Blast query was not accepted by NCBI API."
+        });
+        process.disconnect();
+        return;
+      }
+      RID = RID[1];
+      const getParams = {
+        path: '/blast/Blast.cgi',
+        method: 'GET',
+        CMD: 'GET',
+        FORMAT_TYPE: "JSON2",
+        HITLIST_SIZE: 10,
+        NCBI_GI: "T",
+        RID: "V2ZTJC69016",//RID,
+        FORMAT_OBJECT: "Alignment"
+      };
+      const getParamsString = new URLSearchParams(getParams).toString();
+      const config = {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      };
+      getBlastAnswer(apiUrl, getParamsString, config);
+
+      
+
+      /*
+      var liner = new readlines(outFileName);
     var line;
     var failures = 0;
     fields["includeOnly"] = fields["useIncludeOnly"] === "true" ? fields["includeOnly"].toLowerCase() : "";
@@ -436,11 +532,14 @@ function searchAndDraw(fields, files)
       genes.push(lastJson);
       genomas.push({genes: genes, name: genomaName, definition: genomaDefinition, accesion: genomaAccession, ftpPath: thisFtpPath, taxid: thisTaxid, submitter: thisSubmitter});
     }
-    process.send({
-      genomas  : assignColors(genomas),
-      errorMessage: thereIsAnError
+    
+      */
+
+
+
+    }).catch(error => {
+      console.error('Error:', error.message);
     });
-    process.disconnect();
   } catch (ex) {
     console.log(ex);
     process.send({

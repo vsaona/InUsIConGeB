@@ -28,13 +28,16 @@
   "homepage": "https://github.com/vsaona/InUsIConGeB#readme",
   "dependencies": {
     "@webcomponents/webcomponentsjs": "^2.5.0",
+    "axios": "^1.6.5",
     "body-parser": "^1.19.0",
+    "buffer": "^6.0.3",
     "colorsys": "^1.0.22",
     "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",
     "n-readlines": "^1.0.1",
-    "shelljs": "^0.8.4"
+    "shelljs": "^0.8.4",
+    "zlib": "^1.0.5"
   }
 }
